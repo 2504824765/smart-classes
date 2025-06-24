@@ -1,4 +1,4 @@
-package com.bnwzy.smartclassesspringbootweb.pojo.dto;
+package com.bnwzy.smartclassesspringbootweb.pojo;
 
 import org.springframework.http.HttpStatus;
 

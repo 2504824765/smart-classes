@@ -1,7 +1,9 @@
 package com.bnwzy.smartclassesspringbootweb.pojo;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "tb_teacher")
 public class Teacher {
@@ -9,6 +11,8 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @Column(name = "username")
+    private String username;
     @Column(name = "name")
     private String name;
     @Column(name = "gender")
@@ -17,35 +21,4 @@ public class Teacher {
     @JoinColumn(name = "department_id")
     private Department department;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
 }

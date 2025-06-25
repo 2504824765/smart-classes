@@ -1,8 +1,7 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.exception.TeacherAlreadyExistExcepction;
-import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
+import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Teacher;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.TeacherCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
@@ -35,7 +34,7 @@ public class TeacherService implements ITeacherService {
             teacherRepository.save(teacher);
             return teacher;
         }else{
-            throw new TeacherAlreadyExistExcepction("Teacher Already Exist");
+            throw new UserAlreadyExistException("User already exist");
         }
 
     }

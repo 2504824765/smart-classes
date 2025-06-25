@@ -1,9 +1,10 @@
 package com.bnwzy.smartclassesspringbootweb.controller;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
+import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentCreateDTO;
-import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentLoginDTO;
-import com.bnwzy.smartclassesspringbootweb.service.impl.StudentService;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentUpdateDTO;
+import com.bnwzy.smartclassesspringbootweb.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,20 +14,35 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/student")
 public class StudentController {
     @Autowired
-    private StudentService studentService;
-
-    @PostMapping("/register")
-    public ResponseMessage register(@Validated @RequestBody StudentCreateDTO studentCreateDTO) {
-        return ResponseMessage.success("<Login Success>", studentService.registStudent(studentCreateDTO));
-    }
-
-    @PostMapping("/login")
-    public ResponseMessage login(@Validated @RequestBody StudentLoginDTO studentLoginDTO) {
-        return ResponseMessage.success("<Register successfully>", studentService.loginStudent(studentLoginDTO));
-    }
+    private IStudentService studentService;
 
     @GetMapping("/{id}")
-    public ResponseMessage getStudentById(@PathVariable Long id) {
+    public ResponseMessage getStudentById(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Get student by id successfully", studentService.getStudentById(id));
+    }
+
+    @PostMapping("/update")
+    public ResponseMessage updateStudent(@Validated @RequestBody StudentUpdateDTO studentUpdateDTO) {
+        return ResponseMessage.success("<Update student successfully", studentService.updateStudent(studentUpdateDTO));
+    }
+
+    @GetMapping("/getStudentByUsername/{username}")
+    public ResponseMessage getStudentByUsername(@PathVariable("username") String username) {
+        return ResponseMessage.success("<Get student successfully>", studentService.getStudentByUsername(username));
+    }
+
+    @GetMapping("/all")
+    public ResponseMessage getAllStudent() {
+        return ResponseMessage.success("<Get all students successfully>", studentService.getAllStudent());
+    }
+
+    @PostMapping("/add")
+    public ResponseMessage createStudent(@Validated @RequestBody StudentCreateDTO studentCreateDTO) {
+        return ResponseMessage.success("<Create student>", studentService.createStudent(studentCreateDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseMessage deleteStudent(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Delete Student", studentService.deleteStudent(id));
     }
 }

@@ -1,7 +1,11 @@
 package com.bnwzy.smartclassesspringbootweb.exceptionHandler;
 
+import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
+import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,10 +15,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(DepartmentNotFoundException.class)
+    public ResponseMessage departmentNotFoundException(Exception e, HttpServletRequest request) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(504, "<Department not found>", null);
+    }
+
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseMessage studentNotFountException(Exception e) {
         logger.error(e.getMessage());
-        return new ResponseMessage(501, "<Student Not Found>", null);
+        return new ResponseMessage(503, "<Student Not Found>", null);
+    }
+
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseMessage userAlreadyExistException(Exception e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(502, "<User Already Exist>", null);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseMessage userNotFoundException(Exception e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(501, "<User Not Found>", null);
     }
 
     @ExceptionHandler(Exception.class)

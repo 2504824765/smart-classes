@@ -2,14 +2,22 @@ package com.bnwzy.smartclassesspringbootweb.service;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentCreateDTO;
-import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentLoginDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentUpdateDTO;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface IStudentService {
-    Boolean registStudent(StudentCreateDTO studentCreateDTO);
-
-    Boolean loginStudent(StudentLoginDTO studentLoginDTO);
-
     Student getStudentById(Long id);
+
+    Student updateStudent(StudentUpdateDTO studentUpdateDTO);
+
+    Student getStudentByUsername(String username);
+
+    List<Student> getAllStudent();
+
+    Student createStudent(StudentCreateDTO studentCreateDTO);
+
+    boolean deleteStudent(Long id);
 }

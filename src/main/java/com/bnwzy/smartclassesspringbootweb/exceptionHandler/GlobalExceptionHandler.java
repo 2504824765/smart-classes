@@ -1,9 +1,6 @@
 package com.bnwzy.smartclassesspringbootweb.exceptionHandler;
 
-import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
-import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.*;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -14,6 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+
 
     @ExceptionHandler(DepartmentNotFoundException.class)
     public ResponseMessage departmentNotFoundException(Exception e, HttpServletRequest request) {

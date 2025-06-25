@@ -1,7 +1,6 @@
 package com.bnwzy.smartclassesspringbootweb.controller;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
-import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentService;

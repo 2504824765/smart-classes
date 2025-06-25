@@ -17,12 +17,12 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseMessage getStudentById(@PathVariable("id") Long id) {
-        return ResponseMessage.success("<Get student by id successfully", studentService.getStudentById(id));
+        return ResponseMessage.success("<Get student by id successfully>", studentService.getStudentById(id));
     }
 
     @PostMapping("/update")
     public ResponseMessage updateStudent(@Validated @RequestBody StudentUpdateDTO studentUpdateDTO) {
-        return ResponseMessage.success("<Update student successfully", studentService.updateStudent(studentUpdateDTO));
+        return ResponseMessage.success("<Update student successfully>", studentService.updateStudent(studentUpdateDTO));
     }
 
     @GetMapping("/getStudentByUsername/{username}")
@@ -42,6 +42,6 @@ public class StudentController {
 
     @DeleteMapping("/{id}")
     public ResponseMessage deleteStudent(@PathVariable("id") Long id) {
-        return ResponseMessage.success("<Delete Student", studentService.deleteStudent(id));
+        return ResponseMessage.success("<Delete Student>", studentService.deleteStudent(id));
     }
 }

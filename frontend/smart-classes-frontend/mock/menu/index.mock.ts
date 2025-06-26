@@ -65,7 +65,7 @@ export default [
                   id: 3,
                   type: 1,
                   parentId: 1,
-                  title: '工作台',
+                  title: '工作台1',
                   permissionList: [
                     {
                       id: 1,
@@ -84,7 +84,7 @@ export default [
                     }
                   ],
                   meta: {
-                    title: '工作台',
+                    title: '工作台1',
                     noCache: true
                   }
                 }
@@ -94,7 +94,7 @@ export default [
               path: '/external-link',
               component: '#',
               meta: {
-                title: '文档',
+                title: '学',
                 icon: 'vi-clarity:document-solid'
               },
               name: 'ExternalLink',

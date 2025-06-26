@@ -69,7 +69,6 @@ const schema = reactive<FormSchema[]>([
       style: {
         width: '100%'
       },
-      strength: true,
       placeholder: t('login.passwordPlaceholder')
     }
   },
@@ -85,35 +84,7 @@ const schema = reactive<FormSchema[]>([
       style: {
         width: '100%'
       },
-      strength: true,
       placeholder: t('login.passwordPlaceholder')
-    }
-  },
-  {
-    field: 'code',
-    label: t('login.code'),
-    colProps: {
-      span: 24
-    },
-    formItemProps: {
-      slots: {
-        default: (formData) => {
-          return (
-            <div class="w-[100%] flex">
-              <ElInput v-model={formData.code} placeholder={t('login.codePlaceholder')} />
-              <BaseButton
-                type="primary"
-                disabled={unref(getCodeLoading)}
-                class="ml-10px"
-                onClick={getCode}
-              >
-                {t('login.getCode')}
-                {unref(getCodeLoading) ? `(${unref(getCodeTime)})` : ''}
-              </BaseButton>
-            </div>
-          )
-        }
-      }
     }
   },
 
@@ -178,8 +149,33 @@ const schema = reactive<FormSchema[]>([
 
 const rules: FormRules = {
   username: [required()],
-  password: [required()],
-  check_password: [required()],
+  password: [
+    required(),
+    {
+      min: 8,
+      max: 20,
+      message: '密码长度必须在8到20个字符之间',
+      trigger: 'blur' // 触发时机（blur或change）
+    }
+  ],
+  check_password: [
+    required(),
+    {
+      validator: (rule, value, callback) => {
+        formMethods
+          .getFormData()
+          .then((formData) => {
+            if (value !== formData.password) {
+              callback(new Error('两次输入的密码不一致'))
+            } else {
+              callback()
+            }
+          })
+          .catch(() => callback())
+      },
+      trigger: 'blur'
+    }
+  ],
   code: [required()],
   iAgree: [required(), check()]
 }

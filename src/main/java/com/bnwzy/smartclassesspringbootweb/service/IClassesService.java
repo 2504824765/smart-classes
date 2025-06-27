@@ -20,4 +20,6 @@ public interface IClassesService {
     Classes getClassById(Long id);
 
     Classes getClassByName(String name);
+
+    Classes getClassByTeacherId(Long teacherId);
 }

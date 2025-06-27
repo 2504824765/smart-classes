@@ -97,4 +97,13 @@ public class ClassesService implements IClassesService {
             return classesRepository.findByName(name).get();
         }
     }
+
+    @Override
+    public Classes getClassByTeacherId(Long teacherId) {
+        if (!teacherRepository.findById(teacherId).isPresent()) {
+            throw new TeacherNotFoundException("Teacher not found");
+        } else {
+            return classesRepository.findById(teacherId).get();
+        }
+    }
 }

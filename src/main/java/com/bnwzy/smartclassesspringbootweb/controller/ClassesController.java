@@ -46,4 +46,9 @@ public class ClassesController {
         return ResponseMessage.success("<Get Class>", classesService.getClassByName(name));
     }
 
+    @GetMapping("/getClassByTeacher/{teacherId}")
+    public ResponseMessage getClassesByTeacherId(@PathVariable("teacherId") Long teacherId) {
+        return ResponseMessage.success("<Get Class>", classesService.getClassByTeacherId(teacherId));
+    }
+
 }

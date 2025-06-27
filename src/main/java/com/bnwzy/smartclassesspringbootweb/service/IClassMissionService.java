@@ -5,6 +5,8 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionUpdateDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface IClassMissionService {
     ClassMission createClassMission(ClassMissionCreateDTO classMissionCreateDTO);
@@ -12,4 +14,6 @@ public interface IClassMissionService {
     boolean deleteClassMission(Long id);
 
     ClassMission updateClassMission(ClassMissionUpdateDTO classMissionUpdateDTO);
+
+    List<ClassMission> getAllClassMission();
 }

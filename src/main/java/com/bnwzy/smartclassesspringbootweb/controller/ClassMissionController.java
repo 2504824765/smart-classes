@@ -5,6 +5,7 @@ import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,11 @@ public class ClassMissionController {
 
     @PostMapping("/update")
     public ResponseMessage updateClassMission(@Validated @RequestBody ClassMissionUpdateDTO classMissionUpdateDTO) {
-        return ResponseMessage.success("<Update class mission", classMissionService.updateClassMission(classMissionUpdateDTO));
+        return ResponseMessage.success("<Update class mission>", classMissionService.updateClassMission(classMissionUpdateDTO));
+    }
+
+    @GetMapping("/all")
+    public ResponseMessage getAllClassMission() {
+        return ResponseMessage.success("<Get all class missions>", classMissionService.getAllClassMission());
     }
 }

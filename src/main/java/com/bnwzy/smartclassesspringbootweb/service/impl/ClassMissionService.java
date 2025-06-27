@@ -12,6 +12,8 @@ import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ClassMissionService implements IClassMissionService {
     @Autowired
@@ -64,5 +66,11 @@ public class ClassMissionService implements IClassMissionService {
         classMission.setSubmit_method(classMissionUpdateDTO.getSubmitMethod());
         classMission.setScore(classMissionUpdateDTO.getScore());
         return classMissionRepository.save(classMission);
+    }
+
+    @Override
+    public List<ClassMission> getAllClassMission() {
+        List<ClassMission> classMissions = classMissionRepository.findAll();
+        return classMissions;
     }
 }

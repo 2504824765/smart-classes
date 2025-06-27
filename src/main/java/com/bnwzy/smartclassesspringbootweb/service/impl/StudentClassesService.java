@@ -12,6 +12,7 @@ import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentClassesService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,17 @@ public class StudentClassesService implements IStudentClassesService {
     public StudentClasses addClassRecord(StudentClassesCreateDTO studentClassesCreateDTO) {
         if(studentRepository.existsById(studentClassesCreateDTO.getSid())&&classesRepository.existsById(studentClassesCreateDTO.getCid())){
             StudentClasses studentClasses = new StudentClasses();
-            studentClasses.setClasses(classesRepository.getById(studentClassesCreateDTO.getCid()));
-            studentClasses.setStudent(studentRepository.getById(studentClassesCreateDTO.getSid()));
+            BeanUtils.copyProperties(studentClassesCreateDTO, studentClasses);
+            if (classesRepository.findById(studentClassesCreateDTO.getCid()).isPresent()){
+                studentClasses.setClasses(classesRepository.findById(studentClassesCreateDTO.getCid()).get());
+            } else {
+                throw new ClassesNotFoundException("<Classes not found>");
+            }
+            if (studentRepository.findById(studentClassesCreateDTO.getSid()).isPresent()){
+                studentClasses.setStudent(studentRepository.findById(studentClassesCreateDTO.getSid()).get());
+            } else {
+                throw new StudentNotFoundException("<Student not found>");
+            }
             studentClassesRepository.save(studentClasses);
             return studentClasses;
         }else{
@@ -92,8 +102,8 @@ public class StudentClassesService implements IStudentClassesService {
 
     @Override
     public StudentClasses getStudentClassesById(Long id) {
-        if(studentClassesRepository.existsById(id)){
-            return studentClassesRepository.getById(id);
+        if(studentClassesRepository.findById(id).isPresent()){
+            return studentClassesRepository.findById(id).get();
         }else{
             throw new StudentClassesNotFoundException("Student classes not found");
         }
@@ -107,7 +117,7 @@ public class StudentClassesService implements IStudentClassesService {
                 sc.add(studentClasses);
             }
         }
-        if(sc.size()>0){
+        if(!sc.isEmpty()){
             return sc;
         }
         else{
@@ -123,7 +133,7 @@ public class StudentClassesService implements IStudentClassesService {
                 sc.add(studentClasses);
             }
         }
-        if(sc.size()>0){
+        if(!sc.isEmpty()){
             return sc;
         }
         else{

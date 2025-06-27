@@ -19,7 +19,7 @@ public class Student {
     @JoinColumn(name = "dept_id")
     private Department department;
     @Column(name = "gpa")
-    private double gpa;
+    private Double gpa;
 
     public String getGender() {
         return gender;
@@ -29,11 +29,11 @@ public class Student {
         this.gender = gender;
     }
 
-    public double getGpa() {
+    public Double getGpa() {
         return gpa;
     }
 
-    public void setGpa(double gpa) {
+    public void setGpa(Double gpa) {
         this.gpa = gpa;
     }
 

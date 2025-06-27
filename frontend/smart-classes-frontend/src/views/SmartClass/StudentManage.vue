@@ -2,7 +2,7 @@
 import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
-import { getTableListApi } from '@/api/table'
+import { getStudentListApi } from '@/api/student'
 import { TableData } from '@/api/table/types'
 import { ref, h } from 'vue'
 import { ElTag } from 'element-plus'
@@ -57,7 +57,7 @@ const loading = ref(true)
 const tableDataList = ref<TableData[]>([])
 
 const getTableList = async (params?: Params) => {
-  const res = await getTableListApi(
+  const res = await getStudentListApi(
     params || {
       pageIndex: 1,
       pageSize: 10

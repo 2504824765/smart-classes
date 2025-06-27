@@ -16,4 +16,6 @@ public interface IClassesService {
     Classes updateClass(ClassesUpdateDTO classesUpdateDTO);
 
     List<Classes> getAllClasses();
+
+    Classes getClassById(Long id);
 }

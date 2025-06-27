@@ -79,4 +79,13 @@ public class ClassesService implements IClassesService {
         classesRepository.findAll().forEach(classesList::add);
         return classesList;
     }
+
+    @Override
+    public Classes getClassById(Long id) {
+        if (!classesRepository.findById(id).isPresent()) {
+            throw new ClassesNotFoundException("Class not found");
+        } else {
+            return classesRepository.findById(id).get();
+        }
+    }
 }

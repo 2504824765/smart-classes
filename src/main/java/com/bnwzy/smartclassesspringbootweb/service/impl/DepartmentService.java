@@ -31,4 +31,14 @@ public class DepartmentService implements IDepartmentService {
             return department;
         }
     }
+
+    @Override
+    public Boolean deleteDept(Long id) {
+        if (departmentRepository.findById(id).isPresent()) {
+            departmentRepository.deleteById(id);
+            return true;
+        } else {
+            throw new DepartmentNotFoundException("<Department not found>");
+        }
+    }
 }

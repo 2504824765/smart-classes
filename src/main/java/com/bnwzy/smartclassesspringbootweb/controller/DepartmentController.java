@@ -17,4 +17,9 @@ public class DepartmentController {
     public ResponseMessage addDepartment(@RequestBody DeptCreateDTO deptCreateDTO) {
         return ResponseMessage.success("<Create Department>", departmentService.createDept(deptCreateDTO));
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseMessage deleteDepartment(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Delete Dept", departmentService.deleteDept(id));
+    }
 }

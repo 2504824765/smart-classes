@@ -7,4 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IDepartmentService {
     Department createDept(DeptCreateDTO deptCreateDTO);
+
+    Boolean deleteDept(Long id);
 }

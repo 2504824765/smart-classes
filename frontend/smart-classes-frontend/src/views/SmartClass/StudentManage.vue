@@ -81,6 +81,7 @@ const actionFn = (data: any) => {
 
 <template>
   <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
+    <BaseButton type="primary" @click="getTableList" style="margin-bottom: 16px">刷新</BaseButton>
     <Table
       :columns="columns"
       :data="tableDataList"

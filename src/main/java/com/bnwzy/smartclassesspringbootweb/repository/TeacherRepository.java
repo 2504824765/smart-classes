@@ -1,6 +1,5 @@
 package com.bnwzy.smartclassesspringbootweb.repository;
 
-import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 

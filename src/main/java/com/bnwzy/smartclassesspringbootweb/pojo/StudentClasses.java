@@ -16,7 +16,7 @@ public class StudentClasses {
     @JoinColumn(name = "student_id")
     private Student student;
     @Column(name = "grade")
-    private Integer grade;
+    private Double grade;
 
     public Long getId() {
         return id;
@@ -26,11 +26,11 @@ public class StudentClasses {
         this.id = id;
     }
 
-    public Integer getGrade() {
+    public Double getGrade() {
         return grade;
     }
 
-    public void setGrade(Integer grade) {
+    public void setGrade(Double grade) {
         this.grade = grade;
     }
 

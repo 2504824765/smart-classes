@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(StudentClassesNotFoundException.class)
+    public ResponseMessage StudentClassesNotFoundException(Exception e, HttpServletRequest request) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(507, "<Teacher not found>", null);
+    }
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseMessage wrongPasswordException(Exception e) {
         logger.error(e.getMessage(), e);

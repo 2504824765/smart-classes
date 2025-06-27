@@ -10,6 +10,8 @@ import com.bnwzy.smartclassesspringbootweb.service.IDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DepartmentService implements IDepartmentService {
     @Autowired
@@ -59,5 +61,11 @@ public class DepartmentService implements IDepartmentService {
             departmentRepository.save(department);
             return department;
         }
+    }
+
+    @Override
+    public List<Department> getAllDept() {
+        List<Department> departmentList = departmentRepository.findAll();
+        return departmentList;
     }
 }

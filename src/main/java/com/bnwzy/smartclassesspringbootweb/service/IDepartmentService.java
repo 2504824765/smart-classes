@@ -5,6 +5,8 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptUpdateDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface IDepartmentService {
     Department createDept(DeptCreateDTO deptCreateDTO);
@@ -12,4 +14,6 @@ public interface IDepartmentService {
     Boolean deleteDept(Long id);
 
     Department updateDept(DeptUpdateDTO deptUpdateDTO);
+
+    List<Department> getAllDept();
 }

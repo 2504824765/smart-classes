@@ -29,4 +29,9 @@ public class DepartmentController {
     public ResponseMessage updateDepartment(@Validated @RequestBody DeptUpdateDTO deptUpdateDTO) {
         return ResponseMessage.success("<Update Dept>", departmentService.updateDept(deptUpdateDTO));
     }
+
+    @GetMapping("/all")
+    public ResponseMessage getAllDept() {
+        return ResponseMessage.success("<Get all dept", departmentService.getAllDept());
+    }
 }

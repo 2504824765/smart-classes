@@ -21,7 +21,15 @@ public class ClassMission {
     @Column(name = "deadline")
     private String deadline;
     @Column(name = "score")
-    private Integer score;
+    private Double score;
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
 
     public Integer getId() {
         return id;
@@ -61,14 +69,6 @@ public class ClassMission {
 
     public void setDeadline(String deadline) {
         this.deadline = deadline;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
     }
 
     public Classes getClasses() {

@@ -22,7 +22,7 @@ public class DepartmentController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseMessage deleteDepartment(@PathVariable("id") Long id) {
-        return ResponseMessage.success("<Delete Dept", departmentService.deleteDept(id));
+        return ResponseMessage.success("<Delete Dept>", departmentService.deleteDept(id));
     }
 
     @PostMapping("/update")

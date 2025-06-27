@@ -105,8 +105,8 @@ export default {
     small: '小'
   },
   login: {
-    welcome: '欢迎使用本系统',
-    message: '开箱即用的中后台管理系统',
+    welcome: '欢迎使用智慧课堂',
+    message: 'AI教与学，点亮每一课',
     username: '用户名',
     password: '密码',
     register: '注册',
@@ -132,9 +132,9 @@ export default {
     menu12: '菜单1-2',
     menu2: '菜单2',
     dashboard: '首页',
-    analysis: '分析页',
-    workplace: '工作台',
-    guide: '引导',
+    classManage: '班级管理',
+    studentManage: '学生管理',
+    task: '任务',
     component: '组件',
     icon: '图标',
     echart: '图表',
@@ -430,6 +430,12 @@ export default {
     sticky: '黏性'
   },
   tableDemo: {
+    name: '姓名',
+    gender: '性别',
+    class: '班级',
+    gpa: '绩点',
+    dept: '所在组织',
+    id: '学号',
     table: '表格',
     tableDes: '基于 ElementPlus 的 Table 组件二次封装',
     index: '序号',
@@ -556,6 +562,22 @@ export default {
     activeMenu: '高亮菜单',
     canTo: '是否可跳转',
     name: '组件名称'
+  },
+  task: {
+    id: '编号',
+    cid: '课程编号',
+    type: '类型',
+    description: '说明',
+    deadline: '截止时间',
+    submit_method: '提交方式',
+    score: '得分'
+  },
+  student: {
+    id: '学号',
+    name: '姓名',
+    gender: '性别',
+    dept: '所在部门',
+    gpa: '绩点'
   },
   role: {
     roleName: '角色名称',

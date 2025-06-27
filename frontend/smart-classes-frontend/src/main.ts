@@ -1,5 +1,9 @@
 import 'vue/jsx'
 
+import ElementPlus from 'element-plus'
+
+import 'element-plus/dist/index.css'
+
 // 引入windi css
 import '@/plugins/unocss'
 
@@ -53,6 +57,7 @@ const setupAll = async () => {
   setupPermission(app)
 
   app.mount('#app')
+  app.use(ElementPlus)
 }
 
 setupAll()

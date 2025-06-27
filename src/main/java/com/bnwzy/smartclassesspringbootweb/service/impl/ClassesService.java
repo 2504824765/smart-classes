@@ -88,4 +88,13 @@ public class ClassesService implements IClassesService {
             return classesRepository.findById(id).get();
         }
     }
+
+    @Override
+    public Classes getClassByName(String name) {
+        if (!classesRepository.findByName(name).isPresent()) {
+            throw new ClassesNotFoundException("Class not found");
+        } else {
+            return classesRepository.findByName(name).get();
+        }
+    }
 }

@@ -41,4 +41,9 @@ public class ClassesController {
         return ResponseMessage.success("<Get Class>", classesService.getClassById(id));
     }
 
+    @GetMapping("/getClassByName/{name}")
+    public ResponseMessage getClassesByName(@PathVariable("name") String name) {
+        return ResponseMessage.success("<Get Class>", classesService.getClassByName(name));
+    }
+
 }

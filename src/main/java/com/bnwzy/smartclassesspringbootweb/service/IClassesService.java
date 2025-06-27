@@ -18,4 +18,6 @@ public interface IClassesService {
     List<Classes> getAllClasses();
 
     Classes getClassById(Long id);
+
+    Classes getClassByName(String name);
 }

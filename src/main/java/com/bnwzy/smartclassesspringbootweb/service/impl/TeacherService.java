@@ -36,8 +36,7 @@ public class TeacherService implements ITeacherService {
             }else{
                 throw new DepartmentNotFoundException("Department not found");
             }
-            teacherRepository.save(teacher);
-            return teacher;
+            return teacherRepository.save(teacher);
         }else{
             throw new UserAlreadyExistException("User already exist");
         }

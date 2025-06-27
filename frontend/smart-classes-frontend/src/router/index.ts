@@ -96,17 +96,17 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         component: () => import('@/views/Dashboard/Analysis.vue'),
         name: 'Analysis',
         meta: {
-          title: t('router.analysis'),
+          title: t('router.classManage'),
           noCache: true,
           affix: true
         }
       },
       {
-        path: 'workplace',
-        component: () => import('@/views/Dashboard/Workplace.vue'),
-        name: 'Workplace',
+        path: 'studentManage',
+        component: () => import('@/views/SmartClass/StudentManage.vue'),
+        name: 'StudentManage',
         meta: {
-          title: t('router.workplace'),
+          title: t('router.studentManage'),
           noCache: true
         }
       }
@@ -136,10 +136,10 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/Guide/Guide.vue'),
-        name: 'GuideDemo',
+        component: () => import('@/views/SmartClass/Task.vue'),
+        name: 'Task',
         meta: {
-          title: t('router.guide'),
+          title: t('router.task'),
           icon: 'vi-cib:telegram-plane'
         }
       }

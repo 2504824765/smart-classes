@@ -31,4 +31,9 @@ public class ClassesController {
         return ResponseMessage.success("<Update Class>", classesService.updateClass(classesUpdateDTO));
     }
 
+    @GetMapping("/all")
+    public ResponseMessage getAllClasses() {
+        return ResponseMessage.success("<Get all Classes>", classesService.getAllClasses());
+    }
+
 }

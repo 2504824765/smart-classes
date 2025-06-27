@@ -36,7 +36,12 @@ public class DepartmentController {
     }
 
     @GetMapping("/getDeptById/{id}")
-    public ResponseMessage getDeptById(@PathVariable Long id) {
-        return ResponseMessage.success("<Get Dept by id", departmentService.getDeptById(id));
+    public ResponseMessage getDeptById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get Dept by id>", departmentService.getDeptById(id));
+    }
+
+    @GetMapping("/getDeptByName/{name}")
+    public ResponseMessage getDeptByName(@PathVariable("name") String name) {
+        return ResponseMessage.success("<Get Dept by name>", departmentService.getDeptByName(name));
     }
 }

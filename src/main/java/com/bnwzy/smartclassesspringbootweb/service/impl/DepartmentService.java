@@ -77,4 +77,13 @@ public class DepartmentService implements IDepartmentService {
             return departmentRepository.findById(id).get();
         }
     }
+
+    @Override
+    public Department getDeptByName(String name) {
+        if (!departmentRepository.findByName(name).isPresent()) {
+            throw new DepartmentNotFoundException("<Department not found>");
+        } else {
+            return departmentRepository.findByName(name).get();
+        }
+    }
 }

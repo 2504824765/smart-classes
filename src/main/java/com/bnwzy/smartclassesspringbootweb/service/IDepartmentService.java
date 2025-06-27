@@ -18,4 +18,6 @@ public interface IDepartmentService {
     List<Department> getAllDept();
 
     Department getDeptById(Long id);
+
+    Department getDeptByName(String name);
 }

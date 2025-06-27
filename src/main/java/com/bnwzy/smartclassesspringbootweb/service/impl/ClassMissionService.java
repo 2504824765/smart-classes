@@ -5,6 +5,7 @@ import com.bnwzy.smartclassesspringbootweb.exception.ClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.Classes;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
@@ -44,5 +45,24 @@ public class ClassMissionService implements IClassMissionService {
         } else {
             throw new ClassMissionNotFoundException("<Class mission not found>");
         }
+    }
+
+    @Override
+    public ClassMission updateClassMission(ClassMissionUpdateDTO classMissionUpdateDTO) {
+        if (!classMissionRepository.findById(classMissionUpdateDTO.getId()).isPresent()) {
+            throw new ClassMissionNotFoundException("<Class mission not found>");
+        }
+        ClassMission classMission = classMissionRepository.findById(classMissionUpdateDTO.getId()).get();
+        if (!classesRepository.findById(classMissionUpdateDTO.getCid()).isPresent()) {
+            throw new ClassesNotFoundException("<Class not found>");
+        } else {
+            classMission.setClasses(classesRepository.findById(classMissionUpdateDTO.getCid()).get());
+        }
+        classMission.setType(classMissionUpdateDTO.getType());
+        classMission.setDescription(classMissionUpdateDTO.getDescription());
+        classMission.setDeadline(classMissionUpdateDTO.getDeadline());
+        classMission.setSubmit_method(classMissionUpdateDTO.getSubmitMethod());
+        classMission.setScore(classMissionUpdateDTO.getScore());
+        return classMissionRepository.save(classMission);
     }
 }

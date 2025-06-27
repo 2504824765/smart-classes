@@ -3,6 +3,7 @@ package com.bnwzy.smartclassesspringbootweb.controller;
 import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -23,5 +24,10 @@ public class ClassMissionController {
     @DeleteMapping("/delete/{id}")
     public ResponseMessage deleteClassMission(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Delete class mission>", classMissionService.deleteClassMission(id));
+    }
+
+    @PostMapping("/update")
+    public ResponseMessage updateClassMission(@Validated @RequestBody ClassMissionUpdateDTO classMissionUpdateDTO) {
+        return ResponseMessage.success("<Update class mission", classMissionService.updateClassMission(classMissionUpdateDTO));
     }
 }

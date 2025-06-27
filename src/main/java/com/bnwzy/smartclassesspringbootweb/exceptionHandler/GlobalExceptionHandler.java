@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-
+    @ExceptionHandler(TeacherNotFoundException.class)
+    public ResponseMessage teacherNotFoundException(Exception e, HttpServletRequest request) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(505, "<Teacher not found>", null);
+    }
 
     @ExceptionHandler(DepartmentNotFoundException.class)
     public ResponseMessage departmentNotFoundException(Exception e, HttpServletRequest request) {
@@ -43,4 +47,6 @@ public class GlobalExceptionHandler {
         logger.error(e.getMessage(), e); // 查看日志查看具体异常
         return new ResponseMessage(500, "Unknown exception", null);
     }
+
+
 }

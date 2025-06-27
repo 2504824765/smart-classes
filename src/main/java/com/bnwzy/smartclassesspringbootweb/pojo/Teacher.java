@@ -17,8 +17,8 @@ public class Teacher {
     private String name;
     @Column(name = "gender")
     private String gender;
-    @OneToOne
-    @JoinColumn(name = "department_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "department_id", foreignKey = @ForeignKey(name = "FK_teacher_department"))
     private Department department;
 
 }

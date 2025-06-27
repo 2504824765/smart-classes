@@ -53,11 +53,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.kingbase</groupId>
-            <artifactId>kingbase8</artifactId>
-            <version>9.0.0</version>
-        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -65,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>com.kingbase</groupId>
-            <artifactId>kingbase8</artifactId>
+            <artifactId>kingbase</artifactId>
             <version>9.0.0</version>
         </dependency>
         <dependency>

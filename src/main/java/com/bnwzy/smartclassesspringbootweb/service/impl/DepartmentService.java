@@ -33,7 +33,7 @@ public class DepartmentService implements IDepartmentService {
             else if (departmentRepository.findById(deptCreateDTO.getParentId()).isPresent()) {
                 Department parentDepartment = departmentRepository.findById(deptCreateDTO.getParentId()).get();
                 // 如果选择的父组织不是上一级组织
-                if (parentDepartment.getDepartmentLevel() != deptCreateDTO.getDepartmentLevel() + 1) {
+                if (parentDepartment.getDepartmentLevel() != deptCreateDTO.getDepartmentLevel() - 1) {
                     throw new IlligalParentDeptException("<Target department is not parentDepartment>");
                 } else {
                     department.setParentId(deptCreateDTO.getParentId());
@@ -62,10 +62,20 @@ public class DepartmentService implements IDepartmentService {
             throw new DepartmentNotFoundException("<Department not found>");
         } else {
             Department department = departmentRepository.findById(deptUpdateDTO.getParentId()).get();
-            if (!departmentRepository.findById(deptUpdateDTO.getParentId()).isPresent()) {
+            // 判断是否是顶级组织
+            if (deptUpdateDTO.getDepartmentLevel() == 0) {
+                department.setParentId((long) 0);
+            }
+            // 判断目标父组织存不存在
+            else if (!departmentRepository.findById(deptUpdateDTO.getParentId()).isPresent()) {
                 throw new DepartmentNotFoundException("<Parent department not found>");
             } else {
-                department.setParentId(deptUpdateDTO.getParentId());
+                // 如果存在，判断是否为上一级
+                if (!deptUpdateDTO.getDepartmentLevel().equals(department.getDepartmentLevel() - 1)) {
+                    throw new IlligalParentDeptException("<Target department is not parentDepartment>");
+                } else {
+                    department.setParentId(deptUpdateDTO.getParentId());
+                }
             }
             department.setName(deptUpdateDTO.getName());
             department.setDepartmentLevel(deptUpdateDTO.getDepartmentLevel());

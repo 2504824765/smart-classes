@@ -2,6 +2,7 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.WrongPasswordException;
 import com.bnwzy.smartclassesspringbootweb.pojo.User;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.UserChangePasswordDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.UserLoginDTO;
@@ -26,7 +27,11 @@ public class UserService implements IUserService {
             throw new UserNotFoundException("<User not found>");
         } else {
             User user = userRepository.findByUsername(userLoginDTO.getUsername()).get();
-            return user.getPassword().equals(userLoginDTO.getPassword());
+            if (user.getPassword().equals(userLoginDTO.getPassword()) == true) {
+                return true;
+            } else {
+                throw new WrongPasswordException("<Wrong Password>");
+            }
         }
     }
 

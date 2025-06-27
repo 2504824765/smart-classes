@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>com.kingbase</groupId>
-            <artifactId>kingbase</artifactId>
+            <artifactId>kingbase8</artifactId>
             <version>9.0.0</version>
         </dependency>
         <dependency>

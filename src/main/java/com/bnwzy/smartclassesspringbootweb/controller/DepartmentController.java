@@ -32,6 +32,11 @@ public class DepartmentController {
 
     @GetMapping("/all")
     public ResponseMessage getAllDept() {
-        return ResponseMessage.success("<Get all dept", departmentService.getAllDept());
+        return ResponseMessage.success("<Get all dept>", departmentService.getAllDept());
+    }
+
+    @GetMapping("/getDeptById/{id}")
+    public ResponseMessage getDeptById(@PathVariable Long id) {
+        return ResponseMessage.success("<Get Dept by id", departmentService.getDeptById(id));
     }
 }

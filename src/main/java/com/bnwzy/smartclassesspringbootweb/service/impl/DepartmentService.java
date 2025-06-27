@@ -68,4 +68,13 @@ public class DepartmentService implements IDepartmentService {
         List<Department> departmentList = departmentRepository.findAll();
         return departmentList;
     }
+
+    @Override
+    public Department getDeptById(Long id) {
+        if (!departmentRepository.findById(id).isPresent()) {
+            throw new DepartmentNotFoundException("<Department not found>");
+        } else {
+            return departmentRepository.findById(id).get();
+        }
+    }
 }

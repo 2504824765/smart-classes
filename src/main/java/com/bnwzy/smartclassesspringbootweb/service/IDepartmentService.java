@@ -16,4 +16,6 @@ public interface IDepartmentService {
     Department updateDept(DeptUpdateDTO deptUpdateDTO);
 
     List<Department> getAllDept();
+
+    Department getDeptById(Long id);
 }

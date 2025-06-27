@@ -2,8 +2,10 @@ package com.bnwzy.smartclassesspringbootweb.controller;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
@@ -14,12 +16,17 @@ public class DepartmentController {
     private IDepartmentService departmentService;
 
     @PostMapping("/add")
-    public ResponseMessage addDepartment(@RequestBody DeptCreateDTO deptCreateDTO) {
+    public ResponseMessage addDepartment(@Validated @RequestBody DeptCreateDTO deptCreateDTO) {
         return ResponseMessage.success("<Create Department>", departmentService.createDept(deptCreateDTO));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseMessage deleteDepartment(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Delete Dept", departmentService.deleteDept(id));
+    }
+
+    @PostMapping("/update")
+    public ResponseMessage updateDepartment(@Validated @RequestBody DeptUpdateDTO deptUpdateDTO) {
+        return ResponseMessage.success("<Update Dept>", departmentService.updateDept(deptUpdateDTO));
     }
 }

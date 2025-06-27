@@ -4,6 +4,7 @@ import com.bnwzy.smartclassesspringbootweb.exception.DepartmentAlreadyExistExcep
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Department;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,24 @@ public class DepartmentService implements IDepartmentService {
             return true;
         } else {
             throw new DepartmentNotFoundException("<Department not found>");
+        }
+    }
+
+    @Override
+    public Department updateDept(DeptUpdateDTO deptUpdateDTO) {
+        if (!departmentRepository.findById(deptUpdateDTO.getParentId()).isPresent()) {
+            throw new DepartmentNotFoundException("<Department not found>");
+        } else {
+            Department department = departmentRepository.findById(deptUpdateDTO.getParentId()).get();
+            if (!departmentRepository.findById(deptUpdateDTO.getParentId()).isPresent()) {
+                throw new DepartmentNotFoundException("<Parent department not found>");
+            } else {
+                department.setParentId(deptUpdateDTO.getParentId());
+            }
+            department.setName(deptUpdateDTO.getName());
+            department.setDepartmentLevel(deptUpdateDTO.getDepartmentLevel());
+            departmentRepository.save(department);
+            return department;
         }
     }
 }

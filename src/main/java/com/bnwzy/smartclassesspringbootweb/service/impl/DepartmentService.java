@@ -57,30 +57,30 @@ public class DepartmentService implements IDepartmentService {
     }
 
     @Override
-    public Department updateDept(DeptUpdateDTO deptUpdateDTO) {
-        if (!departmentRepository.findById(deptUpdateDTO.getParentId()).isPresent()) {
+    public Department updateDept(DeptUpdateDTO newDeptDTO) {
+        if (!departmentRepository.findById(newDeptDTO.getId()).isPresent()) {
             throw new DepartmentNotFoundException("<Department not found>");
         } else {
-            Department department = departmentRepository.findById(deptUpdateDTO.getParentId()).get();
+            Department oldDepartment = departmentRepository.findById(newDeptDTO.getId()).get();
             // 判断是否是顶级组织
-            if (deptUpdateDTO.getDepartmentLevel() == 0) {
-                department.setParentId((long) 0);
+            if (newDeptDTO.getDepartmentLevel() == 0) {
+                oldDepartment.setParentId((long) 0);
             }
             // 判断目标父组织存不存在
-            else if (!departmentRepository.findById(deptUpdateDTO.getParentId()).isPresent()) {
-                throw new DepartmentNotFoundException("<Parent department not found>");
+            else if (!departmentRepository.findById(newDeptDTO.getParentId()).isPresent()) {
+                throw new DepartmentNotFoundException("<Parent oldDepartment not found>");
             } else {
                 // 如果存在，判断是否为上一级
-                if (!deptUpdateDTO.getDepartmentLevel().equals(department.getDepartmentLevel() - 1)) {
-                    throw new IlligalParentDeptException("<Target department is not parentDepartment>");
+                Department parentDepartment = departmentRepository.findById(newDeptDTO.getParentId()).get();
+                if (!newDeptDTO.getDepartmentLevel().equals(parentDepartment.getDepartmentLevel() + 1)) {
+                    throw new IlligalParentDeptException("<Target oldDepartment is not parentDepartment>");
                 } else {
-                    department.setParentId(deptUpdateDTO.getParentId());
+                    oldDepartment.setParentId(newDeptDTO.getParentId());
                 }
             }
-            department.setName(deptUpdateDTO.getName());
-            department.setDepartmentLevel(deptUpdateDTO.getDepartmentLevel());
-            departmentRepository.save(department);
-            return department;
+            oldDepartment.setName(newDeptDTO.getName());
+            oldDepartment.setDepartmentLevel(newDeptDTO.getDepartmentLevel());
+            return departmentRepository.save(oldDepartment);
         }
     }
 

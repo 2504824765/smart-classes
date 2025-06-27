@@ -25,7 +25,7 @@ public class DepartmentController {
         return ResponseMessage.success("<Delete Dept", departmentService.deleteDept(id));
     }
 
-    @PostMapping("/update")
+        @PostMapping("/update")
     public ResponseMessage updateDepartment(@Validated @RequestBody DeptUpdateDTO deptUpdateDTO) {
         return ResponseMessage.success("<Update Dept>", departmentService.updateDept(deptUpdateDTO));
     }

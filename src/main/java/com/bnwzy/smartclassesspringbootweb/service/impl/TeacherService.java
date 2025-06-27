@@ -12,6 +12,9 @@ import com.bnwzy.smartclassesspringbootweb.service.ITeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class TeacherService implements ITeacherService {
 
@@ -48,7 +51,8 @@ public class TeacherService implements ITeacherService {
             teacher.setGender(teacherUpdateDTO.getGender());
             if(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).isPresent()){
                 teacher.setDepartment(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).get());
-                return teacherRepository.save(teacher);
+                teacherRepository.save(teacher);
+                return teacher;
             }
             else{
                 throw new DepartmentNotFoundException("Department not found");
@@ -66,5 +70,32 @@ public class TeacherService implements ITeacherService {
         }else{
             throw new TeacherNotFoundException("Teacher not found");
         }
+    }
+
+    @Override
+    public Teacher getTeacherById(Long id) {
+        if (teacherRepository.existsById(id)) {
+            return teacherRepository.findById(id).get();
+        }else{
+            throw new TeacherNotFoundException("Teacher not fount");
+        }
+    }
+
+    @Override
+    public Teacher getTeacherByUsername(String username) {
+        if(teacherRepository.findByUsername(username).isPresent()){
+            return teacherRepository.findByUsername(username).get();
+        }else{
+            throw new TeacherNotFoundException("Teacher not found");
+        }
+    }
+
+    @Override
+    public List<Teacher> getAllTeacher() {
+        List<Teacher> teacherList=new ArrayList<>();
+        for (Teacher teacher : teacherRepository.findAll()) {
+            teacherList.add(teacher);
+        }
+        return teacherList;
     }
 }

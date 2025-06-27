@@ -563,6 +563,22 @@ export default {
     canTo: '是否可跳转',
     name: '组件名称'
   },
+  task: {
+    id: '编号',
+    cid: '课程编号',
+    type: '类型',
+    description: '说明',
+    deadline: '截止时间',
+    submit_method: '提交方式',
+    score: '得分'
+  },
+  student: {
+    id: '学号',
+    name: '姓名',
+    gender: '性别',
+    dept: '所在部门',
+    gpa: '绩点'
+  },
   role: {
     roleName: '角色名称',
     role: '角色',

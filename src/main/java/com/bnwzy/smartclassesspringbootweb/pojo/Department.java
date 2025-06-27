@@ -13,8 +13,8 @@ public class Department {
     private String name;
     @Column(name = "parent_id")
     private Long parentId;
-    @Column(name = "level")
-    private Integer level;
+    @Column(name = "department_level")
+    private Integer departmentLevel;
 
     public Long getId() {
         return id;
@@ -40,11 +40,11 @@ public class Department {
         this.parentId = parentId;
     }
 
-    public Integer getLevel() {
-        return level;
+    public Integer getDepartmentLevel() {
+        return departmentLevel;
     }
 
-    public void setLevel(Integer level) {
-        this.level = level;
+    public void setDepartmentLevel(Integer departmentLevel) {
+        this.departmentLevel = departmentLevel;
     }
 }

@@ -15,9 +15,19 @@ public class Classes {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
     @Column(name = "credit")
-    private Integer credit;
+    private double credit;
     @Column(name = "classHours")
-    private Integer classHours;
+    private double classHours;
+    @Column(name = "graph")
+    private String graph;
+
+    public String getGraph() {
+        return graph;
+    }
+
+    public void setGraph(String graph) {
+        this.graph = graph;
+    }
 
     public int getId() {
         return id;
@@ -35,27 +45,27 @@ public class Classes {
         this.name = name;
     }
 
-    public Integer getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Integer credit) {
-        this.credit = credit;
-    }
-
-    public Integer getClassHours() {
-        return classHours;
-    }
-
-    public void setClassHours(Integer classHours) {
-        this.classHours = classHours;
-    }
-
     public Teacher getTeacher() {
         return teacher;
     }
 
     public void setTeacher(Teacher teacher) {
         this.teacher = teacher;
+    }
+
+    public double getCredit() {
+        return credit;
+    }
+
+    public void setCredit(double credit) {
+        this.credit = credit;
+    }
+
+    public double getClassHours() {
+        return classHours;
+    }
+
+    public void setClassHours(double classHours) {
+        this.classHours = classHours;
     }
 }

@@ -18,24 +18,24 @@ const { t } = useI18n()
 const columns: TableColumn[] = [
   {
     field: 'id',
-    label: t('tableDemo.id')
+    label: t('student.id')
   },
   {
     field: 'name',
-    label: t('tableDemo.name')
+    label: t('student.name')
   },
   {
     field: 'gender',
-    label: t('tableDemo.gender')
+    label: t('student.gender')
   },
   {
     field: 'dept',
-    label: t('tableDemo.dept'),
+    label: t('student.dept'),
     sortable: true
   },
   {
     field: 'gpa',
-    label: t('tableDemo.gpa')
+    label: t('student.gpa')
   },
   {
     field: 'action',

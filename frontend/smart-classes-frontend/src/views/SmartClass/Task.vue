@@ -1,122 +1,99 @@
-<template>
-  <div>
-    <h2 style="margin-bottom: 20px">教学任务管理</h2>
-    <!-- 筛选表单 -->
-    <el-form :inline="true" :model="searchForm" class="mb-20px">
-      <el-form-item label="任务名称">
-        <el-input v-model="searchForm.taskName" placeholder="请输入任务名称" />
-      </el-form-item>
-      <el-form-item label="班级">
-        <el-input v-model="searchForm.className" placeholder="请输入班级" />
-      </el-form-item>
-      <el-form-item label="教师ID">
-        <el-input v-model="searchForm.teacherId" placeholder="请输入教师ID" style="width: 150px" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
-        <el-button @click="handleReset">重置</el-button>
-      </el-form-item>
-    </el-form>
+<script setup lang="tsx">
+import { ContentWrap } from '@/components/ContentWrap'
+import { useI18n } from '@/hooks/web/useI18n'
+import { Table, TableColumn } from '@/components/Table'
+import { getTableListApi } from '@/api/table'
+import { TableData } from '@/api/table/types'
+import { ref, h } from 'vue'
+import { ElTag } from 'element-plus'
+import { BaseButton } from '@/components/Button'
 
-    <!-- 按钮区 -->
-    <div class="mb-10px">
-      <el-button type="primary">新 增</el-button>
-      <el-button type="success">修改</el-button>
-      <el-button type="danger">删除</el-button>
-      <el-button type="warning">导出</el-button>
-    </div>
+interface Params {
+  pageIndex?: number
+  pageSize?: number
+}
 
-    <!-- 表格 -->
-    <el-table :data="taskList" border style="width: 100%">
-      <el-table-column type="selection" width="50" />
-      <el-table-column prop="id" label="ID" width="60" />
-      <el-table-column prop="taskName" label="任务名称" min-width="200" />
-      <el-table-column prop="className" label="班级" width="120" />
-      <el-table-column prop="teacherId" label="教师ID" width="100" />
-      <el-table-column label="操作" width="120">
-        <template #default="scope">
-          <el-link type="primary" @click="editTask(scope.row)">修改</el-link>
-          <el-link type="danger" @click="deleteTask(scope.row)" style="margin-left: 10px">
-            删除
-          </el-link>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
-</template>
-
-<script setup>
-import { ref } from 'vue'
-
-const searchForm = ref({
-  taskName: '',
-  className: '',
-  teacherId: ''
-})
-
-const taskList = ref([
+const { t } = useI18n()
+//| 编号(id) | 课程编号(cid) | 类型(type)| 说明(description) | 截止时间(deadline，varchar(100)) | 提交方式(submit_method) | 得分(score)
+const columns: TableColumn[] = [
   {
-    id: 1,
-    taskName: '2022-2023学年春季Python与数据分析一',
-    className: '软件2201',
-    teacherId: 1
+    field: 'id',
+    label: t('task.id')
   },
   {
-    id: 2,
-    taskName: '2022-2023学年春季Python与数据分析二',
-    className: '软件2202',
-    teacherId: 2
+    field: 'cid',
+    label: t('task.cid')
   },
   {
-    id: 3,
-    taskName: '2022-2023学年秋季自然语言处理一',
-    className: '软件2203',
-    teacherId: 1
+    field: 'type',
+    label: t('task.type')
   },
   {
-    id: 4,
-    taskName: '2022-2023学年秋季自然语言处理二',
-    className: '软件2204',
-    teacherId: 2
+    field: 'description',
+    label: t('task.description'),
+    sortable: true
   },
   {
-    id: 5,
-    taskName: '2024-2025学年春季工程伦理学',
-    className: '软件2205',
-    teacherId: 3
+    field: 'deadline',
+    label: t('task.deadline')
   },
   {
-    id: 7,
-    taskName: '2027-2028学年春季Python与数据分析一',
-    className: '软件2307',
-    teacherId: 7
+    field: 'submit_method',
+    label: t('task.submit_method')
+  },
+  {
+    field: 'score',
+    label: t('task.score')
+  },
+  {
+    field: 'action',
+    label: t('tableDemo.action'),
+    slots: {
+      default: (data) => {
+        return (
+          <BaseButton type="primary" onClick={() => actionFn(data)}>
+            {t('tableDemo.action')}
+          </BaseButton>
+        )
+      }
+    }
   }
-])
+]
 
-function handleSearch() {
-  // 这里可以添加实际的搜索逻辑
+const loading = ref(true)
+
+const tableDataList = ref<TableData[]>([])
+
+const getTableList = async (params?: Params) => {
+  const res = await getTableListApi(
+    params || {
+      pageIndex: 1,
+      pageSize: 10
+    }
+  )
+    .catch(() => {})
+    .finally(() => {
+      loading.value = false
+    })
+  if (res) {
+    tableDataList.value = res.data.list
+  }
 }
 
-function handleReset() {
-  searchForm.value = { taskName: '', className: '', teacherId: '' }
-}
+getTableList()
 
-function editTask(row) {
-  // 编辑任务逻辑
-  alert('编辑任务：' + row.taskName)
-}
-
-function deleteTask(row) {
-  // 删除任务逻辑
-  alert('删除任务：' + row.taskName)
+const actionFn = (data: any) => {
+  console.log(data)
 }
 </script>
 
-<style scoped>
-.mb-10px {
-  margin-bottom: 10px;
-}
-.mb-20px {
-  margin-bottom: 20px;
-}
-</style>
+<template>
+  <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
+    <Table
+      :columns="columns"
+      :data="tableDataList"
+      :loading="loading"
+      :defaultSort="{ prop: 'display_time', order: 'descending' }"
+    />
+  </ContentWrap>
+</template>

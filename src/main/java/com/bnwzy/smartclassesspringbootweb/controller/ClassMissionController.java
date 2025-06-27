@@ -1,11 +1,9 @@
 package com.bnwzy.smartclassesspringbootweb.controller;
 
-import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +33,10 @@ public class ClassMissionController {
     @GetMapping("/all")
     public ResponseMessage getAllClassMission() {
         return ResponseMessage.success("<Get all class missions>", classMissionService.getAllClassMission());
+    }
+
+    @GetMapping("/getClassMissionByCid/{cid}")
+    public ResponseMessage getClassMissionByCid(@PathVariable("cid") Long cid) {
+        return ResponseMessage.success("<Get class mission>", classMissionService.getCLassMissionByCid(cid));
     }
 }

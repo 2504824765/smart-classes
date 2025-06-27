@@ -12,6 +12,7 @@ import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -72,5 +73,10 @@ public class ClassMissionService implements IClassMissionService {
     public List<ClassMission> getAllClassMission() {
         List<ClassMission> classMissions = classMissionRepository.findAll();
         return classMissions;
+    }
+
+    @Override
+    public List<ClassMission> getCLassMissionByCid(Long cid) {
+        return classMissionRepository.findByClasses_Id(cid);
     }
 }

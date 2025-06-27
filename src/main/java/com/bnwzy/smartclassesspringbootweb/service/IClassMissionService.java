@@ -16,4 +16,6 @@ public interface IClassMissionService {
     ClassMission updateClassMission(ClassMissionUpdateDTO classMissionUpdateDTO);
 
     List<ClassMission> getAllClassMission();
+
+    List<ClassMission> getCLassMissionByCid(Long cid);
 }

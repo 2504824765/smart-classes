@@ -1,5 +1,6 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
+import com.bnwzy.smartclassesspringbootweb.exception.ClassMissionNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.ClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.Classes;
@@ -33,5 +34,15 @@ public class ClassMissionService implements IClassMissionService {
         classMission.setSubmit_method(classMissionCreateDTO.getSubmitMethod());
         classMission.setScore(classMissionCreateDTO.getScore());
         return classMissionRepository.save(classMission);
+    }
+
+    @Override
+    public boolean deleteClassMission(Long id) {
+        if (classMissionRepository.findById(id).isPresent()) {
+            classMissionRepository.deleteById(id);
+            return true;
+        } else {
+            throw new ClassMissionNotFoundException("<Class mission not found>");
+        }
     }
 }

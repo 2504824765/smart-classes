@@ -11,6 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ResourceService implements IResourceService {
     @Autowired
@@ -48,5 +50,11 @@ public class ResourceService implements IResourceService {
             resource.setType(resourceUpdateDTO.getType());
             return resourceRepository.save(resource);
         }
+    }
+
+    @Override
+    public List<Resource> getAllResource() {
+        List<Resource> resourceList = resourceRepository.findAll();
+        return resourceList;
     }
 }

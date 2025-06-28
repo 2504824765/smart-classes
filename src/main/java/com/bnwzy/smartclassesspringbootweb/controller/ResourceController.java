@@ -29,4 +29,9 @@ public class ResourceController {
     public ResponseMessage updateResource(@Validated @RequestBody ResourceUpdateDTO resourceUpdateDTO) {
         return ResponseMessage.success("<Update resource>", resourceService.updateResource(resourceUpdateDTO));
     }
+
+    @GetMapping("/all")
+    public ResponseMessage getAllResource() {
+        return ResponseMessage.success("<Get all resources", resourceService.getAllResource());
+    }
 }

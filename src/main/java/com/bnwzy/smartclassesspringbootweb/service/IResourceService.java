@@ -5,6 +5,8 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.ResourceCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ResourceUpdateDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface IResourceService {
     Resource createResource(ResourceCreateDTO resourceCreateDTO);
@@ -12,4 +14,6 @@ public interface IResourceService {
     Boolean deleteResource(Long id);
 
     Resource updateResource(ResourceUpdateDTO resourceUpdateDTO);
+
+    List<Resource> getAllResource();
 }

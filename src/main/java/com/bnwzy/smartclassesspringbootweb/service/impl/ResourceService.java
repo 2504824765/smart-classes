@@ -57,4 +57,13 @@ public class ResourceService implements IResourceService {
         List<Resource> resourceList = resourceRepository.findAll();
         return resourceList;
     }
+
+    @Override
+    public Resource getResourceById(Long id) {
+        if (!resourceRepository.findById(id).isPresent()) {
+            throw new ResourceNotFoundException("<Resource not found>");
+        } else {
+            return resourceRepository.findById(id).get();
+        }
+    }
 }

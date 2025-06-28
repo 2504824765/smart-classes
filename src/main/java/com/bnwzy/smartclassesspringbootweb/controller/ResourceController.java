@@ -34,4 +34,9 @@ public class ResourceController {
     public ResponseMessage getAllResource() {
         return ResponseMessage.success("<Get all resources", resourceService.getAllResource());
     }
+
+    @GetMapping("/getResourceById/{id}")
+    public ResponseMessage getResourceById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get resource>", resourceService.getResourceById(id));
+    }
 }

@@ -16,4 +16,6 @@ public interface IResourceService {
     Resource updateResource(ResourceUpdateDTO resourceUpdateDTO);
 
     List<Resource> getAllResource();
+
+    Resource getResourceById(Long id);
 }

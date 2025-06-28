@@ -4,7 +4,7 @@ import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElCheckbox, ElLink } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
+import { loginApi, getTestRoleApi, getAdminRoleApi, loginBackEnd } from '@/api/login'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
@@ -13,6 +13,9 @@ import { UserType } from '@/api/login/types'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
+import { getAsyncRouterMap } from '@/router'
+import { studentList, teacherList } from './list'
+import { ro } from 'element-plus/es/locale'
 
 const { required } = useValidator()
 
@@ -30,7 +33,8 @@ const { t } = useI18n()
 
 const rules = {
   username: [required()],
-  password: [required()]
+  password: [required()],
+  role: [required()]
 }
 
 const remember = ref(userStore.getRememberMe)
@@ -145,30 +149,30 @@ const skipToStudent = async () => {
   }
 }
 
-// 获取角色信息
-const getRole = async () => {
-  const formData = await getFormData<UserType>()
-  const params = {
-    roleName: formData.username
-  }
-  const res =
-    appStore.getDynamicRouter && appStore.getServerDynamicRouter
-      ? await getAdminRoleApi(params)
-      : await getTestRoleApi(params)
-  if (res) {
-    const routers = res.data || []
-    userStore.setRoleRouters(routers)
-    appStore.getDynamicRouter && appStore.getServerDynamicRouter
-      ? await permissionStore.generateRoutes('server', routers).catch(() => {})
-      : await permissionStore.generateRoutes('frontEnd', routers).catch(() => {})
+// // 获取角色信息
+// const getRole = async () => {
+//   const formData = await getFormData<UserType>()
+//   const params = {
+//     roleName: formData.username
+//   }
+//   const res =
+//     appStore.getDynamicRouter && appStore.getServerDynamicRouter
+//       ? await getAdminRoleApi(params)
+//       : await getTestRoleApi(params)
+//   if (res) {
+//     const routers = res.data || []
+//     userStore.setRoleRouters(routers)
+//     appStore.getDynamicRouter && appStore.getServerDynamicRouter
+//       ? await permissionStore.generateRoutes('server', routers).catch(() => {})
+//       : await permissionStore.generateRoutes('frontEnd', routers).catch(() => {})
 
-    permissionStore.getAddRouters.forEach((route) => {
-      addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
-    })
-    permissionStore.setIsAddRouters(true)
-    push({ path: redirect.value || permissionStore.addRouters[0].path })
-  }
-}
+//     permissionStore.getAddRouters.forEach((route) => {
+//       addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
+//     })
+//     permissionStore.setIsAddRouters(true)
+//     push({ path: redirect.value || permissionStore.addRouters[0].path })
+//   }
+// }
 
 // 登录
 const signIn = async () => {
@@ -177,25 +181,43 @@ const signIn = async () => {
     if (isValid) {
       loading.value = true
       const formData = await getFormData<UserType>()
-
+      const role = formData.role === 'teacher' ? 'teacher' : 'student'
+      const roleList = formData.role === 'teacher' ? teacherList : studentList
+      permissionStore.setUserType(role)
       try {
-        const res = await loginApi(formData)
-
-        if (res) {
+        const res = await loginBackEnd(formData)
+        console.log(res)
+        if (res.data === true) {
           // 是否记住我
           if (unref(remember)) {
             userStore.setLoginInfo({
               username: formData.username,
-              password: formData.password
+              password: formData.password,
+              role: formData.role
             })
           } else {
             userStore.setLoginInfo(undefined)
           }
           userStore.setRememberMe(unref(remember))
-          userStore.setUserInfo(res.data)
+          userStore.setUserInfo(formData)
           // 是否使用动态路由
           if (appStore.getDynamicRouter) {
-            getRole()
+            // getRole()
+            console.log(roleList)
+            userStore.setRoleRouters(roleList)
+            await permissionStore.generateRoutes('frontEnd', roleList).catch(() => {})
+            // 动态添加路由
+            permissionStore.getAddRouters.forEach((route) => {
+              addRoute(route as RouteRecordRaw)
+              console.log(route)
+            })
+            permissionStore.setIsAddRouters(true)
+            console.log('redirect', redirect.value)
+            console.log('permissionStore.addRouters', permissionStore.addRouters[0].path)
+
+            // 跳转首页
+            push({ path: permissionStore.addRouters[0].path })
+            console.log('push s')
           } else {
             await permissionStore.generateRoutes('static').catch(() => {})
             permissionStore.getAddRouters.forEach((route) => {
@@ -278,6 +300,27 @@ const schema = reactive<FormSchema[]>([
           signIn()
         }
       }
+    }
+  },
+  {
+    field: 'role',
+    label: t('login.role'),
+    component: 'Select',
+    colProps: {
+      span: 24
+    },
+    componentProps: {
+      options: [
+        {
+          label: '教师',
+          value: 'teacher'
+        },
+        {
+          label: '学生',
+          value: 'student'
+        }
+      ],
+      placeholder: '请选择角色'
     }
   },
   {

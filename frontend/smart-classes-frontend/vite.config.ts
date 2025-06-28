@@ -147,10 +147,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         '/api': {
           target: 'http://localhost:8080',
           changeOrigin: true
-        },
-        '/mock': {
-          target: 'http://localhost:4000',
-          changeOrigin: true
         }
       },
       hmr: {

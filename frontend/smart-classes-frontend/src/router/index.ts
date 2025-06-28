@@ -90,7 +90,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher',
+        // userType: 'teacher',
         alwaysShow: true
       },
       children: [

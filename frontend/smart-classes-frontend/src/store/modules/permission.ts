@@ -44,6 +44,7 @@ export const usePermissionStore = defineStore('permission', {
   actions: {
     setUserType(userType: 'teacher' | 'student'): void {
       this.userType = userType
+      getAsyncRouterMap(this.userType)
     },
     generateRoutes(
       type: 'server' | 'frontEnd' | 'static',
@@ -56,7 +57,9 @@ export const usePermissionStore = defineStore('permission', {
           routerMap = generateRoutesByServer(routers as AppCustomRouteRecordRaw[])
         } else if (type === 'frontEnd') {
           // 模拟前端过滤菜单
-          routerMap = generateRoutesByFrontEnd(cloneDeep(asyncRouterMap), routers as string[])
+          routerMap = generateRoutesByFrontEnd(cloneDeep(getAsyncRouterMap(this.userType)), routers as string[])
+          console.log('routers', routers, 'type', typeof routers)
+          console.log('routerMap', routerMap)
         } else {
           // 根据用户类型获取对应的路由
           routerMap = cloneDeep(getAsyncRouterMap(this.userType))

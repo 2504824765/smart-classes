@@ -109,6 +109,7 @@ export default {
     message: 'AI教与学，点亮每一课',
     username: '用户名',
     password: '密码',
+    role: '角色',
     register: '注册',
     checkPassword: '确认密码',
     login: '登录',

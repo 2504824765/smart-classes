@@ -2,7 +2,7 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.exception.IlligalParentDeptException;
+import com.bnwzy.smartclassesspringbootweb.exception.IllegalParentDeptException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Department;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptUpdateDTO;
@@ -34,7 +34,7 @@ public class DepartmentService implements IDepartmentService {
                 Department parentDepartment = departmentRepository.findById(deptCreateDTO.getParentId()).get();
                 // 如果选择的父组织不是上一级组织
                 if (parentDepartment.getDepartmentLevel() != deptCreateDTO.getDepartmentLevel() - 1) {
-                    throw new IlligalParentDeptException("<Target department is not parentDepartment>");
+                    throw new IllegalParentDeptException("<Target department is not parentDepartment>");
                 } else {
                     department.setParentId(deptCreateDTO.getParentId());
                 }
@@ -73,7 +73,7 @@ public class DepartmentService implements IDepartmentService {
                 // 如果存在，判断是否为上一级
                 Department parentDepartment = departmentRepository.findById(newDeptDTO.getParentId()).get();
                 if (!newDeptDTO.getDepartmentLevel().equals(parentDepartment.getDepartmentLevel() + 1)) {
-                    throw new IlligalParentDeptException("<Target oldDepartment is not parentDepartment>");
+                    throw new IllegalParentDeptException("<Target oldDepartment is not parentDepartment>");
                 } else {
                     oldDepartment.setParentId(newDeptDTO.getParentId());
                 }

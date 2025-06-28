@@ -68,7 +68,9 @@ public class StudentClassesService implements IStudentClassesService {
 
     @Override
     public StudentClasses updateClassRecord(StudentClassesUpdateDTO studentClassesUpdateDTO) {
-        if(studentClassesRepository.existsById(studentClassesUpdateDTO.getSid())&&classesRepository.existsById(studentClassesUpdateDTO.getCid())){
+        if(studentRepository.existsById(studentClassesUpdateDTO.getSid())&&classesRepository.existsById(studentClassesUpdateDTO.getCid())){
+            System.out.println(studentClassesUpdateDTO.getSid());
+            System.out.println(studentClassesUpdateDTO.getCid());
             List<StudentClasses> studentClasses1 = new ArrayList<>();
             List<StudentClasses> studentClasses2 = new ArrayList<>();
             for(StudentClasses studentClasses : studentClassesRepository.findAll()){

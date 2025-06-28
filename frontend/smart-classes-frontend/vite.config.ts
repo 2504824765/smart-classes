@@ -143,11 +143,14 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     server: {
       port: 4000,
       proxy: {
-        // 选项写法
+        // 代理真实API到后端服务器
         '/api': {
-          target: 'http://127.0.0.1:8000',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          target: 'http://localhost:8080',
+          changeOrigin: true
+        },
+        '/mock': {
+          target: 'http://localhost:4000',
+          changeOrigin: true
         }
       },
       hmr: {

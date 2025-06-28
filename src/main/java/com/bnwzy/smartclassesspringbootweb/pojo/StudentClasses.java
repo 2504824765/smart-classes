@@ -9,10 +9,10 @@ public class StudentClasses {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "classes_id")
     private Classes classes;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
     @Column(name = "grade")

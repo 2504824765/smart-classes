@@ -18,4 +18,6 @@ public interface IResourceService {
     List<Resource> getAllResource();
 
     Resource getResourceById(Long id);
+
+    List<Resource> getResourcesByType(String type);
 }

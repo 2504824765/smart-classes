@@ -2,6 +2,7 @@ package com.bnwzy.smartclassesspringbootweb.controller;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ResourceCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.ResourceUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -22,5 +23,10 @@ public class ResourceController {
     @DeleteMapping("/delete/{id}")
     public ResponseMessage deleteResource(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Delete resource", resourceService.deleteResource(id));
+    }
+
+    @PostMapping("/update")
+    public ResponseMessage updateResource(@Validated @RequestBody ResourceUpdateDTO resourceUpdateDTO) {
+        return ResponseMessage.success("<Update resource>", resourceService.updateResource(resourceUpdateDTO));
     }
 }

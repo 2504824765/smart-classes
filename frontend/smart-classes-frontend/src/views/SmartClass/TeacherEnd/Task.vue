@@ -88,6 +88,7 @@ const actionFn = (data: any) => {
 </script>
 
 <template>
+  <el-text class="mx-1" size="large">这是 教师-任务 页面</el-text>
   <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
     <Table
       :columns="columns"

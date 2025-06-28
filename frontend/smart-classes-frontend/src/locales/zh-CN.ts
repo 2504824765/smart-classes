@@ -577,7 +577,11 @@ export default {
     name: '姓名',
     gender: '性别',
     dept: '所在部门',
-    gpa: '绩点'
+    gpa: '绩点',
+    courseList: '课程列表',
+    videoWatch: '视频观看',
+    homework: '作业',
+    grades: '成绩查看'
   },
   role: {
     roleName: '角色名称',
@@ -596,5 +600,12 @@ export default {
     videoPlay: '视频播放',
     knowledgeGraph: '知识图谱',
     studentManage: '学生管理'
+  },
+  teacher: {
+    dashboard: '首页',
+    studentManage: '学生管理',
+    videoPlay: '视频播放',
+    taskManage: '任务管理',
+    courseManage: '课程管理'
   }
 }

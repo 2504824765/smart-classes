@@ -86,6 +86,7 @@ const goToVideoPlay = () => {
 </script>
 
 <template>
+  <el-text class="mx-1" size="large">这是 教师-学生管理 页面</el-text>
   <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
     <BaseButton type="primary" @click="goToVideoPlay" style="margin-bottom: 16px">
       视频播放

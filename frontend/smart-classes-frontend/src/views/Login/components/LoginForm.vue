@@ -47,25 +47,29 @@ const toRegister = () => {
   emit('to-register')
 }
 
-// 跳过登录校验直接进入dashboard
-const skipLogin = async () => {
+// 跳过登录校验直接进入教师端
+const skipToTeacher = async () => {
   loading.value = true
   try {
     // 设置默认用户信息（跳过登录校验）
     const defaultUserInfo = {
-      username: 'admin',
-      password: 'admin',
-      role: 'admin',
-      roleId: '1'
+      username: 'teacher',
+      password: 'teacher',
+      role: 'teacher',
+      roleId: '1',
+      userType: 'teacher'
     }
 
     userStore.setUserInfo(defaultUserInfo)
+
+    // 设置用户类型到权限 store
+    permissionStore.setUserType('teacher')
 
     // 是否使用动态路由
     if (appStore.getDynamicRouter) {
       // 获取默认角色路由
       const params = {
-        roleName: 'admin'
+        roleName: 'teacher'
       }
       const res = await getTestRoleApi(params)
       if (res) {
@@ -77,7 +81,7 @@ const skipLogin = async () => {
           addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
         })
         permissionStore.setIsAddRouters(true)
-        push({ path: redirect.value || permissionStore.addRouters[0].path })
+        push({ path: '/teacher/dashboard' })
       }
     } else {
       await permissionStore.generateRoutes('static').catch(() => {})
@@ -85,7 +89,56 @@ const skipLogin = async () => {
         addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
       })
       permissionStore.setIsAddRouters(true)
-      push({ path: redirect.value || permissionStore.addRouters[0].path })
+      push({ path: '/teacher/dashboard' })
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// 跳过登录校验直接进入学生端
+const skipToStudent = async () => {
+  loading.value = true
+  try {
+    // 设置默认用户信息（跳过登录校验）
+    const defaultUserInfo = {
+      username: 'student',
+      password: 'student',
+      role: 'student',
+      roleId: '2',
+      userType: 'student'
+    }
+
+    userStore.setUserInfo(defaultUserInfo)
+
+    // 设置用户类型到权限 store
+    permissionStore.setUserType('student')
+
+    // 是否使用动态路由
+    if (appStore.getDynamicRouter) {
+      // 获取默认角色路由
+      const params = {
+        roleName: 'student'
+      }
+      const res = await getTestRoleApi(params)
+      if (res) {
+        const routers = res.data || []
+        userStore.setRoleRouters(routers)
+        await permissionStore.generateRoutes('frontEnd', routers).catch(() => {})
+
+        permissionStore.getAddRouters.forEach((route) => {
+          addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
+        })
+        permissionStore.setIsAddRouters(true)
+        push({ path: '/student/courseList' })
+      }
+    } else {
+      await permissionStore.generateRoutes('static').catch(() => {})
+      permissionStore.getAddRouters.forEach((route) => {
+        addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
+      })
+      permissionStore.setIsAddRouters(true)
+      push({ path: '/student/courseList' })
     }
   } finally {
     loading.value = false
@@ -239,9 +292,14 @@ const schema = reactive<FormSchema[]>([
             <>
               <div class="flex justify-between items-center w-[100%]">
                 <ElCheckbox v-model={remember.value} label={t('login.remember')} size="small" />
-                <ElLink type="primary" underline={false} onClick={skipLogin}>
-                  {t('login.forgetPassword')}
-                </ElLink>
+                <div class="flex space-x-2">
+                  <ElLink type="primary" underline={false} onClick={skipToTeacher}>
+                    教师端
+                  </ElLink>
+                  <ElLink type="success" underline={false} onClick={skipToStudent}>
+                    学生端
+                  </ElLink>
+                </div>
               </div>
             </>
           )

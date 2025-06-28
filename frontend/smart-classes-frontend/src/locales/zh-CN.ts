@@ -590,5 +590,11 @@ export default {
   },
   avatarsDemo: {
     title: '头像列表组件，基于element-plus的Avatar组件二次封装'
+  },
+  smartClass: {
+    course: '课程',
+    videoPlay: '视频播放',
+    knowledgeGraph: '知识图谱',
+    studentManage: '学生管理'
   }
 }

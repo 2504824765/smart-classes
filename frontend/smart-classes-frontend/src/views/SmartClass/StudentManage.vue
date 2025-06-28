@@ -7,6 +7,7 @@ import { TableData } from '@/api/table/types'
 import { ref, h } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
+import { useRouter } from 'vue-router'
 
 interface Params {
   pageIndex?: number
@@ -14,6 +15,7 @@ interface Params {
 }
 
 const { t } = useI18n()
+const router = useRouter()
 
 const columns: TableColumn[] = [
   {
@@ -77,10 +79,17 @@ getTableList()
 const actionFn = (data: any) => {
   console.log(data)
 }
+
+const goToVideoPlay = () => {
+  router.push('/SmartClass/VideoPlay')
+}
 </script>
 
 <template>
   <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
+    <BaseButton type="primary" @click="goToVideoPlay" style="margin-bottom: 16px">
+      视频播放
+    </BaseButton>
     <BaseButton type="primary" @click="getTableList" style="margin-bottom: 16px">刷新</BaseButton>
     <Table
       :columns="columns"

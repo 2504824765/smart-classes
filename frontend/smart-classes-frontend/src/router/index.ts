@@ -100,13 +100,57 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
           noCache: true,
           affix: true
         }
-      },
+      }
+    ]
+  },
+  {
+    path: '/studentManage',
+    component: Layout,
+    redirect: '/studentManage/index',
+    name: 'StudentManage0',
+    meta: {},
+    children: [
       {
-        path: 'studentManage',
+        path: 'index',
         component: () => import('@/views/SmartClass/StudentManage.vue'),
         name: 'StudentManage',
         meta: {
-          title: t('router.studentManage'),
+          title: t('smartClass.studentManage'),
+          icon: 'vi-cib:telegram-plane'
+        }
+      }
+    ]
+  },
+  //课程
+  {
+    path: '/course',
+    component: Layout,
+    redirect: '/course/analysis',
+    name: 'Course',
+    meta: {
+      title: t('smartClass.course'),
+      icon: 'vi-ant-design:dashboard-filled',
+      alwaysShow: true
+    },
+    children: [
+      //视频
+      {
+        path: 'videoPlay',
+        component: () => import('@/views/SmartClass/VideoPlay.vue'),
+        name: 'VideoPlay',
+        meta: {
+          title: t('smartClass.videoPlay'),
+          noCache: true,
+          affix: true
+        }
+      },
+      //知识图谱
+      {
+        path: 'knowledgeGraph',
+        component: () => import('@/views/SmartClass/VideoPlay.vue'),
+        name: 'KnowledgeGraph',
+        meta: {
+          title: t('smartClass.knowledgeGraph'),
           noCache: true
         }
       }
@@ -135,7 +179,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     meta: {},
     children: [
       {
-        path: 'index',
+        path: 'task',
         component: () => import('@/views/SmartClass/Task.vue'),
         name: 'Task',
         meta: {

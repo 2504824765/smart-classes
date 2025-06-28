@@ -7,4 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IResourceService {
     Resource createResource(ResourceCreateDTO resourceCreateDTO);
+
+    Boolean deleteResource(Long id);
 }

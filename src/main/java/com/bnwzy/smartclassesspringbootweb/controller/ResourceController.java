@@ -18,4 +18,9 @@ public class ResourceController {
     public ResponseMessage createResource(@Validated @RequestBody ResourceCreateDTO resourceCreateDTO) {
         return ResponseMessage.success("<Create resource>", resourceService.createResource(resourceCreateDTO));
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseMessage deleteResource(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Delete resource", resourceService.deleteResource(id));
+    }
 }

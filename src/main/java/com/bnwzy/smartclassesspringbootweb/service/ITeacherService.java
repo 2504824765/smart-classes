@@ -20,4 +20,6 @@ public interface ITeacherService {
     Teacher getTeacherByUsername(String username);
 
     List<Teacher> getAllTeacher();
+
+    Long getTeacherCount();
 }

@@ -1,9 +1,5 @@
 <template>
-  <el-card
-    class="course-card"
-    shadow="hover"
-    @click="goToCourseDetail"
-  >
+  <el-card class="course-card" shadow="hover" @click="goToCourseDetail">
     <el-image
       :src="course.image"
       alt="课程封面"
@@ -14,28 +10,17 @@
       <el-text type="info" class="course-desc">
         {{ course.description }}
       </el-text>
-      <el-text
-        class="status"
-        type="success"
-        size="small"
-        v-if="course.open"
-      >
-        开放中
-      </el-text>
-      <el-text
-        class="status"
-        type="danger"
-        size="small"
-        v-else
-      >
-        未开放
-      </el-text>
+      <el-text class="status" type="success" size="small" v-if="course.open"> 开放中 </el-text>
+      <el-text class="status" type="danger" size="small" v-else> 未开放 </el-text>
     </div>
   </el-card>
 </template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
+import { useRouter } from 'vue-router'
+
+const { currentRoute, addRoute, push } = useRouter()
 
 const props = defineProps<{
   course: {
@@ -48,7 +33,7 @@ const props = defineProps<{
 }>()
 
 const goToCourseDetail = () => {
-    //带实现
+  push({ path: '/course/detail' })
 }
 </script>
 

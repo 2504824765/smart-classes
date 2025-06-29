@@ -4,7 +4,7 @@ import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElCheckbox, ElLink } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { loginApi, getTestRoleApi, getAdminRoleApi, loginBackEnd } from '@/api/login'
+import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
@@ -149,31 +149,6 @@ const skipToStudent = async () => {
   }
 }
 
-// // 获取角色信息
-// const getRole = async () => {
-//   const formData = await getFormData<UserType>()
-//   const params = {
-//     roleName: formData.username
-//   }
-//   const res =
-//     appStore.getDynamicRouter && appStore.getServerDynamicRouter
-//       ? await getAdminRoleApi(params)
-//       : await getTestRoleApi(params)
-//   if (res) {
-//     const routers = res.data || []
-//     userStore.setRoleRouters(routers)
-//     appStore.getDynamicRouter && appStore.getServerDynamicRouter
-//       ? await permissionStore.generateRoutes('server', routers).catch(() => {})
-//       : await permissionStore.generateRoutes('frontEnd', routers).catch(() => {})
-
-//     permissionStore.getAddRouters.forEach((route) => {
-//       addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
-//     })
-//     permissionStore.setIsAddRouters(true)
-//     push({ path: redirect.value || permissionStore.addRouters[0].path })
-//   }
-// }
-
 // 登录
 const signIn = async () => {
   const formRef = await getElFormExpose()
@@ -185,7 +160,7 @@ const signIn = async () => {
       const roleList = formData.role === 'teacher' ? teacherList : studentList
       permissionStore.setUserType(role)
       try {
-        const res = await loginBackEnd(formData)
+        const res = await loginApi(formData)
         console.log(res)
         if (res.data === true) {
           // 是否记住我

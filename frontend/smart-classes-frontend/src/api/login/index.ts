@@ -1,5 +1,6 @@
 import request from '@/axios'
 import type { UserType } from './types'
+import axios from '@/axios'
 
 interface RoleParams {
   roleName: string

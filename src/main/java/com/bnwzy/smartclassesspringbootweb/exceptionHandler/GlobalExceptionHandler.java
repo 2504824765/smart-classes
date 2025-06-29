@@ -12,7 +12,46 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(ClassMissionNotFoundException.class)
+    public ResponseMessage classMissionNotFoundException(ClassMissionNotFoundException e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(511, "<ClassMission not found>", null);
+    }
 
+    @ExceptionHandler(IllegalParentDeptException.class)
+    public ResponseMessage illegalParentDeptException(Exception e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(510, "<Target dept is not parent dept>", null);
+    }
+
+    @ExceptionHandler(ClassesNotFoundException.class)
+    public ResponseMessage handleClassesNotFoundException(ClassesNotFoundException e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(509, "<Class not found>", null);
+    }
+
+    @ExceptionHandler(DepartmentAlreadyExistException.class)
+    public ResponseMessage departmentAlreadyExistException(Exception e, HttpServletRequest request) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(508, "<Department already exist>", null);
+    }
+
+    @ExceptionHandler(StudentClassesNotFoundException.class)
+    public ResponseMessage StudentClassesNotFoundException(Exception e, HttpServletRequest request) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(507, "<Teacher not found>", null);
+    }
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseMessage wrongPasswordException(Exception e) {
+        logger.error(e.getMessage(), e);
+        return new ResponseMessage(506, "<Wrong Password>", null);
+    }
+
+    @ExceptionHandler(TeacherNotFoundException.class)
+    public ResponseMessage teacherNotFoundException(Exception e, HttpServletRequest request) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(505, "<Teacher not found>", null);
+    }
 
     @ExceptionHandler(DepartmentNotFoundException.class)
     public ResponseMessage departmentNotFoundException(Exception e, HttpServletRequest request) {
@@ -41,6 +80,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseMessage handleException(Exception e) {
         logger.error(e.getMessage(), e); // 查看日志查看具体异常
-        return new ResponseMessage(500, "Unknown exception", null);
+        return new ResponseMessage(500, "未知错误，请联系管理员", null);
     }
+
 }

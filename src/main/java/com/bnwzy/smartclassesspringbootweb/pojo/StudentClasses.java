@@ -8,29 +8,31 @@ public class StudentClasses {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
-    @OneToOne
+    private Long id;
+
+    @ManyToOne
     @JoinColumn(name = "classes_id")
     private Classes classes;
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
     @Column(name = "grade")
-    private Integer grade;
+    private Double grade;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Integer getGrade() {
+    public Double getGrade() {
         return grade;
     }
 
-    public void setGrade(Integer grade) {
+    public void setGrade(Double grade) {
         this.grade = grade;
     }
 

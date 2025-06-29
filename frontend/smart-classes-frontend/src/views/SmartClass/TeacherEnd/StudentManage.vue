@@ -4,7 +4,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import { getStudentListApi } from '@/api/student'
 import { TableData } from '@/api/table/types'
-import { ref, h } from 'vue'
+import { ref, h, onMounted } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
@@ -70,11 +70,14 @@ const getTableList = async (params?: Params) => {
       loading.value = false
     })
   if (res) {
+    console.log(res.data)
     tableDataList.value = res.data.list
   }
 }
 
-getTableList()
+onMounted(() => {
+  getTableList()
+})
 
 const actionFn = (data: any) => {
   console.log(data)

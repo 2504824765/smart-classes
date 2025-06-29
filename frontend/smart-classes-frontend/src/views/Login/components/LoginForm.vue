@@ -199,7 +199,11 @@ const signIn = async () => {
             userStore.setLoginInfo(undefined)
           }
           userStore.setRememberMe(unref(remember))
-          userStore.setUserInfo(formData)
+          const extendedFormData = {
+            ...formData,
+            permissions: ['*.*.*']
+          }
+          userStore.setUserInfo(extendedFormData)
           // 是否使用动态路由
           if (appStore.getDynamicRouter) {
             // getRole()

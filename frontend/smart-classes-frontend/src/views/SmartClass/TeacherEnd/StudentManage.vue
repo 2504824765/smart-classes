@@ -71,7 +71,7 @@ const getTableList = async (params?: Params) => {
     })
   if (res) {
     console.log(res.data)
-    tableDataList.value = res.data.list
+    tableDataList.value = res.data
   }
 }
 

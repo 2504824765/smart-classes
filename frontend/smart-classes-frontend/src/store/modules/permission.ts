@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { asyncRouterMap, constantRouterMap } from '@/router'
+import { asyncRouterMap, constantRouterMap, getAsyncRouterMap } from '@/router'
 import {
   generateRoutesByFrontEnd,
   generateRoutesByServer,
@@ -13,6 +13,7 @@ export interface PermissionState {
   addRouters: AppRouteRecordRaw[]
   isAddRouters: boolean
   menuTabRouters: AppRouteRecordRaw[]
+  userType: 'teacher' | 'student'
 }
 
 export const usePermissionStore = defineStore('permission', {
@@ -20,7 +21,8 @@ export const usePermissionStore = defineStore('permission', {
     routers: [],
     addRouters: [],
     isAddRouters: false,
-    menuTabRouters: []
+    menuTabRouters: [],
+    userType: 'teacher'
   }),
   getters: {
     getRouters(): AppRouteRecordRaw[] {
@@ -34,9 +36,16 @@ export const usePermissionStore = defineStore('permission', {
     },
     getMenuTabRouters(): AppRouteRecordRaw[] {
       return this.menuTabRouters
+    },
+    getUserType(): 'teacher' | 'student' {
+      return this.userType
     }
   },
   actions: {
+    setUserType(userType: 'teacher' | 'student'): void {
+      this.userType = userType
+      getAsyncRouterMap(this.userType)
+    },
     generateRoutes(
       type: 'server' | 'frontEnd' | 'static',
       routers?: AppCustomRouteRecordRaw[] | string[]
@@ -48,10 +57,12 @@ export const usePermissionStore = defineStore('permission', {
           routerMap = generateRoutesByServer(routers as AppCustomRouteRecordRaw[])
         } else if (type === 'frontEnd') {
           // 模拟前端过滤菜单
-          routerMap = generateRoutesByFrontEnd(cloneDeep(asyncRouterMap), routers as string[])
+          routerMap = generateRoutesByFrontEnd(cloneDeep(getAsyncRouterMap(this.userType)), routers as string[])
+          console.log('routers', routers, 'type', typeof routers)
+          console.log('routerMap', routerMap)
         } else {
-          // 直接读取静态路由表
-          routerMap = cloneDeep(asyncRouterMap)
+          // 根据用户类型获取对应的路由
+          routerMap = cloneDeep(getAsyncRouterMap(this.userType))
         }
         // 动态路由，404一定要放到最后面
         this.addRouters = routerMap.concat([
@@ -88,6 +99,10 @@ export const usePermissionStore = defineStore('permission', {
     },
     {
       pick: ['menuTabRouters'],
+      storage: localStorage
+    },
+    {
+      pick: ['userType'],
       storage: localStorage
     }
   ]

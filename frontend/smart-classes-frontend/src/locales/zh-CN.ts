@@ -109,6 +109,7 @@ export default {
     message: 'AI教与学，点亮每一课',
     username: '用户名',
     password: '密码',
+    role: '角色',
     register: '注册',
     checkPassword: '确认密码',
     login: '登录',
@@ -577,7 +578,11 @@ export default {
     name: '姓名',
     gender: '性别',
     dept: '所在部门',
-    gpa: '绩点'
+    gpa: '绩点',
+    courseList: '课程列表',
+    videoWatch: '视频观看',
+    homework: '作业',
+    grades: '成绩查看'
   },
   role: {
     roleName: '角色名称',
@@ -590,5 +595,18 @@ export default {
   },
   avatarsDemo: {
     title: '头像列表组件，基于element-plus的Avatar组件二次封装'
+  },
+  smartClass: {
+    course: '课程',
+    videoPlay: '视频播放',
+    knowledgeGraph: '知识图谱',
+    studentManage: '学生管理'
+  },
+  teacher: {
+    dashboard: '首页',
+    studentManage: '学生管理',
+    videoPlay: '视频播放',
+    taskManage: '任务管理',
+    courseManage: '课程管理'
   }
 }

@@ -2,11 +2,12 @@
 import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
-import { getTableListApi } from '@/api/table'
+import { getStudentListApi } from '@/api/student'
 import { TableData } from '@/api/table/types'
-import { ref, h } from 'vue'
+import { ref, h, onMounted } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
+import { useRouter } from 'vue-router'
 
 interface Params {
   pageIndex?: number
@@ -14,36 +15,29 @@ interface Params {
 }
 
 const { t } = useI18n()
-//| 编号(id) | 课程编号(cid) | 类型(type)| 说明(description) | 截止时间(deadline，varchar(100)) | 提交方式(submit_method) | 得分(score)
+const router = useRouter()
+
 const columns: TableColumn[] = [
   {
     field: 'id',
-    label: t('task.id')
+    label: t('student.id')
   },
   {
-    field: 'cid',
-    label: t('task.cid')
+    field: 'name',
+    label: t('student.name')
   },
   {
-    field: 'type',
-    label: t('task.type')
+    field: 'gender',
+    label: t('student.gender')
   },
   {
-    field: 'description',
-    label: t('task.description'),
+    field: 'dept',
+    label: t('student.dept'),
     sortable: true
   },
   {
-    field: 'deadline',
-    label: t('task.deadline')
-  },
-  {
-    field: 'submit_method',
-    label: t('task.submit_method')
-  },
-  {
-    field: 'score',
-    label: t('task.score')
+    field: 'gpa',
+    label: t('student.gpa')
   },
   {
     field: 'action',
@@ -65,7 +59,7 @@ const loading = ref(true)
 const tableDataList = ref<TableData[]>([])
 
 const getTableList = async (params?: Params) => {
-  const res = await getTableListApi(
+  const res = await getStudentListApi(
     params || {
       pageIndex: 1,
       pageSize: 10
@@ -76,19 +70,31 @@ const getTableList = async (params?: Params) => {
       loading.value = false
     })
   if (res) {
-    tableDataList.value = res.data.list
+    console.log(res.data)
+    tableDataList.value = res.data
   }
 }
 
-getTableList()
+onMounted(() => {
+  getTableList()
+})
 
 const actionFn = (data: any) => {
   console.log(data)
 }
+
+const goToVideoPlay = () => {
+  router.push('/SmartClass/VideoPlay')
+}
 </script>
 
 <template>
+  <el-text class="mx-1" size="large">这是 教师-学生管理 页面</el-text>
   <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
+    <BaseButton type="primary" @click="goToVideoPlay" style="margin-bottom: 16px">
+      视频播放
+    </BaseButton>
+    <BaseButton type="primary" @click="getTableList" style="margin-bottom: 16px">刷新</BaseButton>
     <Table
       :columns="columns"
       :data="tableDataList"

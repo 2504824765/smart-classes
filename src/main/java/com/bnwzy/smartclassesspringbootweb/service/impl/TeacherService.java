@@ -97,4 +97,9 @@ public class TeacherService implements ITeacherService {
         }
         return teacherList;
     }
+
+    @Override
+    public Long getTeacherCount() {
+        return teacherRepository.count();
+    }
 }

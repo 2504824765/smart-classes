@@ -92,7 +92,7 @@ public class StudentService implements IStudentService {
     }
 
     @Override
-    public boolean deleteStudent(Long id) {
+    public Boolean deleteStudent(Long id) {
         if (!studentRepository.findById(id).isPresent()) {
             throw new StudentNotFoundException("<Student Not Found>");
         } else {
@@ -112,5 +112,10 @@ public class StudentService implements IStudentService {
 //            }
             return true;
         }
+    }
+
+    @Override
+    public Long getStudentCount() {
+        return studentRepository.count();
     }
 }

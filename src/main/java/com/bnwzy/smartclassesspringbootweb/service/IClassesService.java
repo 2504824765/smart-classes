@@ -22,4 +22,6 @@ public interface IClassesService {
     Classes getClassByName(String name);
 
     Classes getClassByTeacherId(Long teacherId);
+
+    Long getClassCount();
 }

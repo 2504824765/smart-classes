@@ -106,4 +106,9 @@ public class ClassesService implements IClassesService {
             return classesRepository.findById(teacherId).get();
         }
     }
+
+    @Override
+    public Long getClassCount() {
+        return classesRepository.count();
+    }
 }

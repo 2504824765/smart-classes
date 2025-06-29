@@ -44,4 +44,9 @@ public class StudentController {
     public ResponseMessage deleteStudent(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Delete Student>", studentService.deleteStudent(id));
     }
+
+    @GetMapping("/count")
+    public ResponseMessage getStudentCount() {
+        return ResponseMessage.success("<Get student count>", studentService.getStudentCount());
+    }
 }

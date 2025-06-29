@@ -50,4 +50,9 @@ public class UserController {
     public ResponseMessage getAllUser() {
         return ResponseMessage.success("<Get all users successfully>", userService.getAllUser());
     }
+
+    @GetMapping("/loginOut")
+    public  ResponseMessage loginOut() {
+        return ResponseMessage.success("<Login out>", null);
+    }
 }

@@ -19,5 +19,7 @@ public interface IStudentService {
 
     Student createStudent(StudentCreateDTO studentCreateDTO);
 
-    boolean deleteStudent(Long id);
+    Boolean deleteStudent(Long id);
+
+    Long getStudentCount();
 }

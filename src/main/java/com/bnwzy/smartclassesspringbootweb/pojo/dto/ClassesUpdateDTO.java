@@ -4,9 +4,20 @@ public class ClassesUpdateDTO {
     private Long id;
     private String name;
     private Long teacherId;
-    private double credit;
-    private double classHours;
+    private Double credit;
+    private Double classHours;
     private String graph;
+    private Boolean isActive;
+    private String description;
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public Long getId() {
         return id;
@@ -32,19 +43,19 @@ public class ClassesUpdateDTO {
         this.teacherId = teacherId;
     }
 
-    public double getCredit() {
+    public Double getCredit() {
         return credit;
     }
 
-    public void setCredit(double credit) {
+    public void setCredit(Double credit) {
         this.credit = credit;
     }
 
-    public double getClassHours() {
+    public Double getClassHours() {
         return classHours;
     }
 
-    public void setClassHours(double classHours) {
+    public void setClassHours(Double classHours) {
         this.classHours = classHours;
     }
 
@@ -54,5 +65,21 @@ public class ClassesUpdateDTO {
 
     public void setGraph(String graph) {
         this.graph = graph;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

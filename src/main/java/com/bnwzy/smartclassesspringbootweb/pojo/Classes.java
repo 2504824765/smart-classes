@@ -3,6 +3,8 @@ package com.bnwzy.smartclassesspringbootweb.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import javax.naming.Name;
+
 @Entity
 @Table(name = "tb_class")
 public class Classes {
@@ -16,18 +18,24 @@ public class Classes {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
     @Column(name = "credit")
-    private double credit;
+    private Double credit;
     @Column(name = "classHours")
-    private double classHours;
+    private Double classHours;
     @Column(name = "graph")
     private String graph;
+    @Column(name = "is_active")
+    private Boolean isActive;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "imageUrl")
+    private String imageUrl;
 
-    public String getGraph() {
-        return graph;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setGraph(String graph) {
-        this.graph = graph;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {
@@ -54,19 +62,43 @@ public class Classes {
         this.teacher = teacher;
     }
 
-    public double getCredit() {
+    public Double getCredit() {
         return credit;
     }
 
-    public void setCredit(double credit) {
+    public void setCredit(Double credit) {
         this.credit = credit;
     }
 
-    public double getClassHours() {
+    public Double getClassHours() {
         return classHours;
     }
 
-    public void setClassHours(double classHours) {
+    public void setClassHours(Double classHours) {
         this.classHours = classHours;
+    }
+
+    public String getGraph() {
+        return graph;
+    }
+
+    public void setGraph(String graph) {
+        this.graph = graph;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

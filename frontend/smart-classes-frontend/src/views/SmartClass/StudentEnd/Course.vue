@@ -1,6 +1,6 @@
 <template>
   <div class="course-list">
-    <CourseCard v-for="item in courseList" :key="item.id" :course="item" :disabled="!item.is_active" />
+    <CourseCard v-for="item in courseList" :key="item.id" :course="item" :disabled="!item.active" />
   </div>
 </template>
 

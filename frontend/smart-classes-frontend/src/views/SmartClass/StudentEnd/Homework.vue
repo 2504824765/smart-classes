@@ -34,6 +34,18 @@ const courses = ref<CourseDisplayData[]>([
   }
 ])
 
+const displayCourses: CourseDisplayData[] = classes.value.map(cls => {
+  const stats = courses[cls.id] || { unfinished: 0, total: 0 }
+
+  return {
+    name: cls.name,
+    image: cls.image || '/default.png',
+    description: cls.description,
+    unfinished: stats.unfinished,
+    total: stats.total
+  }
+})
+
 function goToHomework(course: any) {
   push({ path: '/homework/list', query: { course: course.name } })
 }

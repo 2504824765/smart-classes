@@ -6,7 +6,7 @@
     :class="{ 'is-disabled': disabled }"
   >
     <el-image
-      :src="course.image"
+      :src="`/${course.image}`"
       alt="课程封面"
       style="width: 100%; height: 160px; object-fit: cover"
     />
@@ -15,7 +15,7 @@
       <el-text type="info" class="course-desc">
         {{ course.description }}
       </el-text>
-      <el-text class="status" type="success" size="small" v-if="course.is_active"> 开放中 </el-text>
+      <el-text class="status" type="success" size="small" v-if="course.active"> 开放中 </el-text>
       <el-text class="status" type="danger" size="small" v-else> 未开放 </el-text>
     </div>
   </el-card>
@@ -35,7 +35,7 @@ const props = defineProps<{
     credit: number
     class_hours: number
     graph: string
-    is_active: boolean
+    active: boolean
     description: string
     image: string
   }

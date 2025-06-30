@@ -4,6 +4,7 @@ import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.service.IOssUploadService;
 import com.bnwzy.smartclassesspringbootweb.service.impl.OssUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,5 +29,8 @@ public class OssUploadController {
     public ResponseMessage uploadResource(MultipartFile file,Long id,String message) {
         return ResponseMessage.success("Resource upload successful",ossUploadService.uploadResource(file,id,message));
     }
-
+    @PostMapping("/getAllByClassId")
+    public ResponseMessage getAllByClassId(Long cid) {
+        return ResponseMessage.success("Get all successfully",ossUploadService.getAllByClassId(cid));
+    }
 }

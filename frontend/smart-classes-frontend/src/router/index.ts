@@ -180,18 +180,19 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
             title: t('student.courseDetail'),
             userType: 'student',
             noCache: true,
-            affix: true
+            hidden: true,
+            canTo: true
           }
         },
         {
-          path: '/knowledge',
+          path: 'knowledge',
           name: 'CourseKnowledge',
           component: () => import('@/views/SmartClass/StudentEnd/KnowledgeStudy.vue'),
-          meta: { 
+          meta: {
             title: t('student.study'),
-            icon: 'vi-ant-design:file-done-outlined',
             userType: 'student',
-            alwaysShow: false,
+            hidden: true,
+            canTo: true,
             noCache: true
           }
         }
@@ -244,7 +245,7 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
           }
         }
       ]
-    },
+    }
   ]
 }
 

@@ -45,10 +45,6 @@ watch(
   }
 )
 
-onBeforeUnmount(() => {
-  unref(playerRef)?.destroy()
-})
-
 defineExpose({
   playerExpose: () => unref(playerRef)
 })

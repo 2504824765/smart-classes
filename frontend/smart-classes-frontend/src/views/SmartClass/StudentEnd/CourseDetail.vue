@@ -67,99 +67,98 @@ const fileCards = ref([
 const graphContainer = ref<HTMLDivElement>()
 
 // 点击树结构或图谱节点
-const handleTreeClick = (node: any) => {
-
-}
+const handleTreeClick = (node: any) => {}
 
 const registerCustomNode = () => {
-  G6.registerNode('progress-node', {
-    draw(cfg, group) {
-      const size = (Array.isArray(cfg.size) ? cfg.size[0] : cfg.size) || 50;
-      const label = cfg.label || '';
-      const style = cfg.style || {};
-      const data = (cfg.data || {}) as { progress?: number };
-      const progress = data.progress ?? 0;
+  G6.registerNode(
+    'progress-node',
+    {
+      draw(cfg, group) {
+        const size = (Array.isArray(cfg.size) ? cfg.size[0] : cfg.size) || 50
+        const label = cfg.label || ''
+        const style = cfg.style || {}
+        const data = (cfg.data || {}) as { progress?: number }
+        const progress = data.progress ?? 0
 
-      const radius = size / 2 - 4;
-      const circumference = 2 * Math.PI * radius;
+        const radius = size / 2 - 4
+        const circumference = 2 * Math.PI * radius
 
-      const keyShape = group.addShape('circle', {
-        attrs: {
-          r: size / 2,
-          fill: style.fill || '#fff',
-          stroke: style.stroke || '#5B8FF9',
-          lineWidth: 2,
-        },
-        name: 'main-circle',
-        draggable: true,
-      })
+        const keyShape = group.addShape('circle', {
+          attrs: {
+            r: size / 2,
+            fill: style.fill || '#fff',
+            stroke: style.stroke || '#5B8FF9',
+            lineWidth: 2
+          },
+          name: 'main-circle',
+          draggable: true
+        })
 
-      group.addShape('circle', {
-        attrs: {
-          r: radius,
-          stroke: '#f0f0f0',
-          lineWidth: 4,
-        },
-        name: 'bg-bar',
-      })
+        group.addShape('circle', {
+          attrs: {
+            r: radius,
+            stroke: '#f0f0f0',
+            lineWidth: 4
+          },
+          name: 'bg-bar'
+        })
 
-      group.addShape('circle', {
-        attrs: {
-          r: radius,
-          stroke: '#6EDD87',
-          lineWidth: 4,
-          lineDash: [
-            circumference * progress,
-            circumference * (1 - progress),
-          ],
-          lineDashOffset: -circumference / 4,
-        },
-        name: 'progress-bar',
-      })
+        group.addShape('circle', {
+          attrs: {
+            r: radius,
+            stroke: '#6EDD87',
+            lineWidth: 4,
+            lineDash: [circumference * progress, circumference * (1 - progress)],
+            lineDashOffset: -circumference / 4
+          },
+          name: 'progress-bar'
+        })
 
-      group.addShape('text', {
-        attrs: {
-          x: 0,
-          y: size / 2 + 10,
-          text: label || '',
-          fontSize: 12,
-          fill: '#333',
-          textAlign: 'center',
-          textBaseline: 'top',
-        },
-        name: 'node-label',
-      })
+        group.addShape('text', {
+          attrs: {
+            x: 0,
+            y: size / 2 + 10,
+            text: label || '',
+            fontSize: 12,
+            fill: '#333',
+            textAlign: 'center',
+            textBaseline: 'top'
+          },
+          name: 'node-label'
+        })
 
-      return keyShape
-    },
-    setState(name, value, item) {
-      if(!item) return
-      const group = item.getContainer();
-      const keyShape = item.getKeyShape();
+        return keyShape
+      },
+      setState(name, value, item) {
+        if (!item) return
+        const group = item.getContainer()
+        const keyShape = item.getKeyShape()
 
-      if (name === 'hover') {
-        keyShape.attr({
-          shadowColor: value ? '#1890ff' : null,
-          shadowBlur: value ? 20 : 0,
-          lineWidth: value ? 3 : 1,
-          size: value ? 60 : 50,
-        });
+        if (name === 'hover') {
+          keyShape.attr({
+            shadowColor: value ? '#1890ff' : null,
+            shadowBlur: value ? 20 : 0,
+            lineWidth: value ? 3 : 1,
+            size: value ? 60 : 50
+          })
 
-        // 控制标签显示
-        const label = group.find(el => el.cfg.name === 'node-label');
-        if (label) label.set('visible', value);
+          // 控制标签显示
+          const label = group.find((el) => el.cfg.name === 'node-label')
+          if (label) label.set('visible', value)
+        }
+
+        if (name === 'dimmed') {
+          keyShape.attr({
+            opacity: value ? 0.2 : 1
+          })
+
+          const label = group.find((el) => el.cfg.name === 'node-label')
+          if (label) label.set('visible', !value)
+        }
       }
-
-      if (name === 'dimmed') {
-        keyShape.attr({
-          opacity: value ? 0.2 : 1,
-        });
-
-        const label = group.find(el => el.cfg.name === 'node-label');
-        if (label) label.set('visible', !value);
-      }
     },
-  }, 'circle')
+    'circle'
+  )
 }
 
 // 初始化 G6 图谱
@@ -189,7 +188,7 @@ const initGraph = async () => {
     for (const node of treeList) {
       nodes.push({
         id: node.id,
-        label:node.label,
+        label: node.label,
         type: 'progress-node',
         progress: node.progress ?? Math.random(), // 示例随机进度，可自定义
         style: {
@@ -229,11 +228,7 @@ const initGraph = async () => {
       strictRadial: false // 不严格按径向排列，允许微调
     },
     modes: {
-      default: [
-        'drag-canvas',
-        'zoom-canvas',
-        'drag-node',
-      ]
+      default: ['drag-canvas', 'zoom-canvas', 'drag-node']
     },
     // 适应画布
     fitView: true,
@@ -242,9 +237,9 @@ const initGraph = async () => {
       size: 45,
       labelCfg: {
         style: {
-          opacity: 0,
-        },
-      },
+          opacity: 0
+        }
+      }
     },
     defaultEdge: {
       type: 'line',
@@ -276,9 +271,9 @@ const initGraph = async () => {
     })
     graph.getNodes().forEach((node) => {
       if (relatedNodes.has(node)) {
-        graph.setItemState(node, 'hover', true);
+        graph.setItemState(node, 'hover', true)
       } else {
-        graph.setItemState(node, 'dimmed', true);
+        graph.setItemState(node, 'dimmed', true)
       }
     })
     graph.getEdges().forEach((edge) => {
@@ -293,41 +288,41 @@ const initGraph = async () => {
   }
 
   graph.on('node:mouseenter', (e) => {
-    const node = e.item;
-    if(!node) return
+    const node = e.item
+    if (!node) return
 
     highlightRelatedNodes(node)
 
     // 所有边只显示与当前节点相关的
-    const nodeId = node.getID();
-    graph.getEdges().forEach(edge => {
-      const model = edge.getModel();
-      const isRelated = model.source === nodeId;
-      edge.changeVisibility(isRelated);
-    });
-  });
+    const nodeId = node.getID()
+    graph.getEdges().forEach((edge) => {
+      const model = edge.getModel()
+      const isRelated = model.source === nodeId
+      edge.changeVisibility(isRelated)
+    })
+  })
 
   graph.on('node:mouseleave', (e) => {
-    const node = e.item;
-    if(!node) return
+    const node = e.item
+    if (!node) return
 
-    graph.getNodes().forEach(n => {
-      graph.clearItemStates(n, ['hover', 'dimmed']);
-    });
+    graph.getNodes().forEach((n) => {
+      graph.clearItemStates(n, ['hover', 'dimmed'])
+    })
 
-    graph.getEdges().forEach(edge => edge.show());
-  });
+    graph.getEdges().forEach((edge) => edge.show())
+  })
 
   graph.on('node:click', (e) => {
-  const node = e.item
-  if (!node) return
+    const node = e.item
+    if (!node) return
 
-  const model = node.getModel()
-  const knowledgeId = model.id // 知识点id
+    const model = node.getModel()
+    const knowledgeId = model.id // 知识点id
 
-  // 编程式导航跳转到知识点详情页，传参
-  push({ path: '/knowledge', query: { id: knowledgeId } })
-})
+    // 编程式导航跳转到知识点详情页，传参
+    push({ path: '/course/knowledge', query: { id: knowledgeId } })
+  })
 }
 
 // 页面挂载后初始化图谱

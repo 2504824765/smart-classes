@@ -27,6 +27,16 @@ public class Classes {
     private Boolean isActive;
     @Column(name = "description")
     private String description;
+    @Column(name = "imageUrl")
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public Long getId() {
         return id;

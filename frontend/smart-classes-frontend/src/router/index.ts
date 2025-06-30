@@ -219,6 +219,30 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
             userType: 'student',
             noCache: true
           }
+        },
+        {
+          path: 'list',
+          component: () => import('@/views/SmartClass/StudentEnd/HomeworkList.vue'),
+          name: 'HomeworkList',
+          meta: {
+            title: t('student.homeworkList'),
+            userType: 'student',
+            hidden: true,
+            canTo: true,
+            noCache: true
+          }
+        },
+        {
+          path: 'detail',
+          component: () => import('@/views/SmartClass/StudentEnd/HomeworkDetail.vue'),
+          name: 'HomeworkDetail',
+          meta: {
+            title: t('student.homeworkList'),
+            userType: 'student',
+            hidden: true,
+            canTo: true,
+            noCache: true
+          }
         }
       ]
     },

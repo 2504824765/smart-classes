@@ -33,7 +33,7 @@ import VideoPlay from './components/VideoPlay.vue'
 import ChatGPT from './components/ChatGPT.vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-const knowledgeId = ref(route.params.id as string || '1')
+const knowledgeId = ref((route.params.id as string) || '1')
 
 const knowledge = reactive({
   title: '',
@@ -48,7 +48,7 @@ const knowledge = reactive({
 })
 
 const currentResourceId = ref('')
-const currentResource = ref<typeof knowledge.resources[0] | null>(null)
+const currentResource = ref<(typeof knowledge.resources)[0] | null>(null)
 
 async function fetchKnowledge() {
   try {
@@ -65,7 +65,7 @@ async function fetchKnowledge() {
         id: 'r2',
         type: 'text',
         name: '学习笔记',
-        content: '神经网络是一种模仿人脑的算法结构...' 
+        content: '神经网络是一种模仿人脑的算法结构...'
       }
     ]
     currentResourceId.value = knowledge.resources[0]?.id || ''
@@ -75,7 +75,7 @@ async function fetchKnowledge() {
 }
 
 watch(currentResourceId, (newId) => {
-  currentResource.value = knowledge.resources.find(r => r.id === newId) || null
+  currentResource.value = knowledge.resources.find((r) => r.id === newId) || null
 })
 
 onMounted(() => {

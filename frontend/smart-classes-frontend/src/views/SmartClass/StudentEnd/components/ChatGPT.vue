@@ -34,13 +34,7 @@
         class="chat-textarea"
         @keyup.enter.exact="submitMessage"
       />
-      <ElButton
-        type="primary"
-        class="send-button"
-        @click="submitMessage"
-        :icon="sendIcon"
-        circle
-      />
+      <ElButton type="primary" class="send-button" @click="submitMessage" :icon="sendIcon" circle />
     </div>
   </div>
 </template>
@@ -56,7 +50,11 @@ const messages = ref<{ role: 'user' | 'ai'; content: string }[]>([])
 const quickActions = [
   { label: '路径推荐', text: '推荐学习路径', iconName: 'vi-ant-design:project-outlined' },
   { label: '知识简介', text: '知识点简介', iconName: 'vi-ant-design:info-circle-outlined' },
-  { label: '资源清单', text: '我有哪些资源可以学习？', iconName: 'vi-ant-design:folder-open-outlined' }
+  {
+    label: '资源清单',
+    text: '我有哪些资源可以学习？',
+    iconName: 'vi-ant-design:folder-open-outlined'
+  }
 ]
 
 // ✅ 这里在 setup 顶部统一处理所有图标组件，避免响应式陷阱

@@ -5,6 +5,8 @@ const studentList: string[] = [
   '/course/detail',
   '/course/knowledge',
   '/homework',
+  '/homework/list',
+  '/homework/detail',
   '/grades'
 ]
 

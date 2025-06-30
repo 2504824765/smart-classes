@@ -2,6 +2,7 @@
 import { onMounted, ref, reactive } from 'vue'
 import G6 from '@antv/g6'
 import { useRouter } from 'vue-router'
+import FileDisplay from './components/FileDisplay.vue'
 
 const { push } = useRouter()
 // 页面数据
@@ -58,9 +59,8 @@ const defaultProps = {
 
 // 文件资源列表（后续替换为 FileCard 组件）
 const fileCards = ref([
-  { name: '神经网络.pdf', type: 'PDF' },
-  { name: '深度学习.pptx', type: 'PPTX' },
-  { name: 'Python源码.zip', type: 'ZIP' }
+  { name: '神经网络.pdf', type: 'PDF', url:'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/user-images/43d2ef69-83d1-44ac-9234-a790cb99dec0.jpg' },
+  { name: '深度学习.pptx', type: 'PPTX', url:'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/class/web开发技术/json/web开发技术知识图谱.json' },
 ])
 
 // 图容器 DOM 引用
@@ -362,10 +362,9 @@ onMounted(() => {
       <el-card class="col-span-3 h-[80vh] overflow-auto">
         <div class="text-lg font-semibold mb-2">资源文件</div>
         <el-empty v-if="fileCards.length === 0" description="暂无资源" />
-        <el-card v-for="file in fileCards" :key="file.name" class="mb-2">
-          <p>文件名：{{ file.name }}</p>
-          <p>类型：{{ file.type }}</p>
-        </el-card>
+        <div v-for="file in fileCards" :key="file.name" class="mb-2">
+          <FileDisplay :url="file.url" />
+        </div>
       </el-card>
     </div>
   </div>

@@ -33,7 +33,7 @@ const props = defineProps<{
 }>()
 
 const goToCourseDetail = () => {
-  push({ path: '/course/detail' })
+  push({ path: '/course/detail', query: { course: props.course.id } })
 }
 </script>
 

@@ -57,7 +57,10 @@ export const usePermissionStore = defineStore('permission', {
           routerMap = generateRoutesByServer(routers as AppCustomRouteRecordRaw[])
         } else if (type === 'frontEnd') {
           // 模拟前端过滤菜单
-          routerMap = generateRoutesByFrontEnd(cloneDeep(getAsyncRouterMap(this.userType)), routers as string[])
+          routerMap = generateRoutesByFrontEnd(
+            cloneDeep(getAsyncRouterMap(this.userType)),
+            routers as string[]
+          )
           console.log('routers', routers, 'type', typeof routers)
           console.log('routerMap', routerMap)
         } else {

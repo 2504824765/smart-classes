@@ -118,24 +118,50 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
         }
       ]
     },
+    //任务
     {
-      path: '/task',
+      path: '/teacher/Mission',
       component: Layout,
-      redirect: '/task/index',
-      name: 'Task',
+      name: 'Mission',
       meta: {
-        title: t('router.task'),
-        icon: 'vi-ant-design:book-outlined',
+        title: t('teacher.mission'),
         userType: 'teacher',
-        alwaysShow: true
+        noCache: true,
+        affix: true
       },
       children: [
         {
-          path: 'task',
-          component: () => import('@/views/SmartClass/TeacherEnd/Task.vue'),
+          path: '',
           name: 'TeacherTask',
+          component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
           meta: {
             title: t('teacher.task'),
+            icon: 'vi-ri:function-fill',
+            userType: 'teacher',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/teacher/CreateMission',
+      component: Layout,
+      name: 'CreateMission',
+      meta: {
+        title: t('teacher.createMission'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true,
+        hidden: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherCreateMission',
+          component: () => import('@/views/SmartClass/TeacherEnd/CreateMission.vue'),
+          meta: {
+            title: t('teacher.createMission'),
             userType: 'teacher',
             noCache: true,
             affix: true

@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(FileIsNullException.class)
+    public ResponseMessage FileIsNullException(FileIsNullException e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(512, "<Fill is null>", null);
+    }
     @ExceptionHandler(ClassMissionNotFoundException.class)
     public ResponseMessage classMissionNotFoundException(ClassMissionNotFoundException e) {
         logger.error(e.getMessage());

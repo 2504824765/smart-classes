@@ -11,7 +11,7 @@ export const loginApi = (data: UserType): Promise<IResponse<boolean>> => {
 }
 
 export const loginOutApi = (): Promise<IResponse> => {
-  return request.get({ url: '/mock/user/loginOut' })
+  return request.get({ url: '/api/user/loginOut' })
 }
 
 export const getUserListApi = ({ params }: AxiosConfig) => {

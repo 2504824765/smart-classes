@@ -33,7 +33,7 @@ import request from '@/axios'
 import type { Department } from './department'
 
 export const getDepartmentListApi = (params: any) => {
-  return request.get({ url: '/api/dept/all', params})
+  return request.get({ url: '/api/dept/all', params })
 }
 
 // 新增组织

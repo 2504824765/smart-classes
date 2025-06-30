@@ -4,12 +4,7 @@
     shadow="hover"
     :body-style="{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem' }"
   >
-    <el-link
-      :href="props.url"
-      target="_blank"
-      :underline="false"
-      class="file-link"
-    >
+    <el-link :href="props.url" target="_blank" :underline="false" class="file-link">
       <component :is="iconComponent" class="file-icon" />
       <span class="file-name">{{ filename }}</span>
     </el-link>
@@ -67,14 +62,14 @@ const iconComponent = computed(() => {
 .file-display {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  transition: box-shadow 0.2s ease; 
+  transition: box-shadow 0.2s ease;
   width: 100%; /* 或固定宽度也可 */
 }
 
 .file-link {
   display: flex;
   align-items: center;
-  justify-content: space-between; 
+  justify-content: space-between;
   text-decoration: none;
   color: inherit;
   width: 100%;

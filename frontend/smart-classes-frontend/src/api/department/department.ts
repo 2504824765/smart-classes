@@ -34,6 +34,6 @@
 export type Department = {
   id: number
   name: string
-  parent_id: number,
+  parent_id: number
   level: number
 }

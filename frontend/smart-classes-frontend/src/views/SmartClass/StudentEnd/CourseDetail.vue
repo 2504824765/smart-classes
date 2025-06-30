@@ -59,8 +59,16 @@ const defaultProps = {
 
 // 文件资源列表（后续替换为 FileCard 组件）
 const fileCards = ref([
-  { name: '神经网络.pdf', type: 'PDF', url:'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/user-images/43d2ef69-83d1-44ac-9234-a790cb99dec0.jpg' },
-  { name: '深度学习.pptx', type: 'PPTX', url:'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/class/web开发技术/json/web开发技术知识图谱.json' },
+  {
+    name: '神经网络.pdf',
+    type: 'PDF',
+    url: 'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/user-images/43d2ef69-83d1-44ac-9234-a790cb99dec0.jpg'
+  },
+  {
+    name: '深度学习.pptx',
+    type: 'PPTX',
+    url: 'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/class/web开发技术/json/web开发技术知识图谱.json'
+  }
 ])
 
 // 图容器 DOM 引用

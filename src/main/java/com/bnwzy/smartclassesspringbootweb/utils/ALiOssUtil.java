@@ -4,23 +4,30 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.OSSObjectSummary;
+import com.aliyun.oss.model.ObjectListing;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import com.bnwzy.smartclassesspringbootweb.config.OssProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @EnableConfigurationProperties(OssProperties.class)
 public class ALiOssUtil {
 
+    @Qualifier("aliyun.oss-com.bnwzy.smartclassesspringbootweb.config.OssProperties")
     @Autowired
     private OssProperties ossProperties;
+
 
     public String uploadFile(String objectName, InputStream in){
 
@@ -92,5 +99,22 @@ public class ALiOssUtil {
         }
 
         return filename;
+    }
+    public List<String> listFilesInFolder(String folderPath) {
+        // 初始化OSS客户端
+        OSS ossClient = new OSSClientBuilder().build(ossProperties.getEndpoint(), ossProperties.getAccessKeyId(), ossProperties.getAccessKeySecret());
+
+        List<String> files = new ArrayList<>();
+        try {
+
+            ObjectListing objectListing = ossClient.listObjects(ossProperties.getBucketName(), folderPath);
+
+            for (OSSObjectSummary objectSummary : objectListing.getObjectSummaries()) {
+                files.add(objectSummary.getKey());
+            }
+        } finally {
+            ossClient.shutdown();
+        }
+        return files;
     }
 }

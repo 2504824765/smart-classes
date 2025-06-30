@@ -2,7 +2,7 @@
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { PropType, reactive, watch } from 'vue'
-import { DepartmentUserItem } from '@/api/department/types'
+import { DepartmentUserItem } from '@/api/department/department'
 import { useValidator } from '@/hooks/web/useValidator'
 
 const { required } = useValidator()

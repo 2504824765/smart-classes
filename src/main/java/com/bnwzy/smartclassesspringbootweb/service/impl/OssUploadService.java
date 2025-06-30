@@ -28,6 +28,9 @@ public class OssUploadService implements IOssUploadService {
     @Autowired
     ClassesRepository classesRepository;
 
+    @Autowired
+    private ALiOssUtil aliOssUtil;
+
     @Override
     public String uploadImage(MultipartFile file, Long id) {
         if(file.isEmpty()){
@@ -51,7 +54,7 @@ public class OssUploadService implements IOssUploadService {
         String url = null;
         String filename = originalFilename+ UUID.randomUUID()+"."+extension;
         try {
-            url = ALiOssUtil.uploadFile(filename, file.getInputStream());
+            url = aliOssUtil.uploadFile(filename, file.getInputStream());
         } catch (IOException e) {
             throw new ImageUploadException("<Image upload failed>");
         }
@@ -85,11 +88,11 @@ public class OssUploadService implements IOssUploadService {
         String fullUrl = null;
 
         try {
-            fullUrl = ALiOssUtil.uploadFile(filename, file.getInputStream());
+            fullUrl = aliOssUtil.uploadFile(filename, file.getInputStream());
         } catch (IOException e) {
             throw new ImageUploadException("<Image upload failed>");
         }
-        String pathOnly = ALiOssUtil.extractPathFromUrl(fullUrl);
+        String pathOnly = aliOssUtil.extractPathFromUrl(fullUrl);
 
         classes.setGraph(pathOnly);
         classesRepository.save(classes);
@@ -125,16 +128,16 @@ public class OssUploadService implements IOssUploadService {
         String filename = baseFilename + "." + extension;
 
         // 检查文件是否存在并生成不重复的文件名
-        filename = ALiOssUtil.generateUniqueFilename(filename);
+        filename = aliOssUtil.generateUniqueFilename(filename);
 
         String url = null;
         try {
-            url = ALiOssUtil.uploadFile(filename, file.getInputStream());
+            url = aliOssUtil.uploadFile(filename, file.getInputStream());
         } catch (IOException e) {
             throw new ImageUploadException("<Resource upload failed>");
         }
 
-        String path = ALiOssUtil.extractPathFromUrl(url);
+        String path = aliOssUtil.extractPathFromUrl(url);
         resource.setPath(path);
         resourceRepository.save(resource);
         return url;

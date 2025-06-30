@@ -6,28 +6,35 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import com.bnwzy.smartclassesspringbootweb.config.OssProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+@Component
+@EnableConfigurationProperties(OssProperties.class)
 public class ALiOssUtil {
 
-    private static final String ENDPOINT = "https://oss-cn-beijing.aliyuncs.com";
+    @Autowired
+    private OssProperties ossProperties;
 
-    private static final String ACCESS_KEY_ID="LTAI5tNnJmjR8fKkrh9nBb7B";
-    private static final String ACCESS_KEY_SECRET="lmX8nWIX5DuBae6RKkoYhmM9SDGXeD";
-    private static final String BUCKET_NAME = "smart-class-northeast";
-    public static String uploadFile(String objectName, InputStream in){
+    public String uploadFile(String objectName, InputStream in){
 
 
         String url="";
-        OSS ossClient = new OSSClientBuilder().build(ENDPOINT, ACCESS_KEY_ID, ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder()
+                .build(ossProperties.getEndpoint(),
+                        ossProperties.getAccessKeyId(),
+                        ossProperties.getAccessKeySecret());
 
         try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, objectName, in);
-            PutObjectResult result = ossClient.putObject(putObjectRequest);
-            url="https://"+BUCKET_NAME+"."+ENDPOINT.substring(ENDPOINT.lastIndexOf("/")+1)+"/"+objectName;
+            PutObjectRequest putObjectRequest = new PutObjectRequest(ossProperties.getBucketName(), objectName, in);
+            ossClient.putObject(putObjectRequest);
+            url="https://"+ossProperties.getBucketName()+"."+ossProperties.getEndpoint().substring(ossProperties.getEndpoint().lastIndexOf("/")+1)+"/"+objectName;
         } catch (OSSException oe) {
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");
@@ -47,10 +54,10 @@ public class ALiOssUtil {
         }
         return url;
     }
-    public static boolean fileExists(String filename) {
-        OSS ossClient = new OSSClientBuilder().build(ENDPOINT, ACCESS_KEY_ID, ACCESS_KEY_SECRET);
+    public boolean fileExists(String filename) {
+        OSS ossClient = new OSSClientBuilder().build(ossProperties.getEndpoint(), ossProperties.getAccessKeyId(), ossProperties.getAccessKeySecret());
         try {
-            return ossClient.doesObjectExist(BUCKET_NAME, filename);
+            return ossClient.doesObjectExist(ossProperties.getBucketName(), filename);
         } catch (Exception e) {
             System.err.println("检查文件存在时出错: " + e.getMessage());
             return false;
@@ -60,7 +67,7 @@ public class ALiOssUtil {
             }
         }
     }
-    public static String extractPathFromUrl(String url) {
+    public  String extractPathFromUrl(String url) {
         try {
             URI uri = new URI(url);
             String path = uri.getPath();
@@ -71,11 +78,11 @@ public class ALiOssUtil {
             return url;
         }
     }
-    public static String generateUniqueFilename(String originalFilename) {
+    public String generateUniqueFilename(String originalFilename) {
         String filename = originalFilename;
         int counter = 1;
 
-        while (ALiOssUtil.fileExists(filename)) {
+        while (fileExists(filename)) {
             int dotIndex = originalFilename.lastIndexOf(".");
             String nameWithoutExt = dotIndex == -1 ? originalFilename : originalFilename.substring(0, dotIndex);
             String ext = dotIndex == -1 ? "" : originalFilename.substring(dotIndex);

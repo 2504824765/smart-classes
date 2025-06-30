@@ -33,16 +33,24 @@ public class TeacherController {
     public ResponseMessage deleteById(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Delete teacher successfully>",teacherService.deleteById(id));
     }
+
     @GetMapping("/getTeacherById/{id}")
     public ResponseMessage getTeacherById(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Get teacher by id successfully>",teacherService.getTeacherById(id));
     }
+
     @GetMapping("getTeacherByUsername/{username}")
     public ResponseMessage getTeacherByUsername(@PathVariable String username) {
         return ResponseMessage.success("<Get teacher by username successfully>",teacherService.getTeacherByUsername(username));
     }
+
     @GetMapping("/all")
     public ResponseMessage getAllTeachers() {
-        return ResponseMessage.success("<Get AllTeachers successfully>",teacherService.getAllTeacher());
+        return ResponseMessage.success("<Get all teachers successfully>",teacherService.getAllTeacher());
+    }
+
+    @GetMapping("/count")
+    public ResponseMessage getTeacherCount() {
+        return ResponseMessage.success("<Get teacher count>", teacherService.getTeacherCount());
     }
 }

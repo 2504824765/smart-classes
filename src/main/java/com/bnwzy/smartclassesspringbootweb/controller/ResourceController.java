@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/resource")
+@RequestMapping("/api/resource")
 public class ResourceController {
     @Autowired
     private IResourceService resourceService;

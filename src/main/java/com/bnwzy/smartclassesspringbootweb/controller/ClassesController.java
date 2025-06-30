@@ -51,4 +51,9 @@ public class ClassesController {
         return ResponseMessage.success("<Get Class>", classesService.getClassByTeacherId(teacherId));
     }
 
+    @GetMapping("/count")
+    public ResponseMessage getClassCount() {
+        return ResponseMessage.success("<Get class count>", classesService.getClassCount());
+    }
+
 }

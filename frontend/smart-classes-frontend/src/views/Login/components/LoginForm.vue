@@ -161,7 +161,6 @@ const signIn = async () => {
       permissionStore.setUserType(role)
       try {
         const res = await loginApi(formData)
-        console.log(res)
         if (res.data === true) {
           // 是否记住我
           if (unref(remember)) {
@@ -182,21 +181,16 @@ const signIn = async () => {
           // 是否使用动态路由
           if (appStore.getDynamicRouter) {
             // getRole()
-            console.log(roleList)
             userStore.setRoleRouters(roleList)
             await permissionStore.generateRoutes('frontEnd', roleList).catch(() => {})
             // 动态添加路由
             permissionStore.getAddRouters.forEach((route) => {
               addRoute(route as RouteRecordRaw)
-              console.log(route)
             })
             permissionStore.setIsAddRouters(true)
-            console.log('redirect', redirect.value)
-            console.log('permissionStore.addRouters', permissionStore.addRouters[0].path)
 
             // 跳转首页
             push({ path: permissionStore.addRouters[0].path })
-            console.log('push s')
           } else {
             await permissionStore.generateRoutes('static').catch(() => {})
             permissionStore.getAddRouters.forEach((route) => {

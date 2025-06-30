@@ -1,3 +1,5 @@
+import CourseDetail from '@/views/SmartClass/StudentEnd/CourseDetail.vue'
+
 export default {
   common: {
     inputText: '请输入',
@@ -579,7 +581,9 @@ export default {
     gender: '性别',
     dept: '所在部门',
     gpa: '绩点',
+    courseDetail: '课程详情',
     courseList: '课程列表',
+    study: '学习',
     videoWatch: '视频观看',
     homework: '作业',
     grades: '成绩查看'

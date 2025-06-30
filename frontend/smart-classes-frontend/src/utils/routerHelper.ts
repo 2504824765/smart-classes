@@ -53,7 +53,6 @@ export const generateRoutesByFrontEnd = (
     }
 
     let data: Nullable<AppRouteRecordRaw> = null
-
     let onlyOneChild: Nullable<string> = null
     if (route.children && route.children.length === 1 && !meta.alwaysShow) {
       onlyOneChild = (

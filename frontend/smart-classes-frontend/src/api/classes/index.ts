@@ -2,7 +2,7 @@ import request from '@/axios'
 import type { Classes } from './classes'
 
 export const getClassListApi = (params: any) => {
-  return request.get({ url: '/api/class/all', params})
+  return request.get({ url: '/api/class/all', params })
 }
 
 // 新增课程

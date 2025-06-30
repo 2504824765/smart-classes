@@ -1,5 +1,5 @@
-import request from "@/axios"
-import { ClassMission } from "./classMission"
+import request from '@/axios'
+import { ClassMission } from './classMission'
 
 export const getClassMissionApi = (params: any) => {
   return request.get({ url: '/api/classMission/all', params })

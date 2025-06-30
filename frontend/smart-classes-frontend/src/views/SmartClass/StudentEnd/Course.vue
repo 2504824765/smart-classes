@@ -1,10 +1,6 @@
 <template>
   <div class="course-list">
-    <CourseCard
-      v-for="item in courseList"
-      :key="item.id"
-      :course="item"
-    />
+    <CourseCard v-for="item in courseList" :key="item.id" :course="item" />
   </div>
 </template>
 

@@ -3,9 +3,11 @@ package com.bnwzy.smartclassesspringbootweb.pojo.dto;
 public class ClassesCreateDTO {
     private String name;
     private Long teacherId;
-    private double credit;
-    private double classHours;
+    private Double credit;
+    private Double classHours;
     private String graph;
+    private Boolean isActive;
+    private String description;
 
     public String getName() {
         return name;
@@ -23,19 +25,19 @@ public class ClassesCreateDTO {
         this.teacherId = teacherId;
     }
 
-    public double getCredit() {
+    public Double getCredit() {
         return credit;
     }
 
-    public void setCredit(double credit) {
+    public void setCredit(Double credit) {
         this.credit = credit;
     }
 
-    public double getClassHours() {
+    public Double getClassHours() {
         return classHours;
     }
 
-    public void setClassHours(double classHours) {
+    public void setClassHours(Double classHours) {
         this.classHours = classHours;
     }
 
@@ -45,5 +47,21 @@ public class ClassesCreateDTO {
 
     public void setGraph(String graph) {
         this.graph = graph;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

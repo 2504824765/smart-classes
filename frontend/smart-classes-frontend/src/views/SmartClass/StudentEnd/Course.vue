@@ -1,28 +1,26 @@
 <template>
   <div class="course-list">
-    <CourseCard v-for="item in courseList" :key="item.id" :course="item" />
+    <CourseCard v-for="item in courseList" :key="item.id" :course="item" :disabled="!item.is_active" />
   </div>
 </template>
 
 <script setup lang="ts">
 import CourseCard from './components/CourseCard.vue'
+import { Classes } from '@/api/classes/classes'
+import { getAllClassesApi } from '@/api/classes/index'
+import { onMounted, ref } from 'vue'
 
-const courseList = [
-  {
-    id: 1,
-    name: 'JavaScript 基础',
-    image: '',
-    description: '学习 JS 的基础语法和逻辑结构',
-    open: true
-  },
-  {
-    id: 2,
-    name: 'Vue3 框架精讲',
-    image: '',
-    description: '深入理解 Vue3 的响应式原理与实践',
-    open: false
-  }
-]
+const courseList = ref<Classes[]>([])
+
+const queryCourseList = async () => {
+  const res = await getAllClassesApi()
+  courseList.value = res.data
+  console.log(courseList)
+}
+
+onMounted(() => {
+  queryCourseList()
+})
 </script>
 
 <style scoped>

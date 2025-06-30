@@ -1,5 +1,10 @@
 <template>
-  <el-card class="course-card" shadow="hover" @click="goToCourseDetail">
+  <el-card
+    class="course-card"
+    shadow="hover"
+    @click="goToCourseDetail"
+    :class="{ 'is-disabled': disabled }"
+  >
     <el-image
       :src="course.image"
       alt="课程封面"
@@ -10,7 +15,7 @@
       <el-text type="info" class="course-desc">
         {{ course.description }}
       </el-text>
-      <el-text class="status" type="success" size="small" v-if="course.open"> 开放中 </el-text>
+      <el-text class="status" type="success" size="small" v-if="course.is_active"> 开放中 </el-text>
       <el-text class="status" type="danger" size="small" v-else> 未开放 </el-text>
     </div>
   </el-card>
@@ -24,12 +29,17 @@ const { currentRoute, addRoute, push } = useRouter()
 
 const props = defineProps<{
   course: {
-    id: string | number
+    id: number
     name: string
-    image: string
+    teacher_id: number
+    credit: number
+    class_hours: number
+    graph: string
+    is_active: boolean
     description: string
-    open: boolean
+    image: string
   }
+  disabled?: boolean
 }>()
 
 const goToCourseDetail = () => {
@@ -60,5 +70,10 @@ const goToCourseDetail = () => {
 .status {
   display: block;
   margin-top: 4px;
+}
+.course-card.is-disabled {
+  opacity: 0.6;
+  pointer-events: none; /* 不可点击 */
+  cursor: not-allowed;
 }
 </style>

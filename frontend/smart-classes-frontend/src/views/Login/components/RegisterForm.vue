@@ -2,6 +2,8 @@
 import { Form, FormSchema } from '@/components/Form'
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
+import { registerApi } from '@/api/login'
+import { UserType } from '@/api/login/types'
 import { useForm } from '@/hooks/web/useForm'
 import { ElInput, FormRules } from 'element-plus'
 import { useValidator } from '@/hooks/web/useValidator'
@@ -11,7 +13,7 @@ import { IAgree } from '@/components/IAgree'
 const emit = defineEmits(['to-login'])
 
 const { formRegister, formMethods } = useForm()
-const { getElFormExpose } = formMethods
+const { getFormData, getElFormExpose } = formMethods
 
 const { t } = useI18n()
 
@@ -87,7 +89,27 @@ const schema = reactive<FormSchema[]>([
       placeholder: t('login.passwordPlaceholder')
     }
   },
-
+  {
+    field: 'select_role',
+    label: t('login.role'),
+    component: 'Select',
+    colProps: {
+      span: 24
+    },
+    componentProps: {
+      placeholder: t('login.rolePlaceholder'),
+      options: [
+        {
+          label: '学生',
+          value: 'student'
+        },
+        {
+          label: '教师',
+          value: 'teacher'
+        }
+      ]
+    }
+  },
   {
     field: 'iAgree',
     colProps: {
@@ -191,8 +213,12 @@ const loginRegister = async () => {
   formRef?.validate(async (valid) => {
     if (valid) {
       try {
-        loading.value = true
-        toLogin()
+        const formData = await getFormData<UserType>()
+        const res = await registerApi(formData)
+        if (res.data === true) {
+          loading.value = true
+          toLogin()
+        }
       } finally {
         loading.value = false
       }

@@ -2,9 +2,9 @@
 import { reactive, ref, watch, onMounted, unref } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElCheckbox, ElLink } from 'element-plus'
+import { ElCheckbox, ElLink, ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
+import { loginApi, getTestRoleApi, getUserInfoApi } from '@/api/login'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
@@ -13,9 +13,7 @@ import { UserType } from '@/api/login/types'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
-import { getAsyncRouterMap } from '@/router'
 import { studentList, teacherList } from './list'
-import { ro } from 'element-plus/es/locale'
 
 const { required } = useValidator()
 
@@ -60,7 +58,7 @@ const skipToTeacher = async () => {
       username: 'teacher',
       password: 'teacher',
       role: 'teacher',
-      roleId: '1',
+      roleId: 1,
       userType: 'teacher'
     }
 
@@ -109,7 +107,7 @@ const skipToStudent = async () => {
       username: 'student',
       password: 'student',
       role: 'student',
-      roleId: '2',
+      roleId: 2,
       userType: 'student'
     }
 
@@ -162,6 +160,9 @@ const signIn = async () => {
       try {
         const res = await loginApi(formData)
         if (res.data === true) {
+          ElMessage.success('登录成功')
+          const user = await getUserInfoApi(formData.username)
+          formData.roleId = user.data.id
           // 是否记住我
           if (unref(remember)) {
             userStore.setLoginInfo({
@@ -199,6 +200,8 @@ const signIn = async () => {
             permissionStore.setIsAddRouters(true)
             push({ path: redirect.value || permissionStore.addRouters[0].path })
           }
+        } else {
+          ElMessage.error('登录失败')
         }
       } finally {
         loading.value = false

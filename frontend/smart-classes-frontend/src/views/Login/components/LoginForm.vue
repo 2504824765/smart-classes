@@ -2,9 +2,9 @@
 import { reactive, ref, watch, onMounted, unref } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElCheckbox, ElLink } from 'element-plus'
+import { ElCheckbox, ElLink, ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
+import { loginApi, getTestRoleApi, getUserInfoApi } from '@/api/login'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
 import { useRouter } from 'vue-router'
@@ -13,10 +13,11 @@ import { UserType } from '@/api/login/types'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
+
 import { getAsyncRouterMap } from '@/router'
-import { studentList, teacherList } from './list'
 import { ro } from 'element-plus/es/locale'
 import axios from 'axios'
+import { adminList, studentList, teacherList } from './list'
 
 const { required } = useValidator()
 
@@ -61,7 +62,7 @@ const skipToTeacher = async () => {
       username: 'teacher',
       password: 'teacher',
       role: 'teacher',
-      roleId: '1',
+      roleId: 1,
       userType: 'teacher'
     }
 
@@ -110,7 +111,7 @@ const skipToStudent = async () => {
       username: 'student',
       password: 'student',
       role: 'student',
-      roleId: '2',
+      roleId: 2,
       userType: 'student'
     }
 
@@ -157,8 +158,20 @@ const signIn = async () => {
     if (isValid) {
       loading.value = true
       const formData = await getFormData<UserType>()
-      const role = formData.role === 'teacher' ? 'teacher' : 'student'
-      const roleList = formData.role === 'teacher' ? teacherList : studentList
+      let role: 'admin' | 'teacher' | 'student'
+      let roleList: any[] = []
+
+      if (formData.username === 'admin' && formData.password === 'admin') {
+        role = 'admin'
+        formData.roleId = 0
+        roleList = adminList
+      } else if (formData.role === 'teacher') {
+        role = 'teacher'
+        roleList = teacherList
+      } else {
+        role = 'student'
+        roleList = studentList
+      }
       permissionStore.setUserType(role)
       try {
         const res = await loginApi(formData)
@@ -171,6 +184,9 @@ const signIn = async () => {
           localStorage.setItem('studentId', student.id)
           localStorage.setItem('studentName', student.name)
 
+          ElMessage.success('登录成功')
+          const user = await getUserInfoApi(formData.username)
+          formData.roleId = user.data.id
           // 是否记住我
           if (unref(remember)) {
             userStore.setLoginInfo({
@@ -208,6 +224,8 @@ const signIn = async () => {
             permissionStore.setIsAddRouters(true)
             push({ path: redirect.value || permissionStore.addRouters[0].path })
           }
+        } else {
+          ElMessage.error('登录失败')
         }
       } finally {
         loading.value = false

@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { Form, FormSchema } from '@/components/Form'
+import { ContentWrap } from '@/components/ContentWrap'
+import { BaseButton } from '@/components/Button'
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { addTeacherApi } from '@/api/teacher/index'
-import type { FormSchema } from '@/components/Form'
+import { createTeacherApi } from '@/api/teacher/index'
 import type { TeacherCreateDTO } from '@/api/teacher/types'
 
-const teacherFormSchema: FormSchema[] = [
+const teacherFormSchema = reactive<FormSchema[]>([
   {
     field: 'name',
     label: '教师姓名',
@@ -38,7 +40,7 @@ const teacherFormSchema: FormSchema[] = [
     label: '所属院系',
     component: 'Input'
   }
-]
+])
 
 const { formRegister, formMethods } = useForm()
 const { getElFormExpose, getFormData } = formMethods
@@ -55,7 +57,7 @@ const handleSubmit = async () => {
 
     const formData = await getFormData<TeacherCreateDTO>()
     try {
-      await addTeacherApi(formData)
+      await createTeacherApi(formData)
       ElMessage.success('教师添加成功')
       elForm.resetFields()
     } catch (err) {

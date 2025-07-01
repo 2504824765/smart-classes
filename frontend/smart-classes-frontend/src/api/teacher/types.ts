@@ -5,3 +5,5 @@ export type Teacher = {
   gender: string
   dept: string
 }
+
+export type TeacherCreateDTO = Omit<Teacher, 'id'>

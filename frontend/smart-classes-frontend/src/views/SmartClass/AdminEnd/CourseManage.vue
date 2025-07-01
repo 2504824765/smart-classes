@@ -90,7 +90,12 @@ setProps({
 
 <template>
   <ContentWrap title="课程管理">
-    <ElButton type="primary" @click="push({ path: '/admin/courseManage/form' })" style="float: right;margin-bottom: 10px;">添加课程</ElButton>
+    <ElButton
+      type="primary"
+      @click="push({ path: '/admin/courseManage/form' })"
+      style="float: right; margin-bottom: 10px"
+      >添加课程</ElButton
+    >
     <Table
       v-model:currentPage="currentPage"
       v-model:pageSize="pageSize"

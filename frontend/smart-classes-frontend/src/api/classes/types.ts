@@ -1,9 +1,9 @@
 export type Classes = {
   id: number
   name: string
-  teacher_id: number
+  teacherId: number
   credit: number
-  class_hours: number
+  classHours: number
   graph: string
   active: boolean
   description: string

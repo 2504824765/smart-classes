@@ -5,6 +5,9 @@ import { BaseButton } from '@/components/Button'
 import { useTable } from '@/hooks/web/useTable'
 import { getAllTeacherApi, deleteTeacherApi } from '@/api/teacher/index'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const { push } = useRouter()
 
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: async () => {
@@ -62,6 +65,12 @@ setProps({
 
 <template>
   <ContentWrap title="教师管理">
+    <ElButton
+      type="primary"
+      @click="push({ path: '/admin/teacherManage/form' })"
+      style="float: right; margin-bottom: 10px"
+      >添加教师</ElButton
+    >
     <Table
       v-model:currentPage="currentPage"
       v-model:pageSize="pageSize"

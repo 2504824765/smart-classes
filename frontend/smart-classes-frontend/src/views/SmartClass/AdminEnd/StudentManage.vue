@@ -6,7 +6,9 @@ import { useTable } from '@/hooks/web/useTable'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { getAllStudentApi, deleteStudentApi } from '@/api/student/index'
 import type { Student } from '@/api/student/types' // 或直接定义在本文件中
+import { useRouter } from 'vue-router'
 
+const { push } = useRouter()
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: async () => {
     const res = await getAllStudentApi()
@@ -78,6 +80,12 @@ setProps({
 
 <template>
   <ContentWrap title="学生管理">
+    <ElButton
+      type="primary"
+      @click="push({ path: '/admin/studentManage/form' })"
+      style="float: right; margin-bottom: 10px"
+      >添加学生</ElButton
+    >
     <Table
       v-model:currentPage="currentPage"
       v-model:pageSize="pageSize"

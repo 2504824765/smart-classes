@@ -12,12 +12,13 @@ export const uploadResourcesApi = (
   const formData = new FormData()
   formData.append('file', file)
   formData.append('message', message)
-  return request.post({ 
-    url: '/api/oss/uploadResource', 
-    data: formData,    
+  return request.post({
+    url: '/api/oss/uploadResource',
+    data: formData,
     headers: {
-      'Content-Type': 'multipart/form-data' 
-    } })
+      'Content-Type': 'multipart/form-data'
+    }
+  })
 }
 
 /**

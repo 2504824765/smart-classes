@@ -4,20 +4,24 @@ import { ContentWrap } from '@/components/ContentWrap'
 import { useForm } from '@/hooks/web/useForm'
 import { BaseButton } from '@/components/Button'
 import { ElMessage } from 'element-plus'
-import type { UploadFile } from 'element-plus'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi } from '@/api/classes'
 import { PendingUploadResource, ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource'
 import { uploadResourcesApi } from '@/api/oss'
+import { Teacher } from '@/api/teacher/types'
+import { getAllTeacherApi } from '@/api/teacher'
 
 //待上传的资源
 const pendingResources = ref<PendingUploadResource[]>([])
 // 绑定上传的资源（uploadedResources 是前面上传时填充的）
 const uploadedResources: ResourceCreateDTO[] = []
+const allTeachers = ref<Teacher[]>([])  // 所有教师原始数据
+const teacherOptions = ref<{ label: string; value: number }[]>([])  // 绑定 Select
+const teacherLoading = ref(false)
 
-const courseFormSchema = reactive<FormSchema[]>([
+const courseFormSchema = reactive<FormSchema[]>([ 
   {
     field: 'name',
     label: '课程名称',
@@ -28,8 +32,29 @@ const courseFormSchema = reactive<FormSchema[]>([
   },
   {
     field: 'teacher_id',
-    label: '授课教师ID',
-    component: 'InputNumber',
+    label: '授课教师',
+    component: 'Select',
+    componentProps: {
+      filterable: true,
+      clearable: true,
+      loading: teacherLoading,
+      options: teacherOptions,
+      filterMethod: (query: string) => {
+        if (!query) {
+          teacherOptions.value = allTeachers.value.map(t => ({
+            label: `${t.name}（ID: ${t.id}）`,
+            value: t.id
+          }))
+          return
+        }
+        teacherOptions.value = allTeachers.value
+          .filter(t => t.name.includes(query) || String(t.id).includes(query))
+          .map(t => ({
+            label: `${t.name}（ID: ${t.id}）`,
+            value: t.id
+          }))
+      }
+    },
     formItemProps: {
       required: true
     }
@@ -124,9 +149,9 @@ const handleSubmit = async () => {
       // 1. 创建一个空课程，后端返回课程 id
       const nullClass: ClassesCreateDTO = {
         name: '',
-        teacher_id: 0,
+        teacherId: 1,
         credit: 0,
-        class_hours: 0,
+        classHours: 0,
         description: '',
         active: false,
         image: '',
@@ -134,6 +159,7 @@ const handleSubmit = async () => {
       }
 
       const res = await addClassApi(nullClass)
+      console.log(res)
       const newClassId = res.data?.id
       if (!newClassId) {
         ElMessage.error('课程 ID 获取失败')
@@ -149,11 +175,9 @@ const handleSubmit = async () => {
 
       await updateClassApi(updatedCourse)
 
-
-
       for (const resource of pendingResources.value) {
         const uploadRes = await uploadResourcesApi(resource.file, '课程资料')
-        const filePath = uploadRes.data.url 
+        const filePath = uploadRes.data.url
 
         uploadedResources.push({
           name: resource.name,
@@ -178,6 +202,20 @@ const handleSubmit = async () => {
     }
   })
 }
+
+onMounted(async () => {
+  teacherLoading.value = true
+  try {
+    const res = await getAllTeacherApi()
+    allTeachers.value = res.data
+    teacherOptions.value = res.data.map(t => ({
+      label: `${t.name}（ID: ${t.id}）`,
+      value: t.id
+    }))
+  } finally {
+    teacherLoading.value = false
+  }
+})
 </script>
 
 <template>

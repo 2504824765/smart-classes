@@ -1,9 +1,9 @@
 import request from '@/axios'
 import { StudentClasses } from './studentClasses'
 
-// export const getStudentClassesListApi = (params: any) => {
-//   return request.get({ url: '/api/scAssociated/all', params })
-// }
+export const getStudentClassesListApi = (params: any) => {
+  return request.get({ url: '/api/scAssociated/all', params })
+}
 
 // 新增学生课程关联记录
 export const addClassRecordApi = (data: StudentClasses) => {

@@ -24,21 +24,12 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
+import { Classes } from '@/api/classes/types'
 
-const { currentRoute, addRoute, push } = useRouter()
+const { push } = useRouter()
 
 const props = defineProps<{
-  course: {
-    id: number
-    name: string
-    teacher_id: number
-    credit: number
-    class_hours: number
-    graph: string
-    active: boolean
-    description: string
-    image: string
-  }
+  course: Classes,
   disabled?: boolean
 }>()
 

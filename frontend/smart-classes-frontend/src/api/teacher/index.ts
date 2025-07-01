@@ -1,5 +1,5 @@
 import request from '@/axios'
-import type { Teacher } from './types'
+import type { Teacher, TeacherCreateDTO } from './types'
 
 export const getTeacherListApi = (params: any) => {
   return request.get({ url: '/api/teacher/all', params })
@@ -26,11 +26,18 @@ export const getAllTeacherApi = () => {
 }
 
 // 新增教师
-export const createTeacherApi = (data: Teacher) => {
+export const createTeacherApi = (data: TeacherCreateDTO) => {
   return request.post({ url: '/api/teacher/add', data })
 }
 
 // 删除教师
 export const deleteTeacherApi = (id: number) => {
   return request.delete({ url: `/api/teacher/${id}` })
+}
+
+export const getTeacherByKeywordApi = (keyword: string) => {
+  return request.get({
+    url: `/api/teacher/search`,
+    params: { keyword }
+  })
 }

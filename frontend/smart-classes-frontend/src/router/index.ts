@@ -370,7 +370,21 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             title: t('admin.student'),
             userType: 'admin',
             noCache: true
-          }
+          },
+          children: [
+            {
+              path: 'form',
+              component: () => import('@/views/SmartClass/AdminEnd/components/StudentForm.vue'),
+              name: 'AdminStudentManageForm',
+              meta: {
+                title: t('admin.createform'),
+                userType: 'admin',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
         },
         {
           path: 'courseManage',

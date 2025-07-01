@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import CourseHCard from './components/CourseHCard.vue'
 import { useRouter } from 'vue-router'
-import { Classes, CourseDisplayData } from '@/api/classes/classes'
+import { Classes, CourseDisplayData } from '@/api/classes/types'
 import { ref } from 'vue'
 const { push } = useRouter()
 
@@ -34,7 +34,7 @@ const courses = ref<CourseDisplayData[]>([
   }
 ])
 
-const displayCourses: CourseDisplayData[] = classes.value.map(cls => {
+const displayCourses: CourseDisplayData[] = classes.value.map((cls) => {
   const stats = courses[cls.id] || { unfinished: 0, total: 0 }
 
   return {

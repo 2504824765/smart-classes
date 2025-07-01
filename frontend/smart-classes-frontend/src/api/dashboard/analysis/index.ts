@@ -6,7 +6,6 @@ import type {
   MonthlySales
 } from './types'
 
-
 export const getCountApi = (): Promise<IResponse<AnalysisTotalTypes[]>> => {
   return request.get({ url: '/mock/analysis/total' })
 }

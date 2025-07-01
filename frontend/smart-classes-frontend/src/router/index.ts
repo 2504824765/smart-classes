@@ -120,51 +120,76 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
     },
     //任务
     {
-      path: '/teacher/Mission',
+      path: '/mission',
       component: Layout,
       name: 'Mission',
       meta: {
         title: t('teacher.mission'),
         userType: 'teacher',
+        icon: 'vi-ri:function-fill',
         noCache: true,
         affix: true
       },
       children: [
         {
-          path: '',
-          name: 'TeacherTask',
+          path: 'content',
+          name: 'MissionContent',
           component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
           meta: {
             title: t('teacher.task'),
-            icon: 'vi-ri:function-fill',
             userType: 'teacher',
             noCache: true,
             affix: true
           }
-        }
-      ]
-    },
-    {
-      path: '/teacher/CreateMission',
-      component: Layout,
-      name: 'CreateMission',
-      meta: {
-        title: t('teacher.createMission'),
-        userType: 'teacher',
-        noCache: true,
-        affix: true,
-        hidden: true
-      },
-      children: [
+        },
         {
-          path: '',
-          name: 'TeacherCreateMission',
+          path: 'create',
+          name: 'MissionCreate',
           component: () => import('@/views/SmartClass/TeacherEnd/CreateMission.vue'),
           meta: {
             title: t('teacher.createMission'),
             userType: 'teacher',
             noCache: true,
+            affix: true,
+            hidden: true,
+            canTo: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/course',
+      component: Layout,
+      redirect: '/course/content',
+      name: 'Course',
+      meta: {
+        title: t('teacher.courseList'),
+        icon: 'vi-ant-design:book-outlined',
+        userType: 'teacher',
+        alwaysShow: true
+      },
+      children: [
+        {
+          path: 'content',
+          component: () => import('@/views/SmartClass/TeacherEnd/Course.vue'),
+          name: 'CourseContent',
+          meta: {
+            title: t('teacher.courseList'),
+            userType: 'teacher',
+            noCache: true,
             affix: true
+          }
+        },
+        {
+          path: 'detail',
+          component: () => import('@/views/SmartClass/TeacherEnd/CourseDetail.vue'),
+          name: 'CourseDetail',
+          meta: {
+            title: t('teacher.courseDetail'),
+            userType: 'teacher',
+            noCache: true,
+            hidden: true,
+            canTo: true
           }
         }
       ]
@@ -299,12 +324,67 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
   ]
 }
 
+export const getAdminRoutes = (): AppRouteRecordRaw[] => {
+  return [
+    {
+      path: '/admin',
+      component: Layout,
+      redirect: '/admin/teacherManage',
+      name: 'Admin',
+      meta: {
+        title: t('admin.admin'),
+        icon: 'vi-ant-design:setting-outlined',
+        userType: 'admin',
+        alwaysShow: true
+      },
+      children: [
+        {
+          path: 'teacherManage',
+          component: () => import('@/views/SmartClass/AdminEnd/TeacherManage.vue'),
+          name: 'AdminTeacherManage',
+          meta: {
+            title: t('admin.teacher'),
+            userType: 'admin',
+            noCache: true
+          }
+        },
+        {
+          path: 'studentManage',
+          component: () => import('@/views/SmartClass/AdminEnd/StudentManage.vue'),
+          name: 'AdminStudentManage',
+          meta: {
+            title: t('admin.student'),
+            userType: 'admin',
+            noCache: true
+          }
+        },
+        {
+          path: 'courseManage',
+          component: () => import('@/views/SmartClass/AdminEnd/CourseManage.vue'),
+          name: 'AdminCourseManage',
+          meta: {
+            title: t('admin.course'),
+            userType: 'admin',
+            noCache: true
+          }
+        }
+      ]
+    }
+  ]
+}
+
 // 根据用户类型获取路由
-export const getAsyncRouterMap = (userType: 'teacher' | 'student'): AppRouteRecordRaw[] => {
+export const getAsyncRouterMap = (
+  userType: 'teacher' | 'student' | 'admin'
+): AppRouteRecordRaw[] => {
   if (userType === 'student') {
     return getStudentRoutes()
-  } else {
+  } else if (userType === 'teacher') {
     return getTeacherRoutes()
+  } else if (userType === 'admin') {
+    return getAdminRoutes()
+  } else {
+    return []
   }
 }
 

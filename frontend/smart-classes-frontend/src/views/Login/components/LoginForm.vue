@@ -13,7 +13,7 @@ import { UserType } from '@/api/login/types'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
-import { studentList, teacherList } from './list'
+import { adminList, studentList, teacherList } from './list'
 
 const { required } = useValidator()
 
@@ -154,8 +154,20 @@ const signIn = async () => {
     if (isValid) {
       loading.value = true
       const formData = await getFormData<UserType>()
-      const role = formData.role === 'teacher' ? 'teacher' : 'student'
-      const roleList = formData.role === 'teacher' ? teacherList : studentList
+      let role: 'admin' | 'teacher' | 'student'
+      let roleList: any[] = []
+
+      if (formData.username === 'admin' && formData.password === 'admin') {
+        role = 'admin'
+        formData.roleId = 0
+        roleList = adminList
+      } else if (formData.role === 'teacher') {
+        role = 'teacher'
+        roleList = teacherList
+      } else {
+        role = 'student'
+        roleList = studentList
+      }
       permissionStore.setUserType(role)
       try {
         const res = await loginApi(formData)

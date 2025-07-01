@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import CourseCard from './components/CourseCard.vue'
-import { Classes } from '@/api/classes/classes'
+import { Classes } from '@/api/classes/types'
 import { getAllClassesApi } from '@/api/classes/index'
 import { onMounted, ref } from 'vue'
 

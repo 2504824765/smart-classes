@@ -1,4 +1,4 @@
-import { Teacher } from '../teacher/teacher'
+import { Teacher } from '../teacher/types'
 
 export type Classes = {
   id: number

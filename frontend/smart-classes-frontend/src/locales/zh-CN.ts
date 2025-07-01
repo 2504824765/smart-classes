@@ -624,5 +624,11 @@ export default {
     task: '任务',
     mission: '任务',
     createMission: '创建任务'
+  },
+  admin: {
+    admin: '管理员',
+    teacher: '教师管理',
+    student: '学生管理',
+    course: '课程关联'
   }
 }

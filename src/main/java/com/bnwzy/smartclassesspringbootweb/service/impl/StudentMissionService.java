@@ -5,6 +5,7 @@ import com.bnwzy.smartclassesspringbootweb.exception.ClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentMissionNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.*;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.GetStudentMissionByStudentIdAndClassMissionIdDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentsAllClassMissionGetDTO;
@@ -135,6 +136,21 @@ public class StudentMissionService implements IStudentMissionService {
                 students.add(studentClass.getStudent());
             }
             return students;
+        }
+    }
+
+    @Override
+    public StudentMission getStudentMissionByStudentIdAndClassMissionId(GetStudentMissionByStudentIdAndClassMissionIdDTO getStudentMissionByStudentIdAndClassMissionIdDTO) {
+        if (classMissionRepository.findById(getStudentMissionByStudentIdAndClassMissionIdDTO.getClassMissionId()).isEmpty()) {
+            throw new ClassMissionNotFoundException("<Class mission not found>");
+        } else {
+            ClassMission classMission = classMissionRepository.findById(getStudentMissionByStudentIdAndClassMissionIdDTO.getClassMissionId()).get();
+            if (studentRepository.findById(getStudentMissionByStudentIdAndClassMissionIdDTO.getStudentId()).isEmpty()) {
+                throw new StudentNotFoundException("<Student not found>");
+            } else {
+                Student student = studentRepository.findById(getStudentMissionByStudentIdAndClassMissionIdDTO.getStudentId()).get();
+                return  studentMissionRepository.findByClassMissionAndStudent(classMission, student);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
+import com.bnwzy.smartclassesspringbootweb.exception.IdentityAuthenticationException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.WrongPasswordException;
@@ -28,7 +29,11 @@ public class UserService implements IUserService {
         } else {
             User user = userRepository.findByUsername(userLoginDTO.getUsername()).get();
             if (user.getPassword().equals(userLoginDTO.getPassword())) {
-                return true;
+                if (user.getRole().equals(userLoginDTO.getRole())) {
+                    return true;
+                } else {
+                    throw new IdentityAuthenticationException("<Role is not correct>");
+                }
             } else {
                 throw new WrongPasswordException("<Wrong Password>");
             }

@@ -1,12 +1,12 @@
 import request from '@/axios'
-import type { Classes } from './classes'
+import type { ClassesCreateDTO, Classes } from './types'
 
 export const getClassListApi = (params: any) => {
   return request.get({ url: '/api/class/all', params })
 }
 
 // 新增课程
-export const addClassApi = (data: Classes) => {
+export const addClassApi = (data: ClassesCreateDTO): Promise<IResponse<Classes>> => {
   return request.post({ url: '/api/class/add', data })
 }
 

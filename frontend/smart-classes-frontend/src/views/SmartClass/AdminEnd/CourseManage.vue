@@ -6,6 +6,9 @@ import { useTable } from '@/hooks/web/useTable'
 import { ElMessageBox, ElMessage, ElTag } from 'element-plus'
 import { getAllClassesApi, deleteClassApi } from '@/api/classes/index'
 import type { Classes } from '@/api/classes/types'
+import { useRouter } from 'vue-router'
+
+const { push } = useRouter()
 
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: async () => {
@@ -98,5 +101,6 @@ setProps({
       @register="tableRegister"
       @refresh="refresh"
     />
+    <ElButton type="primary" @click="push({ path: 'form' })">添加课程</ElButton>
   </ContentWrap>
 </template>

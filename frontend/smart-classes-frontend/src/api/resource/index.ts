@@ -1,12 +1,12 @@
 import request from '@/axios'
-import { Resource } from './resource'
+import { Resource, ResourceCreateDTO } from './types'
 
 export const getResourceListApi = (params: any) => {
   return request.get({ url: '/api/resource/all', params })
 }
 
 // 新增资源
-export const addResourceApi = (data: Resource) => {
+export const addResourceApi = (data: ResourceCreateDTO) => {
   return request.post({ url: '/api/resource/add', data })
 }
 

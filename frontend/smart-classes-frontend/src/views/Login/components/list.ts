@@ -26,6 +26,9 @@ const adminList: string[] = [
   '/admin/teacherManage',
   '/admin/studentManage',
   '/admin/courseManage',
+  '/admin/teacherManage/form',
+  '/admin/studentManage/form',
+  '/admin/courseManage/form',
   '/admin/missionManage',
   '/admin/gradesManage'
 ]

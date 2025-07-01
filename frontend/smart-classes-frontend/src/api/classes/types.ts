@@ -17,3 +17,5 @@ export type CourseDisplayData = {
   unfinished: number
   total: number
 }
+
+export type ClassesCreateDTO = Omit<Classes, 'id'>

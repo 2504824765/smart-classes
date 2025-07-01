@@ -34,8 +34,8 @@
 export type Department = {
   id: number
   name: string
-  parent_id: number
-  level: number
+  parentId: number
+  departmentLevel: number
 }
 
 export type DepartmentCreateDTO = Omit<Department, 'id'>

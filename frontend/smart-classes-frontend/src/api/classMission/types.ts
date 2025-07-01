@@ -7,7 +7,7 @@ export type ClassMission = {
   type: string
   description: string
   deadline: string
-  submit_method: string
+  submitMethod: string
   score: number
 }
 

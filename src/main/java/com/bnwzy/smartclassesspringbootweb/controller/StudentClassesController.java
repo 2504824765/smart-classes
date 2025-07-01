@@ -41,6 +41,6 @@ public class StudentClassesController {
     }
     @GetMapping("/getAssociatedByCid/{cid}")
     public ResponseMessage getAllStudentClassesByClassesId(@PathVariable("cid")Long cid) {
-        return ResponseMessage.success("<Get class record by cid successfully>",studentClassesService.getAllStudentClassesByClassesId(cid));
+        return ResponseMessage.success("<Get class record by cid successfully>", studentClassesService.getAllStudentClassesByClassesId(cid));
     }
 }

@@ -23,7 +23,7 @@ public class UserService implements IUserService {
     UserRepository userRepository;
 
     public Boolean userLogin(UserLoginDTO userLoginDTO) {
-        if (!userRepository.findByUsername(userLoginDTO.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(userLoginDTO.getUsername()).isEmpty()) {
             throw new UserNotFoundException("<User not found>");
         } else {
             User user = userRepository.findByUsername(userLoginDTO.getUsername()).get();
@@ -49,7 +49,7 @@ public class UserService implements IUserService {
 
     @Override
     public Boolean userChangePassword(UserChangePasswordDTO userChangePasswordDTO) {
-        if (!userRepository.findByUsername(userChangePasswordDTO.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(userChangePasswordDTO.getUsername()).isEmpty()) {
             throw new UserNotFoundException("<UserNotFoundException>");
         } else {
             User user = userRepository.findByUsername(userChangePasswordDTO.getUsername()).get();
@@ -86,7 +86,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserReturnDTO getUserById(Long id) {
-        if (!userRepository.findById(id).isPresent()) {
+        if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("<UserNotFoundException>");
         } else {
             User user = userRepository.findById(id).get();
@@ -101,8 +101,6 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> getAllUser() {
-        List<User> userList = new ArrayList<>();
-        userRepository.findAll().forEach(userList::add);
-        return userList;
+        return new ArrayList<>(userRepository.findAll());
     }
 }

@@ -27,44 +27,52 @@
 import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
 
-// 假设登录时将 studentId 存入 localStorage
-const studentId = localStorage.getItem('studentId') || 1
+// 登录后从localStorage拿studentId
+const studentId = Number(localStorage.getItem('studentId') || 0)
 
-// 保存学生信息
 const student = ref({
-  id: Number(studentId),
-  name: '',
-  gpa: null
+  id: studentId,
+  name: ''
 })
 
-// 成绩列表
 const grades = ref([])
 
-// 获取学生成绩数据（从 studentClasses 表）
-const fetchStudentGrades = async () => {
+// 获取学生姓名
+const fetchStudentInfo = async () => {
   try {
-    const res = await axios.get(`/api/studentClasses?studentId=${student.value.id}`)
-    const studentClassList = res.data
-
-    // 映射出前端需要展示的格式
-    grades.value = studentClassList.map(item => ({
-      name: item.classes.name,
-      credit: item.classes.credit,
-      class_hours: item.classes.classHours,
-      grade: item.grade
-    }))
-
-    // 也可以顺带设置学生姓名
-    if (studentClassList.length > 0) {
-      student.value.name = studentClassList[0].student.name
-    }
-
+    const res = await axios.get(`/api/student/getStudentById/${student.value.id}`)
+    student.value.name = res.data.name
   } catch (error) {
-    console.error('获取成绩失败:', error)
+    console.error('获取学生信息失败:', error)
   }
 }
 
-// GPA 计算（成绩×学分 加权平均）
+// 获取学生的选课记录
+const fetchStudentGrades = async () => {
+  try {
+    const res = await axios.get(`/api/scAssociated/getAssociatedBySid/${student.value.id}`)
+    const associatedList = res.data.data
+
+    // 对每个课程ID，请求classes信息
+    const classRequests = associatedList.map(async (item) => {
+      const classRes = await axios.get(`/api/class/getClassById/${item.cid}`)
+      const classData = classRes.data
+      return {
+        name: classData.name,
+        credit: classData.credit,
+        class_hours: classData.classHours,
+        grade: item.grade
+      }
+    })
+
+    // 等待所有课程信息加载完成
+    grades.value = await Promise.all(classRequests)
+  } catch (error) {
+    console.error('获取选课或课程信息失败:', error)
+  }
+}
+
+// GPA
 const gpa = computed(() => {
   if (grades.value.length === 0) return 0
   const total = grades.value.reduce((acc, cur) => {
@@ -75,10 +83,12 @@ const gpa = computed(() => {
   return total.totalCredit > 0 ? total.totalGrade / total.totalCredit : 0
 })
 
-onMounted(() => {
-  fetchStudentGrades()
+onMounted(async () => {
+  await fetchStudentInfo()
+  await fetchStudentGrades()
 })
 </script>
+
 
 
 <style scoped>

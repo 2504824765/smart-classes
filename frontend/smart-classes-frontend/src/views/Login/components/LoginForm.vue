@@ -16,6 +16,7 @@ import { BaseButton } from '@/components/Button'
 import { getAsyncRouterMap } from '@/router'
 import { studentList, teacherList } from './list'
 import { ro } from 'element-plus/es/locale'
+import axios from 'axios'
 
 const { required } = useValidator()
 
@@ -162,6 +163,14 @@ const signIn = async () => {
       try {
         const res = await loginApi(formData)
         if (res.data === true) {
+          
+          // 取用户名
+          const infoRes = await axios.get(`/api/student/getStudentByUsername/${formData.username}`)
+          const student = infoRes.data
+
+          localStorage.setItem('studentId', student.id)
+          localStorage.setItem('studentName', student.name)
+
           // 是否记住我
           if (unref(remember)) {
             userStore.setLoginInfo({

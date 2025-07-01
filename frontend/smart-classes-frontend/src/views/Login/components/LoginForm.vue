@@ -163,6 +163,7 @@ const signIn = async () => {
 
       if (formData.username === 'admin' && formData.password === 'admin') {
         role = 'admin'
+        formData.role = 'admin'
         formData.roleId = 0
         roleList = adminList
       } else if (formData.role === 'teacher') {
@@ -176,7 +177,6 @@ const signIn = async () => {
       try {
         const res = await loginApi(formData)
         if (res.data === true) {
-          
           // 取用户名
           const infoRes = await axios.get(`/api/student/getStudentByUsername/${formData.username}`)
           const student = infoRes.data
@@ -192,7 +192,7 @@ const signIn = async () => {
             userStore.setLoginInfo({
               username: formData.username,
               password: formData.password,
-              role: formData.role
+              role: role
             })
           } else {
             userStore.setLoginInfo(undefined)

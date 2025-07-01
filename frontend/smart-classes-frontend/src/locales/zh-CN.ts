@@ -629,6 +629,7 @@ export default {
     admin: '管理员',
     teacher: '教师管理',
     student: '学生管理',
-    course: '课程关联'
+    course: '课程关联',
+    createForm: '创建表单'
   }
 }

@@ -12,43 +12,66 @@
 import CourseHCard from './components/CourseHCard.vue'
 import { useRouter } from 'vue-router'
 import { Classes, CourseDisplayData } from '@/api/classes/types'
-import { ref } from 'vue'
+import { getAllClassesApi } from '@/api/classes/index'
+import { getStudentByUsernameApi } from '@/api/student/index'
+import { getStudentMissionByClass } from '@/api/studentMission/index'
+import { ref, onMounted } from 'vue'
+import { useUserStore } from '@/store/modules/user'
 const { push } = useRouter()
 
+const studentId = ref<number | null>(null)
+const getStudentId = async (username: string) => {
+  const res = await getStudentByUsernameApi(username)
+  studentId.value = res.data.id
+}
+
+const userStore = useUserStore()
+const loginInfo = userStore.getLoginInfo
+if (loginInfo) {
+  const username = loginInfo.username
+  getStudentId(username)
+}
+
 const classes = ref<Classes[]>([])
+const courses = ref<CourseDisplayData[]>([])
 
-const courses = ref<CourseDisplayData[]>([
-  {
-    name: '高等数学',
-    image: '/default.png',
-    description: '函数、极限、积分等知识',
-    unfinished: 2,
-    total: 5
-  },
-  {
-    name: '大学英语',
-    image: '/default.png',
-    description: '阅读与写作训练',
-    unfinished: 1,
-    total: 3
+const loadCourses = async () => {
+  // 假设当前用户名存在 store 中
+  if (!studentId.value) return
+
+  // 获取所有课程
+  const classRes = await getAllClassesApi()
+  classes.value = classRes.data
+
+  const courseList: CourseDisplayData[] = []
+
+  // 遍历课程，获取任务统计数据
+  for (const cls of classes.value) {
+    const missionRes = await getStudentMissionByClass(cls.id, studentId.value,)
+
+    const missions = missionRes.data || []
+    const total = missions.length
+    const unfinished = missions.filter(m => !m.isActive).length
+
+    courseList.push({
+      name: cls.name,
+      description: cls.description,
+      imageUrl: cls.imageUrl || '/default.png',
+      total,
+      unfinished
+    })
   }
-])
 
-const displayCourses: CourseDisplayData[] = classes.value.map((cls) => {
-  const stats = courses[cls.id] || { unfinished: 0, total: 0 }
-
-  return {
-    name: cls.name,
-    image: cls.image || '/default.png',
-    description: cls.description,
-    unfinished: stats.unfinished,
-    total: stats.total
-  }
-})
+  courses.value = courseList
+}
 
 function goToHomework(course: any) {
   push({ path: '/homework/list', query: { course: course.name } })
 }
+
+onMounted(() => {
+  loadCourses()
+})
 </script>
 
 <style scoped>

@@ -19,7 +19,6 @@
         </el-card>
       </el-col>
     </el-row>
-
   </div>
 </template>
 
@@ -75,11 +74,14 @@ const fetchStudentGrades = async () => {
 // GPA
 const gpa = computed(() => {
   if (grades.value.length === 0) return 0
-  const total = grades.value.reduce((acc, cur) => {
-    acc.totalGrade += cur.grade * cur.credit
-    acc.totalCredit += cur.credit
-    return acc
-  }, { totalGrade: 0, totalCredit: 0 })
+  const total = grades.value.reduce(
+    (acc, cur) => {
+      acc.totalGrade += cur.grade * cur.credit
+      acc.totalCredit += cur.credit
+      return acc
+    },
+    { totalGrade: 0, totalCredit: 0 }
+  )
   return total.totalCredit > 0 ? total.totalGrade / total.totalCredit : 0
 })
 
@@ -88,8 +90,6 @@ onMounted(async () => {
   await fetchStudentGrades()
 })
 </script>
-
-
 
 <style scoped>
 .student-grade-container {

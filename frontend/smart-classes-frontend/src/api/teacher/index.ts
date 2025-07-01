@@ -34,3 +34,10 @@ export const createTeacherApi = (data: TeacherCreateDTO): Promise<IResponse<Teac
 export const deleteTeacherApi = (id: number) => {
   return request.delete({ url: `/api/teacher/${id}` })
 }
+
+export const getTeacherByKeywordApi = (keyword: string) => {
+  return request.get({
+    url: `/api/teacher/search`,
+    params: { keyword }
+  })
+}

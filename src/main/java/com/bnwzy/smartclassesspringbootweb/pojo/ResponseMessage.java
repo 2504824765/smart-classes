@@ -22,6 +22,10 @@ public class ResponseMessage<T> {
         return new ResponseMessage(HttpStatus.OK.value(), message, null);
     }
 
+    public static ResponseMessage fail(int code, String message) {
+        return new ResponseMessage(code, message, null);
+    }
+
     public Integer getCode() {
         return code;
     }

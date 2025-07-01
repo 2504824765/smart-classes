@@ -27,7 +27,7 @@ public class UserService implements IUserService {
             throw new UserNotFoundException("<User not found>");
         } else {
             User user = userRepository.findByUsername(userLoginDTO.getUsername()).get();
-            if (user.getPassword().equals(userLoginDTO.getPassword()) == true) {
+            if (user.getPassword().equals(userLoginDTO.getPassword())) {
                 return true;
             } else {
                 throw new WrongPasswordException("<Wrong Password>");

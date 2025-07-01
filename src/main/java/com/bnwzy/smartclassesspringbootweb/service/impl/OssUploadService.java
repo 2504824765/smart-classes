@@ -49,14 +49,22 @@ public class OssUploadService implements IOssUploadService {
         if (!allowedExtensions.contains(extension)) {
             throw new ImageUploadException("<仅支持上传:PNG,JPG,JPEG,GIF,BMP>");
         }
-        String url = null;
-        String filename = originalFilename+ "user-images/"+UUID.randomUUID()+"."+extension;
-        try {
-            url = aliOssUtil.uploadFile(filename, file.getInputStream());
-        } catch (IOException e) {
-            throw new ImageUploadException("<Image upload failed>");
+        if (userRepository.findById(id).isEmpty()) {
+            throw new UserNotFoundException("<User not found>");
+
+        } else {
+            User user = userRepository.findById(id).get();
+            String url = null;
+            String filename = originalFilename+ UUID.randomUUID()+"."+extension;
+            try {
+                url = aliOssUtil.uploadFile(filename, file.getInputStream());
+            } catch (IOException e) {
+                throw new ImageUploadException("<Image upload failed>");
+            }
+            user.setImageURL(url);
+            userRepository.save(user);
+            return url;
         }
-        return url;
     }
 
     @Override
@@ -72,13 +80,15 @@ public class OssUploadService implements IOssUploadService {
         }
 
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-        Set<String> allowedExtensions = new HashSet<>(Arrays.asList("json"));
+        Set<String> allowedExtensions = new HashSet<>(List.of("json"));
         if (!allowedExtensions.contains(extension)) {
             throw new ImageUploadException("<仅支持上传:json>");
         }
-
-
-        String filename = "class/"+"json/"+"知识图谱"+"." + extension;
+        if (classesRepository.findById(id).isEmpty()) {
+            throw new ClassesNotFoundException("<Classes not found>");
+        }
+        Classes classes = classesRepository.findById(id).get();
+        String filename = "class/"+classes.getName()+"/"+"json/"+classes.getName()+"知识图谱"+"." + extension;
         String fullUrl = null;
 
         try {

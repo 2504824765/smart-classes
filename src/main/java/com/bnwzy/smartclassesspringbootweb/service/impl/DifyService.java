@@ -180,7 +180,7 @@ public class DifyService implements IDifyService {
         // TODO: 实现你的文件上传逻辑
         // 这里只是一个示例，你需要替换为实际的上传代码
         OssUploadService ossUploadService = new OssUploadService();
-        String responseMessage = ossUploadService.uploadGraph(file, 1L);
+        String responseMessage = ossUploadService.uploadGraph(file);
         return Mono.just(responseMessage);
     }
 }

@@ -11,7 +11,7 @@ export const addClassMissionApi = (data: ClassMissionCreateDTO): Promise<IRespon
 }
 
 // 删除课程任务
-export const deleteClassMissionApi = (id: string | number) => {
+export const deleteClassMissionApi = (id: number) => {
   return request.delete({ url: `/api/classMission/delete/${id}` })
 }
 
@@ -26,6 +26,6 @@ export const getallClassMissionApi = (): Promise<IResponse<ClassMission[]>> => {
 }
 
 // 根据课程id获取课程任务
-export const getClassMissionByCidApi = (cid: string | number): Promise<IResponse<ClassMission[]>> => {
+export const getClassMissionByCidApi = (cid: number): Promise<IResponse<ClassMission[]>> => {
   return request.get({ url: `/api/classMission/getClassMissionByCid/${cid}` })
 }

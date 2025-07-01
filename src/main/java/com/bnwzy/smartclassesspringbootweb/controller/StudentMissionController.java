@@ -18,4 +18,9 @@ public class StudentMissionController {
     public ResponseMessage createStudentMission(@Validated @RequestBody StudentMissionCreateDTO studentMissionCreateDTO) {
         return ResponseMessage.success("<Create student mission>", studentMissionService.createStudentMission(studentMissionCreateDTO));
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseMessage deleteStudentMissionById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Delete student mission>", studentMissionService.deleteStudentMission(id));
+    }
 }

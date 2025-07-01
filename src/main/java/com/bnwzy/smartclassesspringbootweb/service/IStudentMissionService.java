@@ -8,4 +8,5 @@ import org.springframework.stereotype.Service;
 public interface IStudentMissionService {
     StudentMission createStudentMission(StudentMissionCreateDTO studentMissionCreateDTO);
 
+    Boolean deleteStudentMission(Long id);
 }

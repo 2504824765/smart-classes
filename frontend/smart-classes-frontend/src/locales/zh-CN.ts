@@ -566,6 +566,15 @@ export default {
     canTo: '是否可跳转',
     name: '组件名称'
   },
+  mission: {
+    id: '编号',
+    cid: '课程编号',
+    type: '类型',
+    description: '说明',
+    deadline: '截止时间',
+    submit_method: '提交方式',
+    score: '得分'
+  },
   task: {
     id: '编号',
     cid: '课程编号',
@@ -611,6 +620,16 @@ export default {
     studentManage: '学生管理',
     videoPlay: '视频播放',
     taskManage: '任务管理',
-    courseManage: '课程管理'
+    courseManage: '课程管理',
+    task: '任务',
+    mission: '任务',
+    createMission: '创建任务'
+  },
+  admin: {
+    admin: '管理员',
+    teacher: '教师管理',
+    student: '学生管理',
+    course: '课程关联',
+    createForm: '创建表单'
   }
 }

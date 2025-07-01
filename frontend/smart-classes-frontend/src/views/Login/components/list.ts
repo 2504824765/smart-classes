@@ -15,8 +15,23 @@ const teacherList: string[] = [
   '/teacher',
   '/teacher/dashboard',
   '/teacher/studentManage',
-  '/task',
-  '/task/task'
+  '/course',
+  '/course/content',
+  '/course/detail',
 ]
 
-export { studentList, teacherList }
+const adminList: string[] = [
+  '/admin',
+  '/admin/dashboard',
+  '/admin/teacherManage',
+  '/admin/studentManage',
+  '/admin/courseManage',
+  '/admin/teacherManage/form',
+  '/admin/studentManage/form',
+  '/admin/courseManage/form',
+  '/admin/mission/content',
+  '/admin/mission/create',
+  '/admin/gradesManage'
+]
+
+export { studentList, teacherList, adminList }

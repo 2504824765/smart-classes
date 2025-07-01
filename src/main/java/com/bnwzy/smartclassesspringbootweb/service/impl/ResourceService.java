@@ -24,6 +24,7 @@ public class ResourceService implements IResourceService {
     @Autowired
     private ClassesRepository classesRepository;
 
+
     @Override
     public Resource createResource(ResourceCreateDTO resourceCreateDTO) {
         if (resourceRepository.findByName(resourceCreateDTO.getName()).isPresent()) {
@@ -36,6 +37,7 @@ public class ResourceService implements IResourceService {
             } else {
                 resource.setClasses(classesRepository.findById(resourceCreateDTO.getClassId()).get());
             }
+
             return resourceRepository.save(resource);
         }
     }

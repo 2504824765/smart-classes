@@ -1,7 +1,7 @@
 <template>
   <el-card class="course-card" shadow="hover" @click="$emit('view-homework', course)">
     <el-image
-      :src="course.image"
+      :src="course.imageUrl"
       alt="课程封面"
       style="width: 100%; height: 160px; object-fit: cover"
     />
@@ -18,14 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import { CourseDisplayData } from '@/api/classes/types'
 defineProps<{
-  course: {
-    name: string
-    image: string
-    description: string
-    unfinished: number
-    total: number
-  }
+  course: CourseDisplayData
 }>()
 defineEmits(['view-homework'])
 </script>

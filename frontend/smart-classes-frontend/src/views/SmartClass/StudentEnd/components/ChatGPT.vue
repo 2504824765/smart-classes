@@ -94,6 +94,7 @@ const askAI = (question: string) => {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
+  height: 100%;
   border-radius: 12px;
   background: white;
   margin-bottom: 12px;
@@ -135,7 +136,7 @@ const askAI = (question: string) => {
 
 /* 快捷按钮样式 */
 .chat-tools {
-  padding: 0.5rem;
+  padding: 0.2rem;
   background-color: #f9fafb;
   border-radius: 12px;
   border: 1px solid #e5e7eb;

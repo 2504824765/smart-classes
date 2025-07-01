@@ -1,7 +1,12 @@
 <template>
-  <el-card class="course-card" shadow="hover" @click="goToCourseDetail">
+  <el-card
+    class="course-card"
+    shadow="hover"
+    @click="goToCourseDetail"
+    :class="{ 'is-disabled': disabled }"
+  >
     <el-image
-      :src="course.image"
+      :src="`/${course.imageUrl}`"
       alt="课程封面"
       style="width: 100%; height: 160px; object-fit: cover"
     />
@@ -10,7 +15,7 @@
       <el-text type="info" class="course-desc">
         {{ course.description }}
       </el-text>
-      <el-text class="status" type="success" size="small" v-if="course.open"> 开放中 </el-text>
+      <el-text class="status" type="success" size="small" v-if="course.active"> 开放中 </el-text>
       <el-text class="status" type="danger" size="small" v-else> 未开放 </el-text>
     </div>
   </el-card>
@@ -19,17 +24,13 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
+import { Classes } from '@/api/classes/types'
 
-const { currentRoute, addRoute, push } = useRouter()
+const { push } = useRouter()
 
 const props = defineProps<{
-  course: {
-    id: string | number
-    name: string
-    image: string
-    description: string
-    open: boolean
-  }
+  course: Classes,
+  disabled?: boolean
 }>()
 
 const goToCourseDetail = () => {
@@ -60,5 +61,10 @@ const goToCourseDetail = () => {
 .status {
   display: block;
   margin-top: 4px;
+}
+.course-card.is-disabled {
+  opacity: 0.6;
+  pointer-events: none; /* 不可点击 */
+  cursor: not-allowed;
 }
 </style>

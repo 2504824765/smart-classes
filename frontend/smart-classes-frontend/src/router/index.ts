@@ -118,27 +118,40 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
         }
       ]
     },
+
     {
-      path: '/task',
+      path: '/course',
       component: Layout,
-      redirect: '/task/index',
-      name: 'Task',
+      redirect: '/course/content',
+      name: 'Course',
       meta: {
-        title: t('router.task'),
+        title: t('teacher.courseList'),
         icon: 'vi-ant-design:book-outlined',
         userType: 'teacher',
         alwaysShow: true
       },
       children: [
         {
-          path: 'task',
-          component: () => import('@/views/SmartClass/TeacherEnd/Task.vue'),
-          name: 'TeacherTask',
+          path: 'content',
+          component: () => import('@/views/SmartClass/TeacherEnd/Course.vue'),
+          name: 'CourseContent',
           meta: {
-            title: t('teacher.task'),
+            title: t('teacher.courseList'),
             userType: 'teacher',
             noCache: true,
             affix: true
+          }
+        },
+        {
+          path: 'detail',
+          component: () => import('@/views/SmartClass/TeacherEnd/CourseDetail.vue'),
+          name: 'CourseDetail',
+          meta: {
+            title: t('teacher.courseDetail'),
+            userType: 'teacher',
+            noCache: true,
+            hidden: true,
+            canTo: true
           }
         }
       ]
@@ -273,12 +286,148 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
   ]
 }
 
+export const getAdminRoutes = (): AppRouteRecordRaw[] => {
+  return [
+    {
+      path: '/admin',
+      component: Layout,
+      redirect: '/admin/teacherManage',
+      name: 'Admin',
+      meta: {
+        title: t('admin.admin'),
+        icon: 'vi-ant-design:setting-outlined',
+        userType: 'admin',
+        alwaysShow: true
+      },
+      children: [
+        {
+          path: 'teacherManage',
+          component: () => import('@/views/SmartClass/AdminEnd/TeacherManage.vue'),
+          name: 'AdminTeacherManage',
+          meta: {
+            title: t('admin.teacher'),
+            userType: 'admin',
+            noCache: true
+          },
+          children: [
+            {
+              path: 'form',
+              component: () => import('@/views/SmartClass/AdminEnd/components/TeacherForm.vue'),
+              name: 'AdminTeacherManageForm',
+              meta: {
+                title: t('admin.createform'),
+                userType: 'admin',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
+        },
+        {
+          path: 'studentManage',
+          component: () => import('@/views/SmartClass/AdminEnd/StudentManage.vue'),
+          name: 'AdminStudentManage',
+          meta: {
+            title: t('admin.student'),
+            userType: 'admin',
+            noCache: true
+          },
+          children: [
+            {
+              path: 'form',
+              component: () => import('@/views/SmartClass/AdminEnd/components/StudentForm.vue'),
+              name: 'AdminStudentManageForm',
+              meta: {
+                title: t('admin.createform'),
+                userType: 'admin',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
+        },
+        {
+          path: 'courseManage',
+          component: () => import('@/views/SmartClass/AdminEnd/CourseManage.vue'),
+          name: 'AdminCourseManage',
+          meta: {
+            title: t('admin.course'),
+            userType: 'admin',
+            noCache: true
+          },
+          children: [
+            {
+              path: 'form',
+              component: () => import('@/views/SmartClass/AdminEnd/components/CourseForm.vue'),
+              name: 'AdminCourseManageForm',
+              meta: {
+                title: t('admin.createform'),
+                userType: 'admin',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
+        },
+        //任务
+        {
+          path: '/mission',
+          component: Layout,
+          name: 'Mission',
+          meta: {
+            title: t('teacher.mission'),
+            userType: 'teacher',
+            icon: 'vi-ant-design:ordered-list',
+            noCache: true,
+            alwaysShow: true
+          },
+          children: [
+            {
+              path: 'content',
+              name: 'MissionContent',
+              component: () => import('@/views/SmartClass/AdminEnd/MissionManage.vue'),
+              meta: {
+                title: t('teacher.task'),
+                userType: 'teacher',
+                noCache: true,
+                affix: true
+              }
+            },
+            {
+              path: 'create',
+              name: 'MissionCreate',
+              component: () => import('@/views/SmartClass/AdminEnd/CreateMission.vue'),
+              meta: {
+                title: t('teacher.createMission'),
+                userType: 'teacher',
+                noCache: true,
+                affix: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
+        },
+      ]
+    }
+  ]
+}
+
 // 根据用户类型获取路由
-export const getAsyncRouterMap = (userType: 'teacher' | 'student'): AppRouteRecordRaw[] => {
+export const getAsyncRouterMap = (
+  userType: 'teacher' | 'student' | 'admin'
+): AppRouteRecordRaw[] => {
   if (userType === 'student') {
     return getStudentRoutes()
-  } else {
+  } else if (userType === 'teacher') {
     return getTeacherRoutes()
+  } else if (userType === 'admin') {
+    return getAdminRoutes()
+  } else {
+    return []
   }
 }
 

@@ -33,13 +33,11 @@ public class OssUploadService implements IOssUploadService {
     private OssProperties ossProperties;
 
     @Override
-    public String uploadImage(MultipartFile file, Long id) {
+    public String uploadImage(MultipartFile file) {
         if(file.isEmpty()){
             throw new FileIsNullException("<File is null>");
         }
-        if(!userRepository.existsById(id)){
-            throw new UserNotFoundException("<User not found>");
-        }
+
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.lastIndexOf(".") == -1) {
             throw new ImageUploadException("<文件名无效>");
@@ -70,13 +68,11 @@ public class OssUploadService implements IOssUploadService {
     }
 
     @Override
-    public String uploadGraph(MultipartFile file, Long id) {
+    public String uploadGraph(MultipartFile file) {
         if(file.isEmpty()){
             throw new FileIsNullException("<File is null>");
         }
-        if(!classesRepository.existsById(id)){
-            throw new ClassesNotFoundException("<Classes not found>");
-        }
+
 
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.lastIndexOf(".") == -1) {
@@ -102,18 +98,13 @@ public class OssUploadService implements IOssUploadService {
         }
         String pathOnly = aliOssUtil.extractPathFromUrl(fullUrl);
 
-        classes.setGraph(pathOnly);
-        classesRepository.save(classes);
         return fullUrl;
     }
 
     @Override
-    public String uploadResource(MultipartFile file, Long id, String message) {
+    public String uploadResource(MultipartFile file,  String message) {
         if(file.isEmpty()){
             throw new FileIsNullException("<File is null>");
-        }
-        if(!resourceRepository.existsById(id)){
-            throw new ResourceNotFoundException("<Resource not found>");
         }
 
         String originalFilename = file.getOriginalFilename();
@@ -131,11 +122,8 @@ public class OssUploadService implements IOssUploadService {
             throw new ImageUploadException("<仅支持上传:TXT, MD, MDX, MARKDOWN, PDF, HTML, XLSX, XLS, DOC, DOCX, CSV,EML, MSG, PPTX, PPT, XML, EPUB>");
         }
 
-        if (resourceRepository.findById(id).isEmpty()) {
-            throw new ResourceNotFoundException("<Resource not found>");
-        } else {
-            Resource resource = resourceRepository.findById(id).get();
-            String baseFilename = "class/" + resource.getClasses().getName() + "/" + "resource/"+message +"/"+resource.getName() + message;
+
+            String baseFilename = "class/" + "resource/"+message +"/"+ message;
             String filename = baseFilename + "." + extension;
 
             // 检查文件是否存在并生成不重复的文件名
@@ -147,12 +135,8 @@ public class OssUploadService implements IOssUploadService {
             } catch (IOException e) {
                 throw new ImageUploadException("<Resource upload failed>");
             }
-
-            String path = aliOssUtil.extractPathFromUrl(url);
-            resource.setPath(path);
-            resourceRepository.save(resource);
             return url;
-        }
+
     }
 
     @Override

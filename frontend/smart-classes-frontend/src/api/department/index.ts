@@ -30,14 +30,14 @@
 // }
 
 import request from '@/axios'
-import type { Department } from './department'
+import type { Department, DepartmentCreateDTO, DepartmentUpdateDTO } from './types'
 
 export const getDepartmentListApi = (params: any) => {
   return request.get({ url: '/api/dept/all', params })
 }
 
 // 新增组织
-export const addDepartmentApi = (data: Department) => {
+export const addDepartmentApi = (data: DepartmentCreateDTO): Promise<IResponse<Department>> => {
   return request.post({ url: '/api/dept/add', data })
 }
 
@@ -47,21 +47,26 @@ export const deleteDepartmentApi = (id: number) => {
 }
 
 // 更新组织
-export const updateDepartmentApi = (data: Department) => {
+export const updateDepartmentApi = (data: DepartmentUpdateDTO): Promise<IResponse<Department>> => {
   return request.post({ url: '/api/dept/update', data })
 }
 
 // 获取所有组织
-export const getAllDeptApi = () => {
+export const getAllDeptApi = (): Promise<IResponse<Department[]>> => {
   return request.get({ url: '/api/dept/all' })
 }
 
 // 根据组织ID获取组织
-export const getDeptByIdApi = (id: number) => {
+export const getDeptByIdApi = (id: number): Promise<IResponse<Department>> => {
   return request.get({ url: `/api/dept/getDeptById/${id}` })
 }
 
 // 根据组织名称获取组织
-export const getDeptByNameApi = (name: string) => {
+export const getDeptByNameApi = (name: string): Promise<IResponse<Department>> => {
   return request.get({ url: `/api/dept/getDeptByName/${name}` })
+}
+
+
+export const getMembersByDeptIdApi = (id: number): Promise<IResponse<any>> => {
+  return request.get({ url: `/api/dept/getMembersByDeptId/${id}` })
 }

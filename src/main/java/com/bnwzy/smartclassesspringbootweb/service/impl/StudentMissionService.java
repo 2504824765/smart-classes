@@ -3,9 +3,12 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 import com.bnwzy.smartclassesspringbootweb.exception.ClassMissionNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentMissionNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
+import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.StudentMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
@@ -52,6 +55,31 @@ public class StudentMissionService implements IStudentMissionService {
             return true;
         }  else {
             throw new StudentMissionNotFoundException("<Student mission not found>");
+        }
+    }
+
+    @Override
+    public StudentMission updateStudentMission(StudentMissionUpdateDTO studentMissionUpdateDTO) {
+        if (studentMissionRepository.findById(studentMissionUpdateDTO.getId()).isEmpty()) {
+            throw new StudentMissionNotFoundException("<Student mission not found>");
+        } else {
+            StudentMission studentMission = studentMissionRepository.findById(studentMissionUpdateDTO.getId()).get();
+            if (studentRepository.findById(studentMissionUpdateDTO.getStudentId()).isEmpty()) {
+                throw new StudentNotFoundException("<Student not found>");
+            } else {
+                Student student = studentRepository.findById(studentMissionUpdateDTO.getStudentId()).get();
+                if (classMissionRepository.findById(studentMissionUpdateDTO.getClassMissionId()).isEmpty()) {
+                    throw new ClassMissionNotFoundException("<Class mission not found>");
+                } else {
+                    ClassMission classmission = classMissionRepository.findById(studentMissionUpdateDTO.getClassMissionId()).get();
+                    studentMission.setStudent(student);
+                    studentMission.setClassMission(classmission);
+                    studentMission.setScore(studentMissionUpdateDTO.getScore());
+                    studentMission.setDone(studentMissionUpdateDTO.getDone());
+                    studentMission.setActive(studentMissionUpdateDTO.getActive());
+                    return studentMissionRepository.save(studentMission);
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.bnwzy.smartclassesspringbootweb.controller;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -22,5 +23,10 @@ public class StudentMissionController {
     @DeleteMapping("/delete/{id}")
     public ResponseMessage deleteStudentMissionById(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Delete student mission>", studentMissionService.deleteStudentMission(id));
+    }
+
+    @PostMapping("/update")
+    public ResponseMessage updateStudentMission(@Validated @RequestBody StudentMissionUpdateDTO studentMissionUpdateDTO) {
+        return ResponseMessage.success("<Update student mission>", studentMissionService.updateStudentMission(studentMissionUpdateDTO));
     }
 }

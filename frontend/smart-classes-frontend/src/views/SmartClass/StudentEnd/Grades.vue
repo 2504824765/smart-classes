@@ -1,10 +1,12 @@
 <template>
   <div class="student-grade-container">
     <el-row justify="center">
-      <el-col :xs="24" :sm="20" :md="18" :lg="16" :xl="14">
+      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
         <el-card>
-          <h2>学生成绩查看</h2>
-          <p>学生姓名: {{ student.name }}（ID: {{ student.id }}）</p>
+          <h2 style="text-align: center;">学生成绩查看</h2>
+          <p style="text-align: center; margin-bottom: 20px;">
+            学生姓名: {{ student.name }}（ID: {{ student.id }}）
+          </p>
 
           <el-table :data="grades" stripe border style="width: 100%; margin-top: 20px">
             <el-table-column prop="name" label="课程名称" />
@@ -13,12 +15,13 @@
             <el-table-column prop="grade" label="成绩" />
           </el-table>
 
-          <div style="margin-top: 20px; font-weight: bold">
+          <div style="margin-top: 30px; font-weight: bold; font-size: 18px; text-align: center;">
             综合绩点 GPA: {{ gpa.toFixed(2) }}
           </div>
         </el-card>
       </el-col>
     </el-row>
+    
 
   </div>
 </template>
@@ -51,12 +54,17 @@ const fetchStudentInfo = async () => {
 const fetchStudentGrades = async () => {
   try {
     const res = await axios.get(`/api/scAssociated/getAssociatedBySid/${student.value.id}`)
-    const associatedList = res.data.data
+    const associatedList = Array.isArray(res.data?.data) ? res.data.data : []
+    // const associatedList = res.data.data
 
     // 对每个课程ID，请求classes信息
-    const classRequests = associatedList.map(async (item) => {
+    // const classRequests = associatedList.map(async (item) => {
+    grades.value = await Promise.all(
+      associatedList.map(async (item) => {
       const classRes = await axios.get(`/api/class/getClassById/${item.cid}`)
-      const classData = classRes.data
+      // const classData = classRes.data
+      const classData = classRes.data?.data ?? classRes.data
+
       return {
         name: classData.name,
         credit: classData.credit,
@@ -64,9 +72,10 @@ const fetchStudentGrades = async () => {
         grade: item.grade
       }
     })
+  )
 
-    // 等待所有课程信息加载完成
-    grades.value = await Promise.all(classRequests)
+    // // 等待所有课程信息加载完成
+    // grades.value = await Promise.all(classRequests)
   } catch (error) {
     console.error('获取选课或课程信息失败:', error)
   }
@@ -93,8 +102,8 @@ onMounted(async () => {
 
 <style scoped>
 .student-grade-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px 20px;
 }
 </style>

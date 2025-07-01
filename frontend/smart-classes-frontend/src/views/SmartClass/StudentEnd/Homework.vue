@@ -23,13 +23,17 @@ const studentId = ref<number | null>(null)
 const getStudentId = async (username: string) => {
   const res = await getStudentByUsernameApi(username)
   studentId.value = res.data.id
+  console.log(studentId.value)
 }
 
 const userStore = useUserStore()
 const loginInfo = userStore.getLoginInfo
-if (loginInfo) {
-  const username = loginInfo.username
-  getStudentId(username)
+const initialize = async ()  => {
+  if (loginInfo) {
+    const username = loginInfo.username
+    await getStudentId(username)
+    console.log('studentId', studentId.value)
+  }
 }
 
 const classes = ref<Classes[]>([])
@@ -38,7 +42,6 @@ const courses = ref<CourseDisplayData[]>([])
 const loadCourses = async () => {
   // 假设当前用户名存在 store 中
   if (!studentId.value) return
-
   // 获取所有课程
   const classRes = await getAllClassesApi()
   classes.value = classRes.data
@@ -66,11 +69,12 @@ const loadCourses = async () => {
 }
 
 function goToHomework(course: any) {
-  push({ path: '/homework/list', query: { course: course.name } })
+  push({ path: '/homework/list', query: { course: course.id } })
 }
 
-onMounted(() => {
-  loadCourses()
+onMounted(async () => {
+  await initialize()  
+  await loadCourses() 
 })
 </script>
 

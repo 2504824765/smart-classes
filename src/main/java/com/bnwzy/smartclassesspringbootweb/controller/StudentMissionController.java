@@ -29,4 +29,9 @@ public class StudentMissionController {
     public ResponseMessage updateStudentMission(@Validated @RequestBody StudentMissionUpdateDTO studentMissionUpdateDTO) {
         return ResponseMessage.success("<Update student mission>", studentMissionService.updateStudentMission(studentMissionUpdateDTO));
     }
+
+    @GetMapping("/getStudentMissionById/{id}")
+    public ResponseMessage getStudentMissionById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get student mission>", studentMissionService.getStudentMissionById(id));
+    }
 }

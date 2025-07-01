@@ -82,4 +82,13 @@ public class StudentMissionService implements IStudentMissionService {
             }
         }
     }
+
+    @Override
+    public StudentMission getStudentMissionById(Long id) {
+        if (studentMissionRepository.findById(id).isPresent()) {
+            return studentMissionRepository.findById(id).get();
+        } else {
+            throw new StudentMissionNotFoundException("<Student mission not found>");
+        }
+    }
 }

@@ -12,4 +12,6 @@ public interface IStudentMissionService {
     Boolean deleteStudentMission(Long id);
 
     StudentMission updateStudentMission(StudentMissionUpdateDTO studentMissionUpdateDTO);
+
+    StudentMission getStudentMissionById(Long id);
 }

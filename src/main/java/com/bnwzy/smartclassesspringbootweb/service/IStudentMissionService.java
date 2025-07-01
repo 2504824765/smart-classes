@@ -1,5 +1,6 @@
 package com.bnwzy.smartclassesspringbootweb.service;
 
+import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.StudentMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
@@ -21,4 +22,6 @@ public interface IStudentMissionService {
     List<StudentMission> getStudentsAllClassMission(StudentsAllClassMissionGetDTO studentsAllClassMissionGetDTO);
 
     List<StudentMission> getStudentMissionsByStudentId(Long id);
+
+    List<Student> getAllStudentsOfClassMission(Long id);
 }

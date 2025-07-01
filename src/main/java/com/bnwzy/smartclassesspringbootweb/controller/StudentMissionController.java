@@ -45,4 +45,9 @@ public class StudentMissionController {
     public ResponseMessage getStudentMissionsByStudentId(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Get student's all class mission>", studentMissionService.getStudentMissionsByStudentId(id));
     }
+
+    @GetMapping("/allStudentsOfClassMission/{id}")
+    public ResponseMessage getAllStudentsOfClassMission(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get all students of class mission>", studentMissionService.getAllStudentsOfClassMission(id));
+    }
 }

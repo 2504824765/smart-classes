@@ -8,14 +8,12 @@ import com.bnwzy.smartclassesspringbootweb.pojo.*;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentsAllClassMissionGetDTO;
-import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
-import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
-import com.bnwzy.smartclassesspringbootweb.repository.StudentMissionRepository;
-import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.*;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +29,9 @@ public class StudentMissionService implements IStudentMissionService {
 
     @Autowired
     private ClassesRepository classesRepository;
+
+    @Autowired
+    private StudentClassesRepository studentClassesRepository;
 
     @Override
     public StudentMission createStudentMission(StudentMissionCreateDTO studentMissionCreateDTO) {
@@ -118,6 +119,22 @@ public class StudentMissionService implements IStudentMissionService {
         } else {
             Student student = studentRepository.findById(id).get();
             return studentMissionRepository.findByStudent(student);
+        }
+    }
+
+    @Override
+    public List<Student> getAllStudentsOfClassMission(Long id) {
+        if (classMissionRepository.findById(id).isEmpty()) {
+            throw new ClassMissionNotFoundException("<Class mission not found>");
+        } else {
+            ClassMission classMission = classMissionRepository.findById(id).orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
+            Classes classes = classMission.getClasses();
+            List<Student> students = new ArrayList<>();
+            List<StudentClasses> studentClasses = studentClassesRepository.findByClasses(classes);
+            for (StudentClasses studentClass : studentClasses) {
+                students.add(studentClass.getStudent());
+            }
+            return students;
         }
     }
 }

@@ -45,8 +45,7 @@ public class StudentClassesService implements IStudentClassesService {
             } else {
                 throw new StudentNotFoundException("<Student not found>");
             }
-            studentClassesRepository.save(studentClasses);
-            return studentClasses;
+            return studentClassesRepository.save(studentClasses);
         }else{
             if (!classesRepository.existsById(studentClassesCreateDTO.getCid())) {
                 throw new ClassesNotFoundException("Classes not found");
@@ -87,8 +86,7 @@ public class StudentClassesService implements IStudentClassesService {
                 for(StudentClasses sc2 : studentClasses2){
                     if(sc1.getId().equals(sc2.getId())){
                         sc2.setGrade(studentClassesUpdateDTO.getGrade());
-                        studentClassesRepository.save(sc2);
-                        return sc2;
+                        return studentClassesRepository.save(sc2);
                     }
                 }
             }

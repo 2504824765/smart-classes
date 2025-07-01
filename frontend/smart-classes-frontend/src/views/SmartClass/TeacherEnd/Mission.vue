@@ -104,12 +104,15 @@ const createMission = () => {
 </script>
 
 <template>
-  <el-text class="mx-1" size="large">这是 教师-任务 页面</el-text>
-  <ContentWrap :title="t('tableDemo.table')" :message="t('tableDemo.tableDes')">
-    <BaseButton type="primary" @click="createMission" style="margin-bottom: 16px">
+  <ContentWrap>
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px">
+      <span style="font-size: 18px; font-weight: bold">{{ t('teacher.mission') }}</span>
+      <el-button @click="() => getTableList()" style="margin-left: 30px">刷新</el-button>
+    </div>
+    <BaseButton type="primary" @click="createMission" style="margin-bottom: 16px" round>
+      <Icon icon="ep:plus" class="mr-5px" />
       创建任务
     </BaseButton>
-    <BaseButton type="primary" @click="getTableList" style="margin-bottom: 16px">刷新</BaseButton>
     <Table
       :columns="columns"
       :data="tableDataList"

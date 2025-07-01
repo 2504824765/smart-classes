@@ -85,35 +85,48 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
     {
       path: '/teacher',
       component: Layout,
-      redirect: '/teacher/dashboard',
       name: 'Teacher',
       meta: {
         title: t('teacher.dashboard'),
-        icon: 'vi-ant-design:dashboard-filled',
-        // userType: 'teacher',
-        alwaysShow: true
+        icon: 'vi-ant-design:dashboard-filled'
+        // userType: 'teacher'
       },
       children: [
         {
           path: 'dashboard',
-          component: () => import('@/views/Dashboard/Analysis.vue'),
+          component: () => import('@/views/SmartClass/TeacherEnd/TeacherDashboard.vue'),
           name: 'TeacherDashboard',
           meta: {
             title: t('teacher.dashboard'),
             userType: 'teacher',
             noCache: true,
-            affix: true
+            affix: true,
+            icon: 'vi-ant-design:dashboard-filled'
           }
-        },
-        //教师-学生管理
+        }
+      ]
+    },
+    //教师-学生管理
+    {
+      path: '/teacher/studentManage',
+      component: Layout,
+      name: 'TeacherStudentManage',
+      meta: {
+        title: t('teacher.studentManage'),
+        userType: 'teacher',
+        noCache: true
+      },
+      children: [
         {
-          path: 'studentManage',
+          path: '',
+          name: 'StudentManage',
           component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
-          name: 'TeacherStudentManage',
           meta: {
             title: t('teacher.studentManage'),
+            icon: 'material-symbols:group',
             userType: 'teacher',
-            noCache: true
+            noCache: true,
+            affix: true
           }
         }
       ]
@@ -162,6 +175,58 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
           component: () => import('@/views/SmartClass/TeacherEnd/CreateMission.vue'),
           meta: {
             title: t('teacher.createMission'),
+            userType: 'teacher',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    //班级管理
+    {
+      path: '/teacher/ClassManage',
+      component: Layout,
+      name: 'ClassManage',
+      meta: {
+        title: t('teacher.classManage'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherClassManage',
+          component: () => import('@/views/SmartClass/TeacherEnd/ClassManage.vue'),
+          meta: {
+            title: t('teacher.classManage'),
+            icon: 'material-symbols:groups',
+            userType: 'teacher',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    //成绩管理
+    {
+      path: '/teacher/GradeManage',
+      component: Layout,
+      name: 'GradeManage',
+      meta: {
+        title: t('teacher.gradeManage'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherGradeManage',
+          component: () => import('@/views/SmartClass/TeacherEnd/GradeManage.vue'),
+          meta: {
+            title: t('teacher.gradeManage'),
+            icon: 'material-symbols:grade',
             userType: 'teacher',
             noCache: true,
             affix: true

@@ -619,6 +619,8 @@ export default {
     courseManage: '课程管理',
     task: '任务',
     mission: '任务',
-    createMission: '创建任务'
+    createMission: '创建任务',
+    classManage: '班级管理',
+    gradeManage: '成绩管理'
   }
 }

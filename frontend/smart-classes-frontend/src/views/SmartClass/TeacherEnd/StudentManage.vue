@@ -14,6 +14,7 @@ import { TableData } from '@/api/table/types'
 import { ref, h, onMounted } from 'vue'
 import { ElTag } from 'element-plus'
 import { ElMessage } from 'element-plus'
+import { Icon } from '@/components/Icon'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
 import EditStudent from './EditStudent.vue'
@@ -90,14 +91,24 @@ const getTableList = async (params?: Params) => {
   if (res) {
     console.log('API响应数据:', res.data)
     // 假设后端返回的数据结构包含total字段，如果不是数组而是对象
+    let studentData: TableData[] = []
     if (Array.isArray(res.data)) {
-      tableDataList.value = res.data
+      studentData = res.data
       total.value = res.data.length // 如果后端没有返回total，暂时用数组长度
     } else {
       // 如果后端返回的是 { list: [], total: number } 这种结构
-      tableDataList.value = res.data.list || res.data
+      studentData = res.data.list || res.data
       total.value = res.data.total || res.data.length || 0
     }
+
+    // 按学号（id）升序排序
+    studentData.sort((a, b) => {
+      const idA = parseInt(a.id) || 0
+      const idB = parseInt(b.id) || 0
+      return idA - idB
+    })
+
+    tableDataList.value = studentData
     console.log(
       `分页信息: 当前页=${currentPage.value}, 每页=${pageSize.value}, 总数=${total.value}`
     )
@@ -277,13 +288,18 @@ const resetSearch = () => {
         @keyup.enter="searchFn"
         clearable
         style="width: 400px; margin-left: 0px"
-      />
+      >
+        <template #prefix>
+          <Icon icon="ep:search" />
+        </template>
+      </el-input>
       <div style="display: flex; gap: 8px">
         <el-button type="primary" @click="searchFn" :loading="isSearching" plain> 搜索 </el-button>
         <el-button type="info" @click="resetSearch" plain>重置</el-button>
       </div>
       <div style="display: flex; gap: 8px; margin-left: auto">
         <el-button type="success" @click="addFn" round style="margin-right: 40px">
+          <Icon icon="ep:plus" class="mr-5px" />
           添加学生
         </el-button>
       </div>

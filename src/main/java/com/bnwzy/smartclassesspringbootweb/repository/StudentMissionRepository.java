@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface StudentMissionRepository extends JpaRepository<StudentMission,Long> {
     List<StudentMission> findByClassMissionInAndStudent(List<ClassMission> classMissions, Student student);
+    List<StudentMission> findByStudent(Student student);
 }

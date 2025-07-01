@@ -110,4 +110,14 @@ public class StudentMissionService implements IStudentMissionService {
             }
         }
     }
+
+    @Override
+    public List<StudentMission> getStudentMissionsByStudentId(Long id) {
+        if (studentRepository.findById(id).isEmpty()) {
+            throw new StudentNotFoundException("<Student not found>");
+        } else {
+            Student student = studentRepository.findById(id).get();
+            return studentMissionRepository.findByStudent(student);
+        }
+    }
 }

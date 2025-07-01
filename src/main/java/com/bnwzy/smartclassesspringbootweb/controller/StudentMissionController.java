@@ -40,4 +40,9 @@ public class StudentMissionController {
     public ResponseMessage getStudentsAllClassMission(@Validated @RequestBody StudentsAllClassMissionGetDTO studentsAllClassMissionGetDTO) {
         return ResponseMessage.success("<Get student's all class mission>", studentMissionService.getStudentsAllClassMission(studentsAllClassMissionGetDTO));
     }
+
+    @GetMapping("/getStudentMissionsByStudentId/{id}")
+    public ResponseMessage getStudentMissionsByStudentId(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get student's all class mission>", studentMissionService.getStudentMissionsByStudentId(id));
+    }
 }

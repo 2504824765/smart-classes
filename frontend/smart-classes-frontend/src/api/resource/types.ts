@@ -8,3 +8,7 @@ export type Resource = {
 }
 
 export type ResourceCreateDTO = Omit<Resource, 'id'>
+
+export type ResourceUpdateDTO = Partial<Omit<Resource, 'id'>> & {
+  id: number
+}

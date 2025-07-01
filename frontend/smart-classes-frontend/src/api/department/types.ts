@@ -37,3 +37,9 @@ export type Department = {
   parent_id: number
   level: number
 }
+
+export type DepartmentCreateDTO = Omit<Department, 'id'>
+
+export type DepartmentUpdateDTO = Partial<Omit<Department, 'id'>> & {
+  id: number
+}

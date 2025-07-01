@@ -19,3 +19,7 @@ export type CourseDisplayData = {
 }
 
 export type ClassesCreateDTO = Omit<Classes, 'id'>
+
+export type ClassesUpdateDTO = Partial<Omit<Classes, 'id'>> & {
+  id: number // 更新时必须包含id
+}

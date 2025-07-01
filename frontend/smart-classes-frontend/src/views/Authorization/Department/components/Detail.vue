@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
-import { DepartmentItem } from '@/api/department/department'
+import { DepartmentItem } from '@/api/department/types'
 import { Descriptions, DescriptionsSchema } from '@/components/Descriptions'
 
 defineProps({

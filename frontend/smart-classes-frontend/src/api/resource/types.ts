@@ -15,3 +15,8 @@ export type PendingUploadResource = {
   description: string
   file: File
 }
+
+
+export type ResourceUpdateDTO = Partial<Omit<Resource, 'id'>> & {
+  id: number
+}

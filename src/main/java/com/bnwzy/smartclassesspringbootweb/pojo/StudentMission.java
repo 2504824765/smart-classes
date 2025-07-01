@@ -13,7 +13,7 @@ public class StudentMission {
     @JoinColumn(name = "student_id")
     private Student student;
     @ManyToOne
-    @JoinColumn(name = "class_mission-id")
+    @JoinColumn(name = "class_mission_id")
     private ClassMission classMission;
     @Column(name = "score")
     private Integer score;

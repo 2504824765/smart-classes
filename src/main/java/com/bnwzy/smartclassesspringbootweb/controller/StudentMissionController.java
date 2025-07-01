@@ -3,6 +3,7 @@ package com.bnwzy.smartclassesspringbootweb.controller;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentsAllClassMissionGetDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -33,5 +34,10 @@ public class StudentMissionController {
     @GetMapping("/getStudentMissionById/{id}")
     public ResponseMessage getStudentMissionById(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Get student mission>", studentMissionService.getStudentMissionById(id));
+    }
+
+    @GetMapping("/getStudentsAllClassMission")
+    public ResponseMessage getStudentsAllClassMission(@Validated @RequestBody StudentsAllClassMissionGetDTO studentsAllClassMissionGetDTO) {
+        return ResponseMessage.success("<Get student's all class mission>", studentMissionService.getStudentsAllClassMission(studentsAllClassMissionGetDTO));
     }
 }

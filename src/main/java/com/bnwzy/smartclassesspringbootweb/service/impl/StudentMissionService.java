@@ -1,22 +1,22 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.ClassMissionNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.ClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentMissionNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
-import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
-import com.bnwzy.smartclassesspringbootweb.pojo.Student;
-import com.bnwzy.smartclassesspringbootweb.pojo.StudentMission;
+import com.bnwzy.smartclassesspringbootweb.pojo.*;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentsAllClassMissionGetDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 @Service
 public class StudentMissionService implements IStudentMissionService {
@@ -28,6 +28,9 @@ public class StudentMissionService implements IStudentMissionService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private ClassesRepository classesRepository;
 
     @Override
     public StudentMission createStudentMission(StudentMissionCreateDTO studentMissionCreateDTO) {
@@ -89,6 +92,22 @@ public class StudentMissionService implements IStudentMissionService {
             return studentMissionRepository.findById(id).get();
         } else {
             throw new StudentMissionNotFoundException("<Student mission not found>");
+        }
+    }
+
+    @Override
+    public List<StudentMission> getStudentsAllClassMission(StudentsAllClassMissionGetDTO studentsAllClassMissionGetDTO) {
+        if (classesRepository.findById(studentsAllClassMissionGetDTO.getClassId()).isEmpty()) {
+            throw new ClassesNotFoundException("<Class not found>");
+        } else {
+            Classes classes =  classesRepository.findById(studentsAllClassMissionGetDTO.getClassId()).get();
+            List<ClassMission> classMissionList = classMissionRepository.findByClasses_Id(classes.getId());
+            if (studentRepository.findById(studentsAllClassMissionGetDTO.getStudentId()).isEmpty()) {
+                throw new StudentNotFoundException("<Student not found>");
+            } else {
+                Student student = studentRepository.findById(studentsAllClassMissionGetDTO.getStudentId()).get();
+                return studentMissionRepository.findByClassMissionInAndStudent(classMissionList, student);
+            }
         }
     }
 }

@@ -49,22 +49,14 @@ public class OssUploadService implements IOssUploadService {
         if (!allowedExtensions.contains(extension)) {
             throw new ImageUploadException("<仅支持上传:PNG,JPG,JPEG,GIF,BMP>");
         }
-        if (userRepository.findById(id).isEmpty()) {
-            throw new UserNotFoundException("<User not found>");
-
-        } else {
-            User user = userRepository.findById(id).get();
-            String url = null;
-            String filename = originalFilename+ UUID.randomUUID()+"."+extension;
-            try {
-                url = aliOssUtil.uploadFile(filename, file.getInputStream());
-            } catch (IOException e) {
-                throw new ImageUploadException("<Image upload failed>");
-            }
-            user.setImageURL(url);
-            userRepository.save(user);
-            return url;
+        String url = null;
+        String filename = originalFilename+ "user-images/"+UUID.randomUUID()+"."+extension;
+        try {
+            url = aliOssUtil.uploadFile(filename, file.getInputStream());
+        } catch (IOException e) {
+            throw new ImageUploadException("<Image upload failed>");
         }
+        return url;
     }
 
     @Override
@@ -84,11 +76,9 @@ public class OssUploadService implements IOssUploadService {
         if (!allowedExtensions.contains(extension)) {
             throw new ImageUploadException("<仅支持上传:json>");
         }
-        if (classesRepository.findById(id).isEmpty()) {
-            throw new ClassesNotFoundException("<Classes not found>");
-        }
-        Classes classes = classesRepository.findById(id).get();
-        String filename = "class/"+classes.getName()+"/"+"json/"+classes.getName()+"知识图谱"+"." + extension;
+
+
+        String filename = "class/"+"json/"+"知识图谱"+"." + extension;
         String fullUrl = null;
 
         try {
@@ -123,19 +113,19 @@ public class OssUploadService implements IOssUploadService {
         }
 
 
-            String baseFilename = "class/" + "resource/"+message +"/"+ message;
-            String filename = baseFilename + "." + extension;
+        String baseFilename = "class/" + "resource/"+message +"/"+ message;
+        String filename = baseFilename + "." + extension;
 
-            // 检查文件是否存在并生成不重复的文件名
-            filename = aliOssUtil.generateUniqueFilename(filename);
+        // 检查文件是否存在并生成不重复的文件名
+        filename = aliOssUtil.generateUniqueFilename(filename);
 
-            String url = null;
-            try {
-                url = aliOssUtil.uploadFile(filename, file.getInputStream());
-            } catch (IOException e) {
-                throw new ImageUploadException("<Resource upload failed>");
-            }
-            return url;
+        String url = null;
+        try {
+            url = aliOssUtil.uploadFile(filename, file.getInputStream());
+        } catch (IOException e) {
+            throw new ImageUploadException("<Resource upload failed>");
+        }
+        return url;
 
     }
 

@@ -118,45 +118,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
         }
       ]
     },
-    //任务
-    {
-      path: '/mission',
-      component: Layout,
-      name: 'Mission',
-      meta: {
-        title: t('teacher.mission'),
-        userType: 'teacher',
-        icon: 'vi-ri:function-fill',
-        noCache: true,
-        affix: true
-      },
-      children: [
-        {
-          path: 'content',
-          name: 'MissionContent',
-          component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
-          meta: {
-            title: t('teacher.task'),
-            userType: 'teacher',
-            noCache: true,
-            affix: true
-          }
-        },
-        {
-          path: 'create',
-          name: 'MissionCreate',
-          component: () => import('@/views/SmartClass/TeacherEnd/CreateMission.vue'),
-          meta: {
-            title: t('teacher.createMission'),
-            userType: 'teacher',
-            noCache: true,
-            affix: true,
-            hidden: true,
-            canTo: true
-          }
-        }
-      ]
-    },
+
     {
       path: '/course',
       component: Layout,
@@ -409,7 +371,46 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               }
             }
           ]
-        }
+        },
+        //任务
+        {
+          path: '/mission',
+          component: Layout,
+          name: 'Mission',
+          meta: {
+            title: t('teacher.mission'),
+            userType: 'teacher',
+            icon: 'vi-ant-design:ordered-list',
+            noCache: true,
+            alwaysShow: true
+          },
+          children: [
+            {
+              path: 'content',
+              name: 'MissionContent',
+              component: () => import('@/views/SmartClass/AdminEnd/MissionManage.vue'),
+              meta: {
+                title: t('teacher.task'),
+                userType: 'teacher',
+                noCache: true,
+                affix: true
+              }
+            },
+            {
+              path: 'create',
+              name: 'MissionCreate',
+              component: () => import('@/views/SmartClass/AdminEnd/CreateMission.vue'),
+              meta: {
+                title: t('teacher.createMission'),
+                userType: 'teacher',
+                noCache: true,
+                affix: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
+        },
       ]
     }
   ]

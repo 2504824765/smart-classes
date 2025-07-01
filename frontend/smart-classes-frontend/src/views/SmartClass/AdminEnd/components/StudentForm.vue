@@ -6,7 +6,7 @@ import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
 import { createStudentApi } from '@/api/student/index'
-import type { Student } from '@/api/student/types'
+import type { Student, StudentCreateDTO } from '@/api/student/types'
 
 const studentFormSchema = reactive<FormSchema[]>([
   {
@@ -79,7 +79,7 @@ const handleSubmit = async () => {
       return
     }
 
-    const formData = await getFormData<Student>()
+    const formData = await getFormData<StudentCreateDTO>()
     try {
       await createStudentApi(formData)
       ElMessage.success('学生添加成功')

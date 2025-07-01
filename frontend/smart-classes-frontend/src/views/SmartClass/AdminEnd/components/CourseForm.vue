@@ -154,7 +154,7 @@ const handleSubmit = async () => {
         classHours: 0,
         description: '',
         active: false,
-        image: '',
+        imageUrl: 'default.png',
         graph: ''
       }
 

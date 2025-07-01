@@ -15,7 +15,6 @@ const courseList = ref<Classes[]>([])
 const queryCourseList = async () => {
   const res = await getAllClassesApi()
   courseList.value = res.data
-  console.log(courseList)
 }
 
 onMounted(() => {

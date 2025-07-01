@@ -29,7 +29,8 @@ router.beforeEach(async (to, from, next) => {
 
       // 开发者可根据实际情况进行修改
       const roleRouters = userStore.getRoleRouters || []
-      permissionStore.setUserType(userStore.getUserInfo.role.toString() as 'teacher' | 'student')
+      permissionStore.setUserType(userStore.getUserInfo.role.toString() as 'teacher' | 'student' | 'admin')
+      
       // 是否使用动态路由
       if (appStore.getDynamicRouter) {
         await permissionStore.generateRoutes('frontEnd', roleRouters as string[])

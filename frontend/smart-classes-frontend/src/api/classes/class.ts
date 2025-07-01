@@ -1,8 +1,10 @@
+import { Teacher } from '../teacher/types'
+
 export type Classes = {
   id: number
   name: string
-  teacher_id: number
+  teacher: Teacher
   credit: number
-  class_hours: number
+  classHours: number
   graph: string
 }

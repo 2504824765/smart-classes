@@ -13,7 +13,7 @@ export interface PermissionState {
   addRouters: AppRouteRecordRaw[]
   isAddRouters: boolean
   menuTabRouters: AppRouteRecordRaw[]
-  userType: 'teacher' | 'student'
+  userType: 'teacher' | 'student' | 'admin'
 }
 
 export const usePermissionStore = defineStore('permission', {
@@ -37,12 +37,12 @@ export const usePermissionStore = defineStore('permission', {
     getMenuTabRouters(): AppRouteRecordRaw[] {
       return this.menuTabRouters
     },
-    getUserType(): 'teacher' | 'student' {
+    getUserType(): 'teacher' | 'student' | 'admin' {
       return this.userType
     }
   },
   actions: {
-    setUserType(userType: 'teacher' | 'student'): void {
+    setUserType(userType: 'teacher' | 'student' | 'admin'): void {
       this.userType = userType
     },
     generateRoutes(
@@ -60,6 +60,7 @@ export const usePermissionStore = defineStore('permission', {
             cloneDeep(getAsyncRouterMap(this.userType)),
             routers as string[]
           )
+          console.log('routerMap', routerMap)
         } else {
           // 根据用户类型获取对应的路由
           routerMap = cloneDeep(getAsyncRouterMap(this.userType))

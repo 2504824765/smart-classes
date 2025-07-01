@@ -3,12 +3,13 @@ import { onMounted, ref, reactive } from 'vue'
 import G6 from '@antv/g6'
 import { useRouter } from 'vue-router'
 import FileDisplay from './components/FileDisplay.vue'
+import ChatGPT from './components/ChatGPT.vue'
 
 const { push } = useRouter()
 // 页面数据
 const courseTitle = ref('Python 深度学习')
 const progress = ref(65)
-
+const activeTab = ref('graph')
 // 树结构数据
 const treeData = ref([
   {
@@ -352,28 +353,41 @@ onMounted(() => {
       </div>
     </el-card>
 
-    <div class="grid grid-cols-12 gap-4">
-      <!-- 树结构 -->
-      <el-card class="col-span-2 h-[80vh] overflow-auto">
+    <!-- 主体区域：三栏布局 -->
+    <div class="grid grid-cols-12 gap-4 h-[80vh]">
+      <!-- 左：树结构 -->
+      <el-card class="col-span-2 overflow-auto">
         <el-tree :data="treeData" :props="defaultProps" @node-click="handleTreeClick" />
       </el-card>
 
-      <el-card class="col-span-7 h-[80vh]" body-style="height: 100%; padding: 0;">
-        <div
-          ref="graphContainer"
-          class="w-full h-full"
-          style="width: 100%; height: 100%; min-height: 500px"
-        ></div>
+      <!-- 中：图谱/资源 tabs -->
+      <el-card class="col-span-7 flex flex-col">
+        <el-tabs v-model="activeTab" class="flex-1" tab-position="top">
+          <!-- 图谱 tab -->
+          <el-tab-pane label="图谱" name="graph">
+            <div
+              ref="graphContainer"
+              class="w-full h-[calc(80vh-120px)]"
+              style="min-height: 500px"
+            ></div>
+          </el-tab-pane>
+
+          <!-- 资源 tab -->
+          <el-tab-pane label="资源文件" name="files">
+            <div class="overflow-auto h-[calc(80vh-120px)] px-2 pt-2">
+              <el-empty v-if="fileCards.length === 0" description="暂无资源" />
+              <div v-for="file in fileCards" :key="file.name" class="mb-2">
+                <FileDisplay :url="file.url" />
+              </div>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
       </el-card>
 
-      <!-- 文件卡片列表 -->
-      <el-card class="col-span-3 h-[80vh] overflow-auto">
-        <div class="text-lg font-semibold mb-2">资源文件</div>
-        <el-empty v-if="fileCards.length === 0" description="暂无资源" />
-        <div v-for="file in fileCards" :key="file.name" class="mb-2">
-          <FileDisplay :url="file.url" />
-        </div>
-      </el-card>
+      <!-- 右：ChatGPT -->
+      <div class="col-span-3 h-[80vh]">
+        <ChatGPT />
+      </div>
     </div>
   </div>
 </template>

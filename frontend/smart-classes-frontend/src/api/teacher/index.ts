@@ -1,5 +1,5 @@
 import request from '@/axios'
-import type { Teacher } from './teacher'
+import type { Teacher } from './types'
 
 export const getTeacherListApi = (params: any) => {
   return request.get({ url: '/api/teacher/all', params })

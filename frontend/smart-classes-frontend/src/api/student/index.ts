@@ -1,5 +1,5 @@
 import request from '@/axios'
-import type { Student } from './student'
+import type { Student } from './types'
 
 export const getStudentListApi = (params: any) => {
   return request.get({ url: '/api/student/all', params })

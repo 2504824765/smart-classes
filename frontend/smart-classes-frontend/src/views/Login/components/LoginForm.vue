@@ -159,6 +159,7 @@ const signIn = async () => {
 
       if (formData.username === 'admin' && formData.password === 'admin') {
         role = 'admin'
+        formData.role = 'admin'
         formData.roleId = 0
         roleList = adminList
       } else if (formData.role === 'teacher') {
@@ -180,7 +181,7 @@ const signIn = async () => {
             userStore.setLoginInfo({
               username: formData.username,
               password: formData.password,
-              role: formData.role
+              role: role
             })
           } else {
             userStore.setLoginInfo(undefined)

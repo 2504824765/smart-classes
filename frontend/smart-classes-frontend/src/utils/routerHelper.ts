@@ -69,6 +69,8 @@ export const generateRoutesByFrontEnd = (
         data = Object.assign({}, route)
       } else {
         const routePath = (onlyOneChild ?? pathResolve(basePath, route.path)).trim()
+        console.log('1',routePath,'item', item)
+        console.log('2',meta.followRoute,'item', item)
         if (routePath === item || meta.followRoute === item) {
           data = Object.assign({}, route)
         }

@@ -10,6 +10,9 @@ import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi } from '@/api/classes'
 import { ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource'
+import { uploadResourcesApi } from '@/api/oss'
+
+const uploadedResources = ref<ResourceCreateDTO[]>([])
 
 const courseFormSchema = reactive<FormSchema[]>([
   {
@@ -75,40 +78,43 @@ const courseFormSchema = reactive<FormSchema[]>([
     label: '上传课程资料',
     component: 'Upload',
     componentProps: {
-      limit: 3,
-      action: 'https://your-oss-upload-api-or-direct-oss-url',
       multiple: true,
-      onSuccess: async (response: { url?: string }, uploadFile: UploadFile) => {
-        const fileUrl = response?.url || uploadFile.url // 适配 response 返回结构
-        if (!fileUrl) return
-
-        const fileName = decodeURIComponent(fileUrl.split('/').pop() ?? '未知文件')
-        const fileType = fileName.split('.').pop()?.toLowerCase() ?? 'unknown'
-
-        // TODO: 替换为你当前课程的 id
-        const currentClassId = classId.value
-
-        // 构造 ResourceCreateDTO
-        const resource: ResourceCreateDTO = {
-          name: fileName,
-          path: fileUrl,
-          type: fileType,
-          description: fileName,
-          classId: currentClassId
-        }
-
-        // 发送资源信息到后端
+      limit: 3,
+      httpRequest: async (options) => {
         try {
-          await addResourceApi(resource)
-          ElMessage.success(`${fileName} 上传并登记资源成功`)
-        } catch (err) {
-          console.error('资源登记失败', err)
-          ElMessage.error('资源信息登记失败')
+          const rawFile = options.file as File
+          const res = await uploadResourcesApi(rawFile, '课程资料') // 你可以替换成动态 message 名称
+
+          // 上传成功后构建 Resource
+          const fileUrl = res.data.url
+          const fileName = rawFile.name
+          const fileType = fileName.split('.').pop() || ''
+
+          const resource: ResourceCreateDTO = {
+            name: fileName,
+            path: fileUrl,
+            type: fileType,
+            description: fileName,
+            classId: classId.value // 课程 ID，此时是 ref
+          }
+
+          uploadedResources.value.push(resource)
+
+          // 手动触发 onSuccess 回调，让 UI 显示为上传成功
+          options.onSuccess?.(res, rawFile)
+          ElMessage.success(`文件 ${fileName} 上传成功`)
+        } catch (error) {
+          options.onError?.({
+            name: 'UploadError',
+            message: '文件上传失败',
+            status: 500,
+            method: 'POST',
+            url: '/oss/uploadResources'
+          })
         }
       },
       slots: {
-        default: () => <BaseButton type="primary">点击上传</BaseButton>,
-        tip: () => <div class="el-upload__tip">最多上传3个文件，大小限制请参考 OSS 配置</div>
+        default: () => <BaseButton type="primary">点击上传</BaseButton>
       }
     }
   }
@@ -124,8 +130,14 @@ const handleSubmit = async () => {
   if (!elForm) return
 
   await elForm.validate(async (valid) => {
-    if (valid) {
-      const nullClass = {
+    if (!valid) {
+      ElMessage.warning('请检查表单填写是否完整')
+      return
+    }
+
+    try {
+      // 1. 创建一个空课程，后端返回课程 id
+      const nullClass: ClassesCreateDTO = {
         name: '',
         teacher_id: 0,
         credit: 0,
@@ -133,25 +145,51 @@ const handleSubmit = async () => {
         description: '',
         active: false,
         image: '',
-        graph: '',
+        graph: ''
       }
-      const res = await addClassApi(nullClass) 
-      classId.value = res.data.id 
+
+      const res = await addClassApi(nullClass)
+      const newClassId = res.data?.id
+      if (!newClassId) {
+        ElMessage.error('课程 ID 获取失败')
+        return
+      }
+
+      // 2. 获取表单数据，并合并课程 ID，更新课程信息
       const formData = await getFormData<ClassesCreateDTO>()
       const updatedCourse: Classes = {
-        id: classId.value,           
-        ...formData              
+        id: newClassId,
+        ...formData
       }
 
       await updateClassApi(updatedCourse)
 
-      console.log('课程信息：', formData)
-      ElMessage.success('提交成功（模拟）')
-    } else {
-      ElMessage.warning('请检查表单填写是否完整')
+      // 3. 绑定上传的资源（uploadedResources 是前面上传时填充的）
+      const uploadList = uploadedResources.value
+      if (uploadList.length > 0) {
+        for (const resource of uploadList) {
+          await addResourceApi({
+            ...resource,
+            classId: newClassId
+          })
+        }
+      }
+
+      ElMessage.success('课程创建成功并绑定资源')
+      console.log('课程数据：', updatedCourse)
+      console.log('绑定资源：', uploadList)
+
+      // 4. 可选：重置表单、清空资源状态
+      elForm.resetFields()
+      uploadedResources.value = []
+
+    } catch (err) {
+      ElMessage.error('提交失败，请重试')
+      console.error('提交错误：', err)
     }
   })
 }
+
 </script>
 
 <template>

@@ -101,6 +101,6 @@ setProps({
       @register="tableRegister"
       @refresh="refresh"
     />
-    <ElButton type="primary" @click="push({ path: 'form' })">添加课程</ElButton>
+    <ElButton type="primary" @click="push({ path: '/admin/courseManage/form' })">添加课程</ElButton>
   </ContentWrap>
 </template>

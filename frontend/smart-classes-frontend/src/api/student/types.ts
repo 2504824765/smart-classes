@@ -10,12 +10,12 @@ export type Student = {
 }
 
 export type StudentCreateDTO = Omit<Student, 'id' | 'dept'> & {
-  dept_id: number
+  deptId: number
 }
 
 export type StudentUpdateDTO = Partial<{
   id: number
 } & Omit<Student, 'id' | 'dept'>> & {
   id: number
-  dept_id: number
+  deptId: number
 }

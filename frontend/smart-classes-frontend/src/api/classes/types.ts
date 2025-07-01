@@ -1,18 +1,18 @@
 export type Classes = {
   id: number
   name: string
-  teacher_id: number
+  teacherId: number
   credit: number
-  class_hours: number
+  classHours: number
   graph: string
-  active: boolean
+  isActive: boolean
   description: string
-  image: string
+  imageUrl: string
 }
 
 export type CourseDisplayData = {
   name: string
-  image: string
+  imageUrl: string
   description: string
   unfinished: number
   total: number

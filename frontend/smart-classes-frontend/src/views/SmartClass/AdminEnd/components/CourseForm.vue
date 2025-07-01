@@ -8,11 +8,14 @@ import type { UploadFile } from 'element-plus'
 import { ref, reactive } from 'vue'
 import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi } from '@/api/classes'
-import { ResourceCreateDTO } from '@/api/resource/types'
+import { PendingUploadResource, ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource'
 import { uploadResourcesApi } from '@/api/oss'
 
-const uploadedResources = ref<ResourceCreateDTO[]>([])
+//待上传的资源
+const pendingResources = ref<PendingUploadResource[]>([])
+// 绑定上传的资源（uploadedResources 是前面上传时填充的）
+const uploadedResources: ResourceCreateDTO[] = []
 
 const courseFormSchema = reactive<FormSchema[]>([
   {
@@ -81,37 +84,19 @@ const courseFormSchema = reactive<FormSchema[]>([
       multiple: true,
       limit: 3,
       httpRequest: async (options) => {
-        try {
-          const rawFile = options.file as File
-          const res = await uploadResourcesApi(rawFile, '课程资料') // 你可以替换成动态 message 名称
+        const rawFile = options.file as File
+        const fileName = rawFile.name
+        const fileType = fileName.split('.').pop() || ''
 
-          // 上传成功后构建 Resource
-          const fileUrl = res.data.url
-          const fileName = rawFile.name
-          const fileType = fileName.split('.').pop() || ''
+        pendingResources.value.push({
+          name: fileName,
+          type: fileType,
+          description: fileName,
+          file: rawFile
+        })
 
-          const resource: ResourceCreateDTO = {
-            name: fileName,
-            path: fileUrl,
-            type: fileType,
-            description: fileName,
-            classId: classId.value // 课程 ID，此时是 ref
-          }
-
-          uploadedResources.value.push(resource)
-
-          // 手动触发 onSuccess 回调，让 UI 显示为上传成功
-          options.onSuccess?.(res, rawFile)
-          ElMessage.success(`文件 ${fileName} 上传成功`)
-        } catch (error) {
-          options.onError?.({
-            name: 'UploadError',
-            message: '文件上传失败',
-            status: 500,
-            method: 'POST',
-            url: '/oss/uploadResources'
-          })
-        }
+        options.onSuccess?.({}, rawFile)
+        ElMessage.success(`已添加到待上传列表：${fileName}`)
       },
       slots: {
         default: () => <BaseButton type="primary">点击上传</BaseButton>
@@ -164,37 +149,44 @@ const handleSubmit = async () => {
 
       await updateClassApi(updatedCourse)
 
-      // 3. 绑定上传的资源（uploadedResources 是前面上传时填充的）
-      const uploadList = uploadedResources.value
-      if (uploadList.length > 0) {
-        for (const resource of uploadList) {
-          await addResourceApi({
-            ...resource,
-            classId: newClassId
-          })
-        }
+
+
+      for (const resource of pendingResources.value) {
+        const uploadRes = await uploadResourcesApi(resource.file, '课程资料')
+        const filePath = uploadRes.data.url 
+
+        uploadedResources.push({
+          name: resource.name,
+          path: filePath,
+          type: resource.type,
+          description: resource.description,
+          classId: newClassId
+        })
+      }
+
+      // 插入数据库资源记录
+      for (const resource of uploadedResources) {
+        await addResourceApi(resource)
       }
 
       ElMessage.success('课程创建成功并绑定资源')
-      console.log('课程数据：', updatedCourse)
-      console.log('绑定资源：', uploadList)
-
       // 4. 可选：重置表单、清空资源状态
       elForm.resetFields()
-      uploadedResources.value = []
-
     } catch (err) {
       ElMessage.error('提交失败，请重试')
       console.error('提交错误：', err)
     }
   })
 }
-
 </script>
 
 <template>
   <ContentWrap title="新增课程">
     <Form :schema="courseFormSchema" @register="formRegister" />
+    <el-table :data="uploadedResources" style="width: 100%">
+      <el-table-column prop="name" label="文件名" />
+      <el-table-column prop="type" label="类型" width="120" />
+    </el-table>
     <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">提交</BaseButton>
   </ContentWrap>
 </template>

@@ -8,3 +8,10 @@ export type Resource = {
 }
 
 export type ResourceCreateDTO = Omit<Resource, 'id'>
+
+export type PendingUploadResource = {
+  name: string
+  type: string
+  description: string
+  file: File
+}

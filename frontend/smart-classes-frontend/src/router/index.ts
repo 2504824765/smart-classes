@@ -347,7 +347,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             userType: 'admin',
             noCache: true
           },
-          children:[
+          children: [
             {
               path: 'form',
               component: () => import('@/views/SmartClass/AdminEnd/components/TeacherForm.vue'),
@@ -381,7 +381,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             userType: 'admin',
             noCache: true
           },
-          children:[
+          children: [
             {
               path: 'form',
               component: () => import('@/views/SmartClass/AdminEnd/components/CourseForm.vue'),
@@ -395,7 +395,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               }
             }
           ]
-        },
+        }
       ]
     }
   ]

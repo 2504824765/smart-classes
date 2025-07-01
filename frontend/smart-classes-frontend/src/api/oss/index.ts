@@ -1,4 +1,4 @@
-import request  from '@/axios'
+import request from '@/axios'
 /**
  * 上传资源文件（带文件夹名 message）
  * @param file 上传的资源文件
@@ -12,7 +12,12 @@ export const uploadResourcesApi = (
   const formData = new FormData()
   formData.append('file', file)
   formData.append('message', message)
-  return request.post({ url: '/api/oss/uploadResources', data: formData })
+  return request.post({ 
+    url: '/api/oss/uploadResource', 
+    data: formData,    
+    headers: {
+      'Content-Type': 'multipart/form-data' 
+    } })
 }
 
 /**
@@ -21,10 +26,7 @@ export const uploadResourcesApi = (
  * @param id 课程 ID
  * @returns 图谱文件的访问 URL
  */
-export const uploadGraphApi = (
-  file: File,
-  id: number
-): Promise<IResponse<{ url: string }>> => {
+export const uploadGraphApi = (file: File, id: number): Promise<IResponse<{ url: string }>> => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('id', id.toString())
@@ -37,10 +39,7 @@ export const uploadGraphApi = (
  * @param id 课程 ID
  * @returns 图片 URL
  */
-export const uploadImageApi = (
-  file: File,
-  id: number
-): Promise<IResponse<{ url: string }>> => {
+export const uploadImageApi = (file: File, id: number): Promise<IResponse<{ url: string }>> => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('id', id.toString())

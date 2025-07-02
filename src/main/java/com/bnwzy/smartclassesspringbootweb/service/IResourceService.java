@@ -20,4 +20,7 @@ public interface IResourceService {
     Resource getResourceById(Long id);
 
     List<Resource> getResourcesByType(String type);
+
+    List<Resource> getResourceByClassId(Long classId);
+
 }

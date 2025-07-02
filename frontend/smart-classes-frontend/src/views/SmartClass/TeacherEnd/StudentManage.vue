@@ -10,14 +10,13 @@ import {
   getStudentByUsernameApi,
   getStudentByIdApi
 } from '@/api/student'
-import { TableData } from '@/api/table/types'
-import { ref, h, onMounted } from 'vue'
-import { ElTag } from 'element-plus'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
 import EditStudent from './EditStudent.vue'
 import AddStudent from './AddStudent.vue'
+import { Student } from '@/api/student/types'
 
 interface Params {
   pageIndex?: number
@@ -69,7 +68,7 @@ const columns: TableColumn[] = [
 ]
 
 const loading = ref(true)
-const tableDataList = ref<TableData[]>([])
+const tableDataList = ref<Student[]>([])
 
 // 分页相关状态
 const currentPage = ref(1)

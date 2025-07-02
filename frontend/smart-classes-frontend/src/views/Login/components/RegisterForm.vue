@@ -214,6 +214,9 @@ const loginRegister = async () => {
     if (valid) {
       try {
         const formData = await getFormData<UserType>()
+        const userInfo = {
+          
+        }
         const res = await registerApi(formData)
         if (res.data === true) {
           loading.value = true

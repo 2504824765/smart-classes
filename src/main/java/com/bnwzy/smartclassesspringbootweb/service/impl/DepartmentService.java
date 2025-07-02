@@ -58,7 +58,7 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public Department updateDept(DeptUpdateDTO newDeptDTO) {
-        if (!departmentRepository.findById(newDeptDTO.getId()).isPresent()) {
+        if (departmentRepository.findById(newDeptDTO.getId()).isEmpty()) {
             throw new DepartmentNotFoundException("<Department not found>");
         } else {
             Department oldDepartment = departmentRepository.findById(newDeptDTO.getId()).get();
@@ -67,7 +67,7 @@ public class DepartmentService implements IDepartmentService {
                 oldDepartment.setParentId((long) 0);
             }
             // 判断目标父组织存不存在
-            else if (!departmentRepository.findById(newDeptDTO.getParentId()).isPresent()) {
+            else if (departmentRepository.findById(newDeptDTO.getParentId()).isEmpty()) {
                 throw new DepartmentNotFoundException("<Parent oldDepartment not found>");
             } else {
                 // 如果存在，判断是否为上一级
@@ -86,13 +86,12 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public List<Department> getAllDept() {
-        List<Department> departmentList = departmentRepository.findAll();
-        return departmentList;
+        return departmentRepository.findAll();
     }
 
     @Override
     public Department getDeptById(Long id) {
-        if (!departmentRepository.findById(id).isPresent()) {
+        if (departmentRepository.findById(id).isEmpty()) {
             throw new DepartmentNotFoundException("<Department not found>");
         } else {
             return departmentRepository.findById(id).get();
@@ -101,7 +100,7 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public Department getDeptByName(String name) {
-        if (!departmentRepository.findByName(name).isPresent()) {
+        if (departmentRepository.findByName(name).isEmpty()) {
             throw new DepartmentNotFoundException("<Department not found>");
         } else {
             return departmentRepository.findByName(name).get();

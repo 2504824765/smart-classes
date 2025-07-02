@@ -4,19 +4,27 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyCreateGraphDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IDifyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.*;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service
+// TODO: 将智能体获得的字符串变成文件上传至OSS
 public class DifyService implements IDifyService {
 
     private final WebClient webClient;
@@ -105,5 +113,75 @@ public class DifyService implements IDifyService {
                         return Mono.error(new RuntimeException("API调用失败: " + errorBody));
                     }
                 });
+    }
+
+    /**
+     * 将字符串内容保存为TXT文件
+     * @param content 文件内容
+     * @param filename 文件名(不带扩展名)
+     * @return 生成的File对象
+     */
+    private File createTextFile(String content, String filename) throws IOException, IOException {
+        File file = File.createTempFile(filename, ".txt");
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+        }
+        log.info("TXT文件已生成: {}", file.getAbsolutePath());
+        return file;
+    }
+
+    /**
+     * 将File转换为MultipartFile
+     */
+    private MultipartFile convertToMultipartFile(File file) throws IOException {
+        FileSystemResource resource = new FileSystemResource(file);
+        return new MockMultipartFile(
+                "file",
+                file.getName(),
+                "text/plain",
+                Files.readAllBytes(file.toPath())
+        );
+    }
+
+    /**
+     * 生成TXT文件并上传
+     * @param content 文件内容
+     * @param baseFilename 基础文件名(不带扩展名)
+     * @return 上传结果
+     */
+    public Mono<String> generateAndUploadTxt(String content, String baseFilename) {
+        try {
+            // 1. 生成TXT文件
+            File txtFile = createTextFile(content, baseFilename);
+
+            // 2. 转换为MultipartFile
+            MultipartFile multipartFile = convertToMultipartFile(txtFile);
+
+            // 3. 调用上传逻辑 - 这里需要你实现具体的上传方法
+            // 假设你有一个uploadFile方法
+            return uploadFile(multipartFile)
+                    .doFinally(signalType -> {
+                        // 4. 上传完成后删除临时文件
+                        if (txtFile.delete()) {
+                            log.info("临时文件已删除: {}", txtFile.getAbsolutePath());
+                        } else {
+                            log.warn("未能删除临时文件: {}", txtFile.getAbsolutePath());
+                        }
+                    });
+
+        } catch (IOException e) {
+            log.error("生成或上传TXT文件失败", e);
+            return Mono.error(e);
+        }
+    }
+
+    // 你需要实现这个上传方法
+    private Mono<String> uploadFile(MultipartFile file) {
+        // TODO: 实现你的文件上传逻辑
+        // 这里只是一个示例，你需要替换为实际的上传代码
+        OssUploadService ossUploadService = new OssUploadService();
+//        String responseMessage = ossUploadService.uploadGraph(file, 1L);
+//        return Mono.just(responseMessage);
+        return Mono.empty();
     }
 }

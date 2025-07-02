@@ -72,7 +72,7 @@ public class OssUploadService implements IOssUploadService {
         }
 
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-        Set<String> allowedExtensions = new HashSet<>(Arrays.asList("json"));
+        Set<String> allowedExtensions = new HashSet<>(List.of("json"));
         if (!allowedExtensions.contains(extension)) {
             throw new ImageUploadException("<仅支持上传:json>");
         }
@@ -113,19 +113,19 @@ public class OssUploadService implements IOssUploadService {
         }
 
 
-            String baseFilename = "class/" + "resource/"+message +"/"+ message;
-            String filename = baseFilename + "." + extension;
+        String baseFilename = "class/" + "resource/"+message +"/"+ message;
+        String filename = baseFilename + "." + extension;
 
-            // 检查文件是否存在并生成不重复的文件名
-            filename = aliOssUtil.generateUniqueFilename(filename);
+        // 检查文件是否存在并生成不重复的文件名
+        filename = aliOssUtil.generateUniqueFilename(filename);
 
-            String url = null;
-            try {
-                url = aliOssUtil.uploadFile(filename, file.getInputStream());
-            } catch (IOException e) {
-                throw new ImageUploadException("<Resource upload failed>");
-            }
-            return url;
+        String url = null;
+        try {
+            url = aliOssUtil.uploadFile(filename, file.getInputStream());
+        } catch (IOException e) {
+            throw new ImageUploadException("<Resource upload failed>");
+        }
+        return url;
 
     }
 

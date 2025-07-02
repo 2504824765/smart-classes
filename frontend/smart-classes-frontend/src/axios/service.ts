@@ -28,7 +28,6 @@ axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
     const url = res.config.url || ''
-    console.log('url: ', url)
     abortControllerMap.delete(url)
     // 这里不能做任何处理，否则后面的 interceptors 拿不到完整的上下文了
     return res

@@ -26,7 +26,7 @@ public class TeacherService implements ITeacherService {
 
     @Override
     public Teacher addTeacher(TeacherCreateDTO teacherCreateDTO) {
-        if(!teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()){
+        if(teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isEmpty()){
             Teacher teacher = new Teacher();
             teacher.setUsername(teacherCreateDTO.getUsername());
             teacher.setName(teacherCreateDTO.getName());
@@ -45,13 +45,15 @@ public class TeacherService implements ITeacherService {
     @Override
     public Teacher updateTeacher(TeacherUpdateDTO teacherUpdateDTO) {
         if(teacherRepository.existsById(teacherUpdateDTO.getId())){
+            if (teacherRepository.findById(teacherUpdateDTO.getId()).isEmpty()) {
+                throw new TeacherNotFoundException("Teacher not found");
+            }
             Teacher teacher=teacherRepository.findById(teacherUpdateDTO.getId()).get();
             teacher.setName(teacherUpdateDTO.getName());
             teacher.setGender(teacherUpdateDTO.getGender());
             if(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).isPresent()){
                 teacher.setDepartment(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).get());
-                teacherRepository.save(teacher);
-                return teacher;
+                return teacherRepository.save(teacher);
             }
             else{
                 throw new DepartmentNotFoundException("Department not found");
@@ -73,7 +75,7 @@ public class TeacherService implements ITeacherService {
 
     @Override
     public Teacher getTeacherById(Long id) {
-        if (teacherRepository.existsById(id)) {
+        if (teacherRepository.findById(id).isPresent()) {
             return teacherRepository.findById(id).get();
         }else{
             throw new TeacherNotFoundException("Teacher not fount");
@@ -91,11 +93,7 @@ public class TeacherService implements ITeacherService {
 
     @Override
     public List<Teacher> getAllTeacher() {
-        List<Teacher> teacherList=new ArrayList<>();
-        for (Teacher teacher : teacherRepository.findAll()) {
-            teacherList.add(teacher);
-        }
-        return teacherList;
+        return new ArrayList<>(teacherRepository.findAll());
     }
 
     @Override

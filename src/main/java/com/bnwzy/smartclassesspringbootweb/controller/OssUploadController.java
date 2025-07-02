@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/oss")
 public class OssUploadController {
@@ -14,20 +15,20 @@ public class OssUploadController {
     IOssUploadService ossUploadService;
 
     @PostMapping("/uploadImage")
-    public ResponseMessage uploadResource(MultipartFile file) {
+    public ResponseMessage uploadResource(@RequestParam("file")MultipartFile file) {
         return ResponseMessage.success("Resource upload successful",ossUploadService.uploadImage(file));
     }
     @PostMapping("/uploadGraph")
-    public ResponseMessage uploadGraph(MultipartFile file) {
+    public ResponseMessage uploadGraph(@RequestParam("file")MultipartFile file) {
         return ResponseMessage.success("Resource upload successful",ossUploadService.uploadGraph(file));
     }
 
     @PostMapping("/uploadResource")
-    public ResponseMessage uploadResource(MultipartFile file,String message) {
+    public ResponseMessage uploadResource(@RequestParam("file")MultipartFile file,@RequestParam(value = "message", required = false)String message) {
         return ResponseMessage.success("Resource upload successful",ossUploadService.uploadResource(file,message));
     }
     @GetMapping("/getAllByClassId")
-    public ResponseMessage getAllByClassId(Long cid) {
+    public ResponseMessage getAllByClassId(@PathVariable("id")Long cid) {
         return ResponseMessage.success("Get all successfully",ossUploadService.getAllByClassId(cid));
     }
 }

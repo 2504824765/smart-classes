@@ -39,8 +39,7 @@ public class ClassesService implements IClassesService {
         classes.setDescription(classesCreateDTO.getDescription());
         classes.setActive(classesCreateDTO.getActive());
         classes.setImageUrl(classesCreateDTO.getImageUrl());
-        classesRepository.save(classes);
-        return classes;
+        return classesRepository.save(classes);
     }
 
     @Override
@@ -74,8 +73,7 @@ public class ClassesService implements IClassesService {
             classes.setDescription(classesUpdateDTO.getDescription());
             classes.setActive(classesUpdateDTO.getActive());
             classes.setImageUrl(classesUpdateDTO.getImageUrl());
-            classesRepository.save(classes);
-            return classes;
+            return classesRepository.save(classes);
         }
     }
 

@@ -5,7 +5,7 @@ export type Classes = {
   credit: number
   classHours: number
   graph: string
-  isActive: boolean
+  active: boolean
   description: string
   imageUrl: string
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/studentMission")
+@RequestMapping("/api/studentMission")
 public class StudentMissionController {
     @Autowired
     private IStudentMissionService studentMissionService;
@@ -37,7 +37,7 @@ public class StudentMissionController {
         return ResponseMessage.success("<Get student mission>", studentMissionService.getStudentMissionById(id));
     }
 
-    @GetMapping("/getStudentsAllClassMission")
+    @PostMapping("/getStudentsAllClassMission")
     public ResponseMessage getStudentsAllClassMission(@Validated @RequestBody StudentsAllClassMissionGetDTO studentsAllClassMissionGetDTO) {
         return ResponseMessage.success("<Get student's all class mission>", studentMissionService.getStudentsAllClassMission(studentsAllClassMissionGetDTO));
     }

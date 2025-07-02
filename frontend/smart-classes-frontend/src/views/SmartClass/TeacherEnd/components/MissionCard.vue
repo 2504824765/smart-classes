@@ -5,7 +5,7 @@
     @click="goToDetail"
     :class="{ 'is-disabled': isExpired }"
   >
-    <el-text tag="h4">{{ mission.class.name }}</el-text>
+    <el-text tag="h4">{{ mission.classes.name }}</el-text>
     <el-text class="mission-desc" size="small">{{ mission.description }}</el-text>
     <el-text type="info" size="small">截止时间：{{ mission.deadline }}</el-text>
     <el-tag
@@ -24,13 +24,13 @@ import { useRouter } from 'vue-router'
 import type { ClassMission } from '@/api/classMission/types'
 
 const props = defineProps<{ mission: ClassMission }>()
-
+console.log('接收到的 mission：', props.mission)
 const { push } = useRouter()
 
 const isExpired = computed(() => new Date(props.mission.deadline) < new Date())
 
 const goToDetail = () => {
-  push({ path: '/mission/detail', query: { id: props.mission.id } })
+  push({ path: '/course/detail/mission', query: { id: props.mission.id } })
 }
 </script>
 

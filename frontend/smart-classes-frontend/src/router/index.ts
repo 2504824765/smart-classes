@@ -128,7 +128,8 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
         title: t('teacher.courseList'),
         icon: 'vi-ant-design:book-outlined',
         userType: 'teacher',
-        alwaysShow: true
+        alwaysShow: true,
+        noCache: true
       },
       children: [
         {
@@ -152,7 +153,33 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             noCache: true,
             hidden: true,
             canTo: true
-          }
+          },
+          children:[
+            {
+              path: 'form',
+              component: () => import('@/views/SmartClass/TeacherEnd/components/MissionForm.vue'),
+              name: 'CourseDetailForm',
+              meta: {
+                title: t('teacher.courseCreate'),
+                userType: 'teacher',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            },
+            {
+              path: 'mission',
+              component: () => import('@/views/SmartClass/TeacherEnd/MissionDetail.vue'),
+              name: 'CourseDetailMission',
+              meta: {
+                title: t('teacher.missionDetail'),
+                userType: 'teacher',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
         }
       ]
     }
@@ -372,37 +399,24 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             }
           ]
         },
-        //任务
         {
-          path: '/mission',
-          component: Layout,
-          name: 'Mission',
+          path: 'missionManage',
+          name: 'AdminMissionManage',
+          component: () => import('@/views/SmartClass/AdminEnd/MissionManage.vue'),
           meta: {
-            title: t('teacher.mission'),
-            userType: 'teacher',
-            icon: 'vi-ant-design:ordered-list',
+            title: t('admin.mission'),
+            userType: 'admin',
             noCache: true,
-            alwaysShow: true
+            affix: true
           },
           children: [
             {
-              path: 'content',
-              name: 'MissionContent',
-              component: () => import('@/views/SmartClass/AdminEnd/MissionManage.vue'),
-              meta: {
-                title: t('teacher.task'),
-                userType: 'teacher',
-                noCache: true,
-                affix: true
-              }
-            },
-            {
-              path: 'create',
+              path: 'form',
               name: 'MissionCreate',
-              component: () => import('@/views/SmartClass/AdminEnd/CreateMission.vue'),
+              component: () => import('@/views/SmartClass/AdminEnd/components/MissionForm.vue'),
               meta: {
-                title: t('teacher.createMission'),
-                userType: 'teacher',
+                title: t('admin.createMission'),
+                userType: 'admin',
                 noCache: true,
                 affix: true,
                 hidden: true,
@@ -411,6 +425,16 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             }
           ]
         },
+        {
+          path: 'departmentManage',
+          component: () => import('@/views/SmartClass/AdminEnd/DepartmentManage.vue'),
+          name: 'AdminDepartmentManage',
+          meta: {
+            title: t('admin.department'),
+            userType: 'admin',
+            noCache: true
+          }
+        }
       ]
     }
   ]

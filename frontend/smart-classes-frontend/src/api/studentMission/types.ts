@@ -1,7 +1,10 @@
+import { Student } from "@/api/student/types"
+import { ClassMission } from "@/api/classMission/types"
+
 export type StudentMission = {
     id: number
-    studentId: number
-    missionId: number
+    student: Student
+    mission: ClassMission
     score: number
     isDone: boolean
     isActive: boolean

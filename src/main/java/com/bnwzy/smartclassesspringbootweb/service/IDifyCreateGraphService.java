@@ -4,9 +4,7 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyCreateGraphDTO;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @Service
-public interface IDifyService {
+public interface IDifyCreateGraphService {
     Mono<String> createGraph(DifyCreateGraphDTO difyCreateGraphDTO);
 }

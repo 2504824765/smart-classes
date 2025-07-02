@@ -8,4 +8,5 @@ public class ResourceUpdateDTO {
     private String name;
     private String path;
     private String type;
+    private Long classId;
 }

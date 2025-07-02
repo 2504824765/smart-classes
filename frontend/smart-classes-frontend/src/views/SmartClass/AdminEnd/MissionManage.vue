@@ -8,7 +8,7 @@ import { ref, h, reactive } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
-import { createClassMissionApi } from '@/api/mission'
+import { addClassMissionApi } from '@/api/classMission/index'
 import { ElMessage } from 'element-plus'
 
 interface Params {

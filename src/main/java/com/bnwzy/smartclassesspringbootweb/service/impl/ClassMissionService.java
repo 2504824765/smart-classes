@@ -12,7 +12,6 @@ import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -26,7 +25,7 @@ public class ClassMissionService implements IClassMissionService {
     public ClassMission createClassMission(ClassMissionCreateDTO classMissionCreateDTO) {
         ClassMission classMission = new ClassMission();
         // 如果没有课程
-        if (!classesRepository.findById(classMissionCreateDTO.getCid()).isPresent()) {
+        if (classesRepository.findById(classMissionCreateDTO.getCid()).isEmpty()) {
             throw new ClassesNotFoundException("<Class not found>");
         } else {
             Classes classes = classesRepository.findById(classMissionCreateDTO.getCid()).get();
@@ -52,11 +51,11 @@ public class ClassMissionService implements IClassMissionService {
 
     @Override
     public ClassMission updateClassMission(ClassMissionUpdateDTO classMissionUpdateDTO) {
-        if (!classMissionRepository.findById(classMissionUpdateDTO.getId()).isPresent()) {
+        if (classMissionRepository.findById(classMissionUpdateDTO.getId()).isEmpty()) {
             throw new ClassMissionNotFoundException("<Class mission not found>");
         }
         ClassMission classMission = classMissionRepository.findById(classMissionUpdateDTO.getId()).get();
-        if (!classesRepository.findById(classMissionUpdateDTO.getCid()).isPresent()) {
+        if (classesRepository.findById(classMissionUpdateDTO.getCid()).isEmpty()) {
             throw new ClassesNotFoundException("<Class not found>");
         } else {
             classMission.setClasses(classesRepository.findById(classMissionUpdateDTO.getCid()).get());
@@ -71,8 +70,7 @@ public class ClassMissionService implements IClassMissionService {
 
     @Override
     public List<ClassMission> getAllClassMission() {
-        List<ClassMission> classMissions = classMissionRepository.findAll();
-        return classMissions;
+        return classMissionRepository.findAll();
     }
 
     @Override

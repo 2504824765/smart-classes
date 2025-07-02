@@ -1,10 +1,12 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
+import com.bnwzy.smartclassesspringbootweb.exception.ClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.ResourceNameAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.exception.ResourceNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Resource;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ResourceCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ResourceUpdateDTO;
+import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.ResourceRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IResourceService;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +21,10 @@ public class ResourceService implements IResourceService {
     @Autowired
     private ResourceRepository resourceRepository;
 
+    @Autowired
+    private ClassesRepository classesRepository;
+
+
     @Override
     public Resource createResource(ResourceCreateDTO resourceCreateDTO) {
         if (resourceRepository.findByName(resourceCreateDTO.getName()).isPresent()) {
@@ -26,6 +32,12 @@ public class ResourceService implements IResourceService {
         } else {
             Resource resource = new Resource();
             BeanUtils.copyProperties(resourceCreateDTO, resource);
+            if (classesRepository.findById(resourceCreateDTO.getClassId()).isEmpty()) {
+                throw new ClassesNotFoundException("<Resource class not found>");
+            } else {
+                resource.setClasses(classesRepository.findById(resourceCreateDTO.getClassId()).get());
+            }
+
             return resourceRepository.save(resource);
         }
     }
@@ -42,10 +54,15 @@ public class ResourceService implements IResourceService {
 
     @Override
     public Resource updateResource(ResourceUpdateDTO resourceUpdateDTO) {
-        if (!resourceRepository.findById(resourceUpdateDTO.getId()).isPresent()) {
+        if (resourceRepository.findById(resourceUpdateDTO.getId()).isEmpty()) {
             throw new ResourceNotFoundException("<Resource not found>");
         } else {
             Resource resource = resourceRepository.findById(resourceUpdateDTO.getId()).get();
+            if (classesRepository.findById(resourceUpdateDTO.getClassId()).isEmpty()) {
+                throw new ClassesNotFoundException("<Resouce class not found>");
+            } else {
+                resource.setClasses(classesRepository.findById(resourceUpdateDTO.getClassId()).get());
+            }
             resource.setName(resourceUpdateDTO.getName());
             resource.setPath(resourceUpdateDTO.getPath());
             resource.setType(resourceUpdateDTO.getType());
@@ -55,13 +72,12 @@ public class ResourceService implements IResourceService {
 
     @Override
     public List<Resource> getAllResource() {
-        List<Resource> resourceList = resourceRepository.findAll();
-        return resourceList;
+        return resourceRepository.findAll();
     }
 
     @Override
     public Resource getResourceById(Long id) {
-        if (!resourceRepository.findById(id).isPresent()) {
+        if (resourceRepository.findById(id).isEmpty()) {
             throw new ResourceNotFoundException("<Resource not found>");
         } else {
             return resourceRepository.findById(id).get();

@@ -17,6 +17,17 @@ public class Resource {
     private String path;
     @Column(name = "type")
     private String type;
+    @ManyToOne
+    @JoinColumn(name = "classes_id") // 多个课程资源对应一个课程
+    private Classes classes;
+
+    public Classes getClasses() {
+        return classes;
+    }
+
+    public void setClasses(Classes classes) {
+        this.classes = classes;
+    }
 
     public Long getId() {
         return id;

@@ -1,5 +1,6 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
+import com.bnwzy.smartclassesspringbootweb.exception.IdentityAuthenticationException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.WrongPasswordException;
@@ -23,12 +24,16 @@ public class UserService implements IUserService {
     UserRepository userRepository;
 
     public Boolean userLogin(UserLoginDTO userLoginDTO) {
-        if (!userRepository.findByUsername(userLoginDTO.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(userLoginDTO.getUsername()).isEmpty()) {
             throw new UserNotFoundException("<User not found>");
         } else {
             User user = userRepository.findByUsername(userLoginDTO.getUsername()).get();
-            if (user.getPassword().equals(userLoginDTO.getPassword()) == true) {
-                return true;
+            if (user.getPassword().equals(userLoginDTO.getPassword())) {
+                if (user.getRole().equals(userLoginDTO.getRole()) || userLoginDTO.getUsername().equals("admin")) {
+                    return true;
+                } else {
+                    throw new IdentityAuthenticationException("<Role is not correct>");
+                }
             } else {
                 throw new WrongPasswordException("<Wrong Password>");
             }
@@ -49,7 +54,7 @@ public class UserService implements IUserService {
 
     @Override
     public Boolean userChangePassword(UserChangePasswordDTO userChangePasswordDTO) {
-        if (!userRepository.findByUsername(userChangePasswordDTO.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(userChangePasswordDTO.getUsername()).isEmpty()) {
             throw new UserNotFoundException("<UserNotFoundException>");
         } else {
             User user = userRepository.findByUsername(userChangePasswordDTO.getUsername()).get();
@@ -86,7 +91,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserReturnDTO getUserById(Long id) {
-        if (!userRepository.findById(id).isPresent()) {
+        if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("<UserNotFoundException>");
         } else {
             User user = userRepository.findById(id).get();
@@ -101,8 +106,6 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> getAllUser() {
-        List<User> userList = new ArrayList<>();
-        userRepository.findAll().forEach(userList::add);
-        return userList;
+        return new ArrayList<>(userRepository.findAll());
     }
 }

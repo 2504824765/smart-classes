@@ -1,3 +1,5 @@
+import CourseDetail from '@/views/SmartClass/StudentEnd/CourseDetail.vue'
+
 export default {
   common: {
     inputText: '请输入',
@@ -588,7 +590,9 @@ export default {
     gender: '性别',
     dept: '所在部门',
     gpa: '绩点',
+    courseDetail: '课程详情',
     courseList: '课程列表',
+    study: '学习',
     videoWatch: '视频观看',
     homework: '作业',
     grades: '成绩查看'
@@ -619,8 +623,13 @@ export default {
     courseManage: '课程管理',
     task: '任务',
     mission: '任务',
-    createMission: '创建任务',
-    classManage: '班级管理',
-    gradeManage: '成绩管理'
+    createMission: '创建任务'
+  },
+  admin: {
+    admin: '管理员',
+    teacher: '教师管理',
+    student: '学生管理',
+    course: '课程关联',
+    createForm: '创建表单'
   }
 }

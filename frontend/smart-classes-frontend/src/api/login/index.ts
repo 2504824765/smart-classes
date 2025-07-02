@@ -1,5 +1,5 @@
 import request from '@/axios'
-import type { UserType } from './types'
+import type { UserType, UserBackEnd } from './types'
 import axios from '@/axios'
 
 interface RoleParams {
@@ -11,7 +11,15 @@ export const loginApi = (data: UserType): Promise<IResponse<boolean>> => {
 }
 
 export const loginOutApi = (): Promise<IResponse> => {
-  return request.get({ url: '/mock/user/loginOut' })
+  return request.get({ url: '/api/user/loginOut' })
+}
+
+export const registerApi = (data: UserType): Promise<IResponse<boolean>> => {
+  return request.post({ url: '/api/user/register', data })
+}
+
+export const getUserInfoApi = (username: string): Promise<IResponse<UserBackEnd>> => {
+  return request.get({ url: `/api/user/getUserByUsername/${username}` })
 }
 
 export const getUserListApi = ({ params }: AxiosConfig) => {

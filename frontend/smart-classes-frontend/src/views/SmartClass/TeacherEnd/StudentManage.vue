@@ -89,8 +89,7 @@ const getTableList = async (params?: Params) => {
     })
   if (res) {
     console.log('API响应数据:', res.data)
-    // 假设后端返回的数据结构包含total字段，如果不是数组而是对象
-    let studentData: TableData[] = []
+    let studentData: Student[] = []
     if (Array.isArray(res.data)) {
       studentData = res.data
       total.value = res.data.length // 如果后端没有返回total，暂时用数组长度
@@ -102,8 +101,8 @@ const getTableList = async (params?: Params) => {
 
     // 按学号（id）升序排序
     studentData.sort((a, b) => {
-      const idA = parseInt(a.id) || 0
-      const idB = parseInt(b.id) || 0
+      const idA = a.id || 0
+      const idB = b.id || 0
       return idA - idB
     })
 

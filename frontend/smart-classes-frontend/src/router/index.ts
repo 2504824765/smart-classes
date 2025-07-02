@@ -89,8 +89,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher',
-        alwaysShow: true
+        userType: 'teacher'
       },
       children: [
         {
@@ -124,6 +123,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
           component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
           meta: {
             title: t('teacher.studentManage'),
+            icon: 'vi-ant-design:user-outlined',
             userType: 'teacher',
             noCache: true
           }
@@ -138,9 +138,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
       name: 'Course',
       meta: {
         title: t('teacher.courseList'),
-        icon: 'vi-ant-design:book-outlined',
-        userType: 'teacher',
-        alwaysShow: true
+        userType: 'teacher'
       },
       children: [
         {
@@ -149,6 +147,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
           name: 'CourseContent',
           meta: {
             title: t('teacher.courseList'),
+            icon: 'ep:collection-tag',
             userType: 'teacher',
             noCache: true,
             affix: true
@@ -164,6 +163,109 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             noCache: true,
             hidden: true,
             canTo: true
+          }
+        }
+      ]
+    },
+    //任务
+    {
+      path: '/teacher/Mission',
+      component: Layout,
+      name: 'Mission',
+      meta: {
+        title: t('teacher.mission'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherTask',
+          component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
+          meta: {
+            title: t('teacher.task'),
+            icon: 'vi-ri:function-fill',
+            userType: 'teacher',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/teacher/CreateMission',
+      component: Layout,
+      name: 'CreateMission',
+      meta: {
+        title: t('teacher.createMission'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true,
+        hidden: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherCreateMission',
+          component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
+          meta: {
+            title: t('teacher.createMission'),
+            userType: 'teacher',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    //班级管理
+    {
+      path: '/teacher/ClassManage',
+      component: Layout,
+      name: 'ClassManage',
+      meta: {
+        title: t('teacher.classManage'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherClassManage',
+          component: () => import('@/views/SmartClass/TeacherEnd/ClassManage.vue'),
+          meta: {
+            title: t('teacher.classManage'),
+            icon: 'material-symbols:groups',
+            userType: 'teacher',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    //成绩管理
+    {
+      path: '/teacher/GradeManage',
+      component: Layout,
+      name: 'GradeManage',
+      meta: {
+        title: t('teacher.gradeManage'),
+        userType: 'teacher',
+        noCache: true,
+        affix: true
+      },
+      children: [
+        {
+          path: '',
+          name: 'TeacherGradeManage',
+          component: () => import('@/views/SmartClass/TeacherEnd/GradeManage.vue'),
+          meta: {
+            title: t('teacher.gradeManage'),
+            icon: 'material-symbols:grade',
+            userType: 'teacher',
+            noCache: true,
+            affix: true
           }
         }
       ]
@@ -422,7 +524,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               }
             }
           ]
-        },
+        }
       ]
     }
   ]

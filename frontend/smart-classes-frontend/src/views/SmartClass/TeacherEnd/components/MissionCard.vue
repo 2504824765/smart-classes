@@ -8,11 +8,7 @@
     <el-text tag="h4">{{ mission.class.name }}</el-text>
     <el-text class="mission-desc" size="small">{{ mission.description }}</el-text>
     <el-text type="info" size="small">截止时间：{{ mission.deadline }}</el-text>
-    <el-tag
-      :type="isExpired ? 'danger' : 'success'"
-      class="status"
-      effect="light"
-    >
+    <el-tag :type="isExpired ? 'danger' : 'success'" class="status" effect="light">
       {{ isExpired ? '已截止' : '进行中' }}
     </el-tag>
   </el-card>

@@ -9,7 +9,6 @@ import { ElTag, ElCard, ElStatistic, ElProgress } from 'element-plus'
 // import { Calendar, Document, Trophy, Message, Clock } from '@element-plus/icons-vue'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
-import { createClassMissionApi } from '@/api/mission'
 import { UserType } from '@/api/login/types'
 import { ElMessage } from 'element-plus'
 import {

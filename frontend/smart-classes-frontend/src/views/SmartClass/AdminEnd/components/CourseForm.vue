@@ -8,8 +8,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi } from '@/api/classes'
 import { PendingUploadResource, ResourceCreateDTO } from '@/api/resource/types'
-import { addResourceApi } from '@/api/resource'
-import { uploadResourcesApi } from '@/api/oss'
+import { addResourceApi } from '@/api/resource/index'
+import { uploadResourcesApi } from '@/api/oss/index'
 import { Teacher } from '@/api/teacher/types'
 import { getAllTeacherApi } from '@/api/teacher'
 
@@ -17,11 +17,11 @@ import { getAllTeacherApi } from '@/api/teacher'
 const pendingResources = ref<PendingUploadResource[]>([])
 // 绑定上传的资源（uploadedResources 是前面上传时填充的）
 const uploadedResources: ResourceCreateDTO[] = []
-const allTeachers = ref<Teacher[]>([])  // 所有教师原始数据
-const teacherOptions = ref<{ label: string; value: number }[]>([])  // 绑定 Select
+const allTeachers = ref<Teacher[]>([]) // 所有教师原始数据
+const teacherOptions = ref<{ label: string; value: number }[]>([]) // 绑定 Select
 const teacherLoading = ref(false)
 
-const courseFormSchema = reactive<FormSchema[]>([ 
+const courseFormSchema = reactive<FormSchema[]>([
   {
     field: 'name',
     label: '课程名称',
@@ -41,15 +41,15 @@ const courseFormSchema = reactive<FormSchema[]>([
       options: teacherOptions,
       filterMethod: (query: string) => {
         if (!query) {
-          teacherOptions.value = allTeachers.value.map(t => ({
+          teacherOptions.value = allTeachers.value.map((t) => ({
             label: `${t.name}（ID: ${t.id}）`,
             value: t.id
           }))
           return
         }
         teacherOptions.value = allTeachers.value
-          .filter(t => t.name.includes(query) || String(t.id).includes(query))
-          .map(t => ({
+          .filter((t) => t.name.includes(query) || String(t.id).includes(query))
+          .map((t) => ({
             label: `${t.name}（ID: ${t.id}）`,
             value: t.id
           }))
@@ -208,7 +208,7 @@ onMounted(async () => {
   try {
     const res = await getAllTeacherApi()
     allTeachers.value = res.data
-    teacherOptions.value = res.data.map(t => ({
+    teacherOptions.value = res.data.map((t) => ({
       label: `${t.name}（ID: ${t.id}）`,
       value: t.id
     }))

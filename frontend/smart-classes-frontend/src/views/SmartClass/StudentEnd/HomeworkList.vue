@@ -29,7 +29,7 @@ const getStudentId = async (username: string) => {
 
 const userStore = useUserStore()
 const loginInfo = userStore.getLoginInfo
-const initialize = async ()  => {
+const initialize = async () => {
   if (loginInfo) {
     const username = loginInfo.username
     await getStudentId(username)
@@ -39,18 +39,20 @@ const initialize = async ()  => {
 const homeworks = ref<StudentMission[]>([])
 
 onMounted(async () => {
-  await initialize()  
   const classId = Number(route.query.classId)
+  console.log(classId)
+  await initialize()
   if (!classId || !studentId.value) return
 
   const res = await getStudentMissionByClass(classId, studentId.value) // TODO: 接口你来实现
+  console.log(res)
   homeworks.value = res.data
 })
 
 function goToDetail(hw: StudentMission) {
   router.push({
     name: 'HomeworkDetail',
-    query: { missionId: hw.missionId }
+    query: { missionId: hw.classMission.id }
   })
 }
 </script>

@@ -27,7 +27,7 @@ const getStudentId = async (username: string) => {
 
 const userStore = useUserStore()
 const loginInfo = userStore.getLoginInfo
-const initialize = async ()  => {
+const initialize = async () => {
   if (loginInfo) {
     const username = loginInfo.username
     await getStudentId(username)
@@ -48,31 +48,33 @@ const loadCourses = async () => {
 
   // 遍历课程，获取任务统计数据
   for (const cls of classes.value) {
-    const missionRes = await getStudentMissionByClass(cls.id, studentId.value,)
+    const missionRes = await getStudentMissionByClass(cls.id, studentId.value)
 
     const missions = missionRes.data || []
     const total = missions.length
-    const unfinished = missions.filter(m => !m.isActive).length
+    const unfinished = missions.filter((m) => !m.active).length
 
     courseList.push({
+      id: cls.id,
       name: cls.name,
       description: cls.description,
       imageUrl: cls.imageUrl || '/default.png',
       total,
-      unfinished
+      unfinished,
+      active: cls.active
     })
   }
 
   courses.value = courseList
 }
 
-function goToHomework(course: any) {
-  push({ path: '/homework/list', query: { course: course.id } })
+function goToHomework(course: CourseDisplayData) {
+  push({ path: '/homework/list', query: { classId: course.id } })
 }
 
 onMounted(async () => {
-  await initialize()  
-  await loadCourses() 
+  await initialize()
+  await loadCourses()
 })
 </script>
 

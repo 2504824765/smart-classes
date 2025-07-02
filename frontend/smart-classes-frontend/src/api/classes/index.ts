@@ -16,7 +16,7 @@ export const deleteClassApi = (id: number) => {
 }
 
 // 更新课程
-export const updateClassApi = (data: ClassesUpdateDTO):Promise<IResponse<Classes>> => {
+export const updateClassApi = (data: ClassesUpdateDTO): Promise<IResponse<Classes>> => {
   return request.post({ url: '/api/class/update', data })
 }
 
@@ -31,7 +31,7 @@ export const getClassesByIdApi = (id: number): Promise<IResponse<Classes>> => {
 }
 
 // 根据课程名称获取课程信息
-export const getClassesByNameApi = (name: string): Promise<IResponse<Classes>> =>{
+export const getClassesByNameApi = (name: string): Promise<IResponse<Classes>> => {
   return request.get({ url: `/api/class/getClassByName/${name}` })
 }
 
@@ -41,6 +41,6 @@ export const getClassesByTeacherApi = (teacher_id: number): Promise<IResponse<Cl
 }
 
 // 获取课程数量
-export const getClassCountApi = ():Promise<IResponse<number>> => {
+export const getClassCountApi = (): Promise<IResponse<number>> => {
   return request.get({ url: '/api/class/count' })
 }

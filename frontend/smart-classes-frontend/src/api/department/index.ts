@@ -66,7 +66,6 @@ export const getDeptByNameApi = (name: string): Promise<IResponse<Department>> =
   return request.get({ url: `/api/dept/getDeptByName/${name}` })
 }
 
-
 export const getMembersByDeptIdApi = (id: number): Promise<IResponse<any>> => {
   return request.get({ url: `/api/dept/getMembersByDeptId/${id}` })
 }

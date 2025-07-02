@@ -11,11 +11,13 @@ export type Classes = {
 }
 
 export type CourseDisplayData = {
+  id: number
   name: string
   imageUrl: string
   description: string
   unfinished: number
   total: number
+  active: boolean
 }
 
 export type ClassesCreateDTO = Omit<Classes, 'id'>

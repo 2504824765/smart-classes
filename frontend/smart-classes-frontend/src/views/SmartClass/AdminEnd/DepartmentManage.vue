@@ -18,7 +18,7 @@ const treeProps = {
 
 const buildDepartmentTree = (depts: Department[]): Department[] => {
   const map = new Map<number, any>()
-  depts.forEach(d => map.set(d.id, { ...d, children: [] }))
+  depts.forEach((d) => map.set(d.id, { ...d, children: [] }))
   const tree: Department[] = []
   for (const dept of depts) {
     const node = map.get(dept.id)

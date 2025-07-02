@@ -3,7 +3,7 @@
     <el-page-header content="任务详情" @back="router.back" />
 
     <!-- 任务详情 -->
-    <el-card class="mb-4" style="margin-top: 10px;">
+    <el-card class="mb-4" style="margin-top: 10px">
       <template #header>
         <span>任务信息</span>
       </template>
@@ -12,7 +12,9 @@
         <el-descriptions-item label="截止时间">{{ mission?.deadline }}</el-descriptions-item>
         <el-descriptions-item label="提交方式">{{ mission?.submitMethod }}</el-descriptions-item>
         <el-descriptions-item label="得分">{{ mission?.score }}</el-descriptions-item>
-        <el-descriptions-item label="任务描述" :span="2">{{ mission?.description }}</el-descriptions-item>
+        <el-descriptions-item label="任务描述" :span="2">{{
+          mission?.description
+        }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
 
@@ -93,7 +95,7 @@ onMounted(async () => {
   const studentRes = await getStudentMissionByMission(missionId)
   studentMissions.value = studentRes.data.map((s) => ({
     ...s,
-    isDone: s.isDone
+    isDone: s.done
   }))
 })
 

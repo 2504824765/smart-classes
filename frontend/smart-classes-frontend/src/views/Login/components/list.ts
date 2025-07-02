@@ -19,7 +19,7 @@ const teacherList: string[] = [
   '/course/content',
   '/course/detail',
   '/course/detail/form',
-  '/course/detail/mission',
+  '/course/detail/mission'
 ]
 
 const adminList: string[] = [

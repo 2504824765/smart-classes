@@ -29,12 +29,12 @@ import { Classes } from '@/api/classes/types'
 const { push } = useRouter()
 
 const props = defineProps<{
-  course: Classes,
+  course: Classes
   disabled?: boolean
 }>()
 
 const goToCourseDetail = () => {
-  console.log("go to course detail",props.course.id)
+  console.log('go to course detail', props.course.id)
   push({ path: '/course/detail', query: { classId: props.course.id } })
 }
 </script>

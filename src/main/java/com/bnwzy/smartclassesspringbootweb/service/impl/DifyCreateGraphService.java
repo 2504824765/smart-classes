@@ -1,13 +1,11 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyCreateGraphDTO;
-import com.bnwzy.smartclassesspringbootweb.service.IDifyService;
+import com.bnwzy.smartclassesspringbootweb.service.IDifyCreateGraphService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -28,21 +26,19 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
-// TODO: 将智能体获得的字符串变成文件上传至OSS
-public class DifyService implements IDifyService {
+public class DifyCreateGraphService implements IDifyCreateGraphService {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
     @Autowired
     private OssUploadService ossUploadService;
 
-    public DifyService() {
+    public DifyCreateGraphService() {
         String apiKey = "app-SfTCiHTX3aqjHm9GL1e9ULxE";
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(300))
@@ -62,7 +58,6 @@ public class DifyService implements IDifyService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // TODO: outputFile是null，这到底是为什么？！！！
     @Override
     public Mono<String> createGraph(DifyCreateGraphDTO dto) {
         log.info("开始处理Dify请求，支持直接JSON格式和data:前缀格式");

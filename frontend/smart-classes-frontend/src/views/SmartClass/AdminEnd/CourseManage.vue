@@ -35,15 +35,36 @@ const handleDelete = async (row: Classes) => {
   }
 }
 
+const handleEdit = (row: Classes) => {
+  push({ path: '/admin/courseManage/form', query: { id: row.id } })
+}
+
 setProps({
   columns: [
     { field: 'id', label: '课程ID', width: 80 },
     { field: 'name', label: '课程名称' },
     { field: 'credit', label: '学分', width: 80 },
-    { field: 'class_hours', label: '课时', width: 80 },
+    { field: 'classHours', label: '课时', width: 80 },
+    {
+      field: 'teacher',
+      label: '授课教师',
+      width: 120,
+      formatter: (_: Recordable, __: TableColumn, cellValue: any) => {
+        return cellValue?.name || '未分配'
+      }
+    },
+    {
+      field: 'department',
+      label: '所属院系',
+      width: 150,
+      formatter: (_: Recordable, __: TableColumn, cellValue: any, row: Classes) => {
+        return row.teacher?.dept?.name || '未分配'
+      }
+    },
     {
       field: 'active',
       label: '是否开课',
+      width: 100,
       formatter: (_: Recordable, __: TableColumn, cellValue: boolean) => {
         return (
           <ElTag type={cellValue ? 'success' : 'danger'}>{cellValue ? '已开课' : '未开课'}</ElTag>
@@ -68,7 +89,7 @@ setProps({
               <BaseButton
                 type="primary"
                 size="small"
-                onClick={() => console.log('编辑课程', data.row)}
+                onClick={() => handleEdit(data.row as Classes)}
               >
                 编辑
               </BaseButton>

@@ -16,9 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class OssUploadService implements IOssUploadService {
+    private static final Logger log = LoggerFactory.getLogger(OssUploadService.class);
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -65,29 +69,31 @@ public class OssUploadService implements IOssUploadService {
             throw new FileIsNullException("<File is null>");
         }
 
-
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.lastIndexOf(".") == -1) {
             throw new ImageUploadException("<文件名无效>");
         }
 
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-//        Set<String> allowedExtensions = new HashSet<>(List.of("json"));
-//        if (!allowedExtensions.contains(extension)) {
-//            throw new ImageUploadException("<仅支持上传:json>");
-//        }
+        // 支持JSON文件
+        Set<String> allowedExtensions = new HashSet<>(Arrays.asList("json", "txt"));
+        if (!allowedExtensions.contains(extension)) {
+            throw new ImageUploadException("<仅支持上传:json, txt>");
+        }
 
-
-        String filename = "class/"+"json/"+"知识图谱"+"." + extension;
+        // 使用时间戳确保文件名唯一性
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String filename = "class/"+"json/"+"知识图谱_"+timestamp+"." + extension;
         String fullUrl = null;
 
         try {
             fullUrl = aliOssUtil.uploadFile(filename, file.getInputStream());
+            log.info("知识图谱文件上传成功: {}, URL: {}", filename, fullUrl);
         } catch (IOException e) {
-            throw new ImageUploadException("<Image upload failed>");
+            log.error("知识图谱文件上传失败", e);
+            throw new ImageUploadException("<知识图谱文件上传失败: " + e.getMessage() + ">");
         }
-        String pathOnly = aliOssUtil.extractPathFromUrl(fullUrl);
-
+        
         return fullUrl;
     }
 

@@ -114,11 +114,13 @@ const goback = () => {
 </script>
 
 <template>
-  <Form ref="formRef" :schema="schema" v-model="formData" :rules="rules" />
-  <div style="text-align: center; margin-top: 20px">
-    <BaseButton type="primary" @click="create">确定</BaseButton>
-    <BaseButton type="primary" @click="goback">返回</BaseButton>
-  </div>
+  <ContentWrap>
+    <Form ref="formRef" :schema="schema" v-model="formData" :rules="rules" />
+    <div style="text-align: center; margin-top: 20px">
+      <BaseButton type="primary" @click="create">确定</BaseButton>
+      <BaseButton type="info" @click="goback">返回</BaseButton>
+    </div>
+  </ContentWrap>
 </template>
 
 <style scoped>

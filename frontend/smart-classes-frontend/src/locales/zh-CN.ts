@@ -621,6 +621,9 @@ export default {
     videoPlay: '视频播放',
     taskManage: '任务管理',
     courseManage: '课程管理',
+    courseList: '课程列表',
+    classManage: '班级管理',
+    gradeManage: '成绩管理',
     task: '任务',
     mission: '任务',
     createMission: '创建任务'

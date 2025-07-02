@@ -86,10 +86,12 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
       path: '/teacher',
       component: Layout,
       name: 'Teacher',
+      redirect: '/teacher/dashboard',
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher'
+        userType: 'teacher',
+        alwaysShow: true
       },
       children: [
         {
@@ -101,7 +103,6 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             userType: 'teacher',
             noCache: true,
             affix: true,
-            icon: 'vi-ant-design:dashboard-filled'
           }
         }
       ]
@@ -153,7 +154,6 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             icon: 'ep:collection-tag',
             userType: 'teacher',
             noCache: true,
-            affix: true
           }
         },
         {
@@ -431,7 +431,6 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
                 title: t('admin.createMission'),
                 userType: 'admin',
                 noCache: true,
-                affix: true,
                 hidden: true,
                 canTo: true
               }

@@ -13,9 +13,20 @@
         >
           <VideoPlay v-if="res.type === 'video'" :url="res.url" />
           <div v-else-if="res.type === 'text'" class="p-4 bg-white rounded shadow">
-            <p>{{ res.content }}</p>
+            
           </div>
-          <div v-else class="text-gray-400">暂不支持该类型</div>
+          <div v-else-if="res.type === 'question'" class="text-gray-400">
+            <QuestionCard
+              v-for="(q, index) in questions"
+              :key="index"
+              v-model="answers[index]"
+              :question="q.question"
+              :options="q.options"
+              :answer="q.answer"
+              :showResult="submitted"
+            />
+            <el-button type="primary" @click="handleSubmit">提交</el-button>
+          </div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -32,8 +43,45 @@ import { ElMessage } from 'element-plus'
 import VideoPlay from './components/VideoPlay.vue'
 import ChatGPT from './components/ChatGPT.vue'
 import { useRoute } from 'vue-router'
+import QuestionCard from './components/QuestionCard.vue'
+import { getResourceByClassIdApi } from '@/api/resource/index'
+import type { Resource } from '@/api/resource/types'
+import { PREFIX } from '@/constants/index'
+import { createDifyGenerateQuestionRequest } from '@/api/dify/types'
+import { generateQuestionApi } from '@/api/dify'
+
+interface QuestionItem {
+  question: string
+  options: Record<string, string>  
+  answer: string 
+}
+
 const route = useRoute()
-const knowledgeId = ref((route.params.id as string) || '1')
+
+const classId = Number(route.query.classId)
+const knowledgeName = route.query.knowledgeName as string
+
+const loading = ref(false)
+const currentResourceId = ref('')
+const questions = ref<QuestionItem[]>([])
+const answers = ref<(string | null)[]>([])
+const submitted = ref(false)
+
+watch(currentResourceId, async (newId) => {
+  const questionTabId = 'r3' 
+  if (newId === questionTabId && questions.value.length === 0) {
+    loading.value = true
+    try {
+      fetchQuestions()
+    } finally {
+      loading.value = false
+    }
+  }
+})
+
+const handleSubmit = () => {
+  submitted.value = true
+}
 
 const knowledge = reactive({
   title: '',
@@ -47,13 +95,11 @@ const knowledge = reactive({
   }>
 })
 
-const currentResourceId = ref('')
 const currentResource = ref<(typeof knowledge.resources)[0] | null>(null)
 
 async function fetchKnowledge() {
   try {
-    knowledge.title = '神经网络基础'
-    knowledge.description = '本模块介绍神经网络的基本结构与原理。'
+    knowledge.title = knowledgeName
     knowledge.resources = [
       {
         id: 'r1',
@@ -66,12 +112,43 @@ async function fetchKnowledge() {
         type: 'text',
         name: '学习笔记',
         content: '神经网络是一种模仿人脑的算法结构...'
+      },
+      {
+        id: 'r3',
+        type: 'question',
+        name: '练习题'
       }
     ]
     currentResourceId.value = knowledge.resources[0]?.id || ''
   } catch (e) {
     ElMessage.error('加载资源失败')
   }
+}
+
+const fetchQuestions = async () => {
+  if (!classId) {
+    console.warn('classId 不存在，跳过图谱加载')
+    return
+  }
+  const resourcesRes = await getResourceByClassIdApi(classId)
+  console.log('resourcesRes', resourcesRes)
+  const resources = resourcesRes.data
+  if (!resourcesRes) return
+  const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
+  console.log('urls', urls)
+  const requestBody = createDifyGenerateQuestionRequest(urls,knowledgeName,5)
+  console.log('requestBody', requestBody)
+  const urlRes = await generateQuestionApi(requestBody)
+  console.log('urlRes', urlRes)
+  const res = await fetch(urlRes.data)
+    .then(r => r.json())
+    .catch(err => {
+      console.error('下载题目 JSON 失败', err)
+      return []
+    })
+  console.log('res', res)
+  questions.value = res  
+  answers.value = Array(res.length).fill(null) 
 }
 
 watch(currentResourceId, (newId) => {

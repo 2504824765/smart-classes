@@ -4,13 +4,14 @@ import G6 from '@antv/g6'
 import { useRouter, useRoute } from 'vue-router'
 import FileDisplay from './components/FileDisplay.vue'
 import ChatGPT from './components/ChatGPT.vue'
-import { getResourceByClassIdApi } from '@/api/resource'
+import { getClassesByIdApi } from '@/api/classes'
+import { PREFIX } from '@/constants/index'
 
 const { push } = useRouter()
 const route = useRoute()
-const classId = Number(route.params.classId)
-// 页面数据
-const courseTitle = ref('Python 深度学习')
+const classId = Number(route.query.course)
+
+const courseTitle = ref('课程学习')
 const progress = ref(65)
 const activeTab = ref('graph')
 // 树结构数据
@@ -330,18 +331,47 @@ const initGraph = async () => {
     const node = e.item
     if (!node) return
 
-    const model = node.getModel()
-    const knowledgeId = model.id // 知识点id
-
-    // 编程式导航跳转到知识点详情页，传参
-    push({ path: '/course/knowledge', query: { id: knowledgeId } })
+    const model = node.getModel() 
+    const knowledgeName = model.label 
+    push({ path: '/course/knowledge', query: { classId: classId, knowledgeName: knowledgeName as string} })
   })
+}
+
+
+const fetchGraphData = async () => {
+  const res = await getClassesByIdApi(classId!)
+  const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
+
+  const graphJson = await fetch(fullUrl)
+    .then((r) => r.json())
+    .catch((err) => {
+      console.error('下载或解析 JSON 失败', err)
+      return null
+    })
+  if (!graphJson) return
+
+  if (graphJson) {
+    console.log('解析后的图谱数据：', graphJson)
+    treeData.value = graphJson
+  }
+
+  const normalizeNode = (node: any): any => {
+    node.label = node.name || node.label || ''
+    node.children = Array.isArray(node.children)
+      ? node.children.map(normalizeNode)
+      : []
+    return node
+  }
+
+  treeData.value = [normalizeNode(graphJson)]
+  
+  initGraph()
 }
 
 // 页面挂载后初始化图谱
 onMounted(() => {
   registerCustomNode()
-  initGraph()
+  fetchGraphData()
 })
 </script>
 

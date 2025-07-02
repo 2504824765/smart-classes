@@ -8,6 +8,7 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.TeacherCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.TeacherUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.TeacherRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.UserRepository;
 import com.bnwzy.smartclassesspringbootweb.service.ITeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class TeacherService implements ITeacherService {
     @Autowired
     DepartmentRepository departmentRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     @Override
     public Teacher addTeacher(TeacherCreateDTO teacherCreateDTO) {
         if(teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isEmpty()){
@@ -35,6 +39,11 @@ public class TeacherService implements ITeacherService {
                 teacher.setDepartment(departmentRepository.findById(teacherCreateDTO.getDepartmentId()).get());
             }else{
                 throw new DepartmentNotFoundException("Department not found");
+            }
+            if (userRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()) {
+                throw new UserAlreadyExistException("Teacher already exist");
+            } else {
+                teacher.setUsername(teacherCreateDTO.getUsername());
             }
             return teacherRepository.save(teacher);
         }else{

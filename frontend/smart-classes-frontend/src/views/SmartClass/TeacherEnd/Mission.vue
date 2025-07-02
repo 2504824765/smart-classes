@@ -8,7 +8,6 @@ import { ref, h, reactive } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
-import { addClassMissionApi } from '@/api/classMission/index'
 import { ElMessage } from 'element-plus'
 
 interface Params {
@@ -94,13 +93,6 @@ const actionFn = (data: any) => {
 const createMission = () => {
   router.push('/teacher/CreateMission')
 }
-// const handleSubmit = async () => {
-//   // @ts-ignore
-//   await formRef.value?.validate()
-//   await createClassMissionApi(formData)
-//   ElMessage.success('创建成功')
-//   // 你可以在这里加跳转、刷新等逻辑
-// }
 </script>
 
 <template>

@@ -18,6 +18,8 @@ const teacherList: string[] = [
   '/course',
   '/course/content',
   '/course/detail',
+  '/course/detail/form',
+  '/course/detail/mission',
 ]
 
 const adminList: string[] = [
@@ -26,11 +28,12 @@ const adminList: string[] = [
   '/admin/teacherManage',
   '/admin/studentManage',
   '/admin/courseManage',
+  '/admin/departmentManage',
+  '/admin/missionManage',
   '/admin/teacherManage/form',
   '/admin/studentManage/form',
   '/admin/courseManage/form',
-  '/admin/mission/content',
-  '/admin/mission/create',
+  '/admin/missionManage/form',
   '/admin/gradesManage'
 ]
 

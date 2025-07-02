@@ -1,35 +1,63 @@
 <template>
   <el-card class="homework-card" shadow="hover" @click="$emit('view-detail', homework)">
     <div class="card-header">
-      <h4>{{ homework.title }}</h4>
-      <el-tag :type="homework.finished ? 'success' : 'danger'">
-        {{ homework.finished ? '已完成' : '未完成' }}
+      <div class="title">{{ homework.missionId ? `任务 #${homework.missionId}` : '未知任务' }}</div>
+      <el-tag
+        :type="homework.isDone ? 'success' : homework.isActive ? 'warning' : 'danger'"
+        size="small"
+      >
+        {{ homework.isDone ? '已完成' : homework.isActive ? '未完成' : '已截止' }}
       </el-tag>
     </div>
-    <p>{{ homework.brief }}</p>
+    <p class="brief">成绩：{{ homework.score ?? '未评分' }}</p>
   </el-card>
 </template>
 
+
 <script setup lang="ts">
+import type { StudentMission } from '@/api/studentMission/types' // 根据路径调整
+
 defineProps<{
-  homework: {
-    title: string
-    brief: string
-    finished: boolean
-  }
+  homework: StudentMission
 }>()
+
 defineEmits(['view-detail'])
 </script>
 
 <style scoped>
 .homework-card {
   width: 300px;
+  height: 160px;
   margin: 20px;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 16px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 简介文本限制两行显示 */
+.brief {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;     /* 显示两行 */
+  -webkit-box-orient: vertical;
 }
 </style>

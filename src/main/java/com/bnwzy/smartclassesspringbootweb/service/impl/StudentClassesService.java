@@ -3,8 +3,6 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 import com.bnwzy.smartclassesspringbootweb.exception.ClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentClassesNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.pojo.Classes;
-import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.StudentClasses;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentClassesCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentClassesUpdateDTO;

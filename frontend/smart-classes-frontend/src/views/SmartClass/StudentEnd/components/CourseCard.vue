@@ -29,7 +29,7 @@ import { Classes } from '@/api/classes/types'
 const { push } = useRouter()
 
 const props = defineProps<{
-  course: Classes,
+  course: Classes
   disabled?: boolean
 }>()
 

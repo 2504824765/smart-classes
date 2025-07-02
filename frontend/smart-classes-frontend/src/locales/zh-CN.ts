@@ -595,7 +595,9 @@ export default {
     study: '学习',
     videoWatch: '视频观看',
     homework: '作业',
-    grades: '成绩查看'
+    grades: '成绩查看',
+    homeworkList: '作业清单',
+    homeworkDetail: '作业详情'
   },
   role: {
     roleName: '角色名称',
@@ -627,9 +629,9 @@ export default {
     task: '任务',
     mission: '任务',
     createMission: '创建任务',
-    courseList: '课程列表',
     courseDetail: '课程详情',
     missionDetail: '任务详情',
+    missionCreate: '创建任务'
   },
   admin: {
     admin: '管理员',
@@ -638,6 +640,6 @@ export default {
     course: '课程管理',
     createForm: '创建表单',
     department: '部门管理',
-    mission: '任务管理',
+    mission: '任务管理'
   }
 }

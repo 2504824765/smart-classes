@@ -6,7 +6,9 @@ export const getClassMissionApi = (params: any) => {
 }
 
 // 新增课程任务
-export const addClassMissionApi = (data: ClassMissionCreateDTO): Promise<IResponse<ClassMission>> => {
+export const addClassMissionApi = (
+  data: ClassMissionCreateDTO
+): Promise<IResponse<ClassMission>> => {
   return request.post({ url: '/api/classMission/add', data })
 }
 
@@ -16,7 +18,9 @@ export const deleteClassMissionApi = (id: number) => {
 }
 
 // 更新课程任务
-export const updateClassMissionApi = (data: ClassMissionUpdateDTO): Promise<IResponse<ClassMission>> => {
+export const updateClassMissionApi = (
+  data: ClassMissionUpdateDTO
+): Promise<IResponse<ClassMission>> => {
   return request.post({ url: '/api/classMission/update', data })
 }
 

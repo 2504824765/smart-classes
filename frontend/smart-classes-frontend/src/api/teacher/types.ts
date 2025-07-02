@@ -1,4 +1,4 @@
-import { Department } from "../department/types"
+import { Department } from '../department/types'
 
 export type Teacher = {
   id: number
@@ -13,9 +13,11 @@ export type TeacherCreateDTO = Omit<Teacher, 'id' | 'dept'> & {
   deptId: number
 }
 
-export type TeacherUpdateDTO = Partial<{
-  id: number
-} & Omit<Teacher, 'id' | 'dept'>> & {
+export type TeacherUpdateDTO = Partial<
+  {
+    id: number
+  } & Omit<Teacher, 'id' | 'dept'>
+> & {
   id: number
   deptId: number
 }

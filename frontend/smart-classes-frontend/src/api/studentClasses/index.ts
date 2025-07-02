@@ -6,7 +6,9 @@ export const getStudentClassesListApi = (params: any) => {
 }
 
 // 新增学生课程关联记录
-export const addClassRecordApi = (data: StudentClassesCreateDTO): Promise<IResponse<StudentClasses>> => {
+export const addClassRecordApi = (
+  data: StudentClassesCreateDTO
+): Promise<IResponse<StudentClasses>> => {
   return request.post({ url: '/api/scAssociated/add', data })
 }
 
@@ -16,7 +18,9 @@ export const deleteClassRecordByIdApi = (id: number) => {
 }
 
 // 更新学生课程关联记录
-export const updateClassRecordApi = (data: StudentClassesUpdateDTO): Promise<IResponse<StudentClasses>> => {
+export const updateClassRecordApi = (
+  data: StudentClassesUpdateDTO
+): Promise<IResponse<StudentClasses>> => {
   return request.post({ url: '/api/scAssociated/update', data })
 }
 

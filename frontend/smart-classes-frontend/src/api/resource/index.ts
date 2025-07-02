@@ -34,3 +34,7 @@ export const getResourceByIdApi = (id: number): Promise<IResponse<Resource>> => 
 export const getResourceByTypeApi = (type: string): Promise<IResponse<Resource[]>> => {
   return request.get({ url: `/api/resource/type/${type}` })
 }
+
+export const getResourceByClassIdApi = (id: number): Promise<IResponse<Resource[]>> => {
+  return request.get({ url: `/api/resource/getResourceByClass/${id}` })
+}

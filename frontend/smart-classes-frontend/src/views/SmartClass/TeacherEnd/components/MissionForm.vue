@@ -1,12 +1,15 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { Form, FormSchema } from '@/components/Form'
 import { ContentWrap } from '@/components/ContentWrap'
 import { useForm } from '@/hooks/web/useForm'
 import { BaseButton } from '@/components/Button'
 import { ElMessage } from 'element-plus'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { addClassMissionApi } from '@/api/classMission/index'
+import type { ResourceCreateDTO } from '@/api/resource/types'
+import { addResourceApi } from '@/api/resource/index'
+import { uploadResourcesApi } from '@/api/oss/index'
 import type { ClassMissionCreateDTO } from '@/api/classMission/types'
 
 const route = useRoute()
@@ -14,6 +17,15 @@ const { push } = useRouter()
 
 // 从路由中获取课程 ID
 const classId = Number(route.query.cid)
+// 定义上传等待列表
+const pendingResources = ref<PendingUploadResource[]>([])
+interface PendingUploadResource {
+  name: string
+  type: string
+  description: string
+  file: File
+}
+const uploadedResources: ResourceCreateDTO[] = []
 
 const missionFormSchema = reactive<FormSchema[]>([
   {
@@ -66,7 +78,7 @@ const missionFormSchema = reactive<FormSchema[]>([
   },
   {
     field: 'score',
-    label: '得分',
+    label: '总分',
     component: 'InputNumber',
     componentProps: {
       min: 0,
@@ -74,9 +86,31 @@ const missionFormSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'resource',
-    label: '资源 ID',
-    component: 'InputNumber'
+    field: 'files',
+    label: '任务资源',
+    component: 'Upload',
+    componentProps: {
+      multiple: false,
+      limit: 1,
+      httpRequest: async (options) => {
+        const rawFile = options.file as File
+        const fileName = rawFile.name
+        const fileType = fileName.split('.').pop() || ''
+
+        pendingResources.value.push({
+          name: fileName,
+          type: fileType,
+          description: fileName,
+          file: rawFile
+        })
+
+        options.onSuccess?.({}, rawFile)
+        ElMessage.success(`已添加到待上传列表：${fileName}`)
+      },
+      slots: {
+        default: () => <BaseButton type="primary">点击上传任务文件</BaseButton>
+      }
+    }
   }
 ])
 
@@ -89,21 +123,47 @@ const handleSubmit = async () => {
 
   await elForm.validate(async (valid) => {
     if (!valid) {
-      ElMessage.warning('请检查任务信息填写是否完整')
+      ElMessage.warning('请检查表单填写是否完整')
       return
     }
 
-    const formData = await getFormData<ClassMissionCreateDTO>()
     try {
-      await addClassMissionApi({
+      const formData = await getFormData<ClassMissionCreateDTO>()
+      let resourceId: number | null = null
+
+      // 上传文件（仅一个）
+      if (pendingResources.value.length > 0) {
+        const resFile = pendingResources.value[0]
+        const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
+        const filePath = uploadRes.data.url
+
+        const newRes = {
+          name: resFile.name,
+          path: filePath,
+          type: resFile.type,
+          description: resFile.description,
+          classId: formData.classes.id
+        }
+
+        const savedRes = await addResourceApi(newRes)
+        resourceId = savedRes.data.id
+      }
+
+      // 提交任务数据，合并 resourceId
+      const missionToSubmit = {
         ...formData,
-        cid: classId // 绑定课程 ID
-      })
+        resource: resourceId ?? 0
+      }
+
+      await addClassMissionApi(missionToSubmit)
       ElMessage.success('任务创建成功')
-      push({ path: '/mission/list', query: { cid: classId } })
+
+      // 可选重置
+      elForm.resetFields()
+      pendingResources.value = []
     } catch (err) {
-      console.error('任务创建失败：', err)
-      ElMessage.error('任务创建失败，请稍后重试')
+      ElMessage.error('提交失败，请重试')
+      console.error('任务提交错误：', err)
     }
   })
 }

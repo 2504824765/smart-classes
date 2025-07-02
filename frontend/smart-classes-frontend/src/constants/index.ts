@@ -37,3 +37,8 @@ export const TRANSFORM_REQUEST_DATA = true
  * 全局图标前缀
  */
 export const ICON_PREFIX = 'vi-'
+
+/**
+ * OSS前缀
+ */
+export const PREFIX = 'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/'

@@ -15,8 +15,10 @@ export type ClassMissionCreateDTO = {
   cid: number
 } & Omit<ClassMission, 'id' | 'class'> // 排除id和class
 
-export type ClassMissionUpdateDTO = Partial<{
-  cid: number
-} & Omit<ClassMission, 'id' | 'class'>> & {
+export type ClassMissionUpdateDTO = Partial<
+  {
+    cid: number
+  } & Omit<ClassMission, 'id' | 'class'>
+> & {
   id: number // 必须包含ID
 }

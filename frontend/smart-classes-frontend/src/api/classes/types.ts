@@ -13,11 +13,13 @@ export type Classes = {
 }
 
 export type CourseDisplayData = {
+  id: number
   name: string
   imageUrl: string
   description: string
   unfinished: number
   total: number
+  active: boolean
 }
 
 // 创建课程时，只需要teacherId，不需要完整的teacher对象

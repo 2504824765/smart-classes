@@ -8,8 +8,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi, getClassesByIdApi } from '@/api/classes'
 import { PendingUploadResource, ResourceCreateDTO } from '@/api/resource/types'
-import { addResourceApi } from '@/api/resource'
-import { uploadResourcesApi } from '@/api/oss'
+import { addResourceApi } from '@/api/resource/index'
+import { uploadResourcesApi } from '@/api/oss/index'
 import { Teacher } from '@/api/teacher/types'
 import { getAllTeacherApi } from '@/api/teacher'
 import { useRoute, useRouter } from 'vue-router'
@@ -23,11 +23,11 @@ const courseId = ref<number | null>(null)
 const pendingResources = ref<PendingUploadResource[]>([])
 // 绑定上传的资源（uploadedResources 是前面上传时填充的）
 const uploadedResources: ResourceCreateDTO[] = []
-const allTeachers = ref<Teacher[]>([])  // 所有教师原始数据
-const teacherOptions = ref<{ label: string; value: number }[]>([])  // 绑定 Select
+const allTeachers = ref<Teacher[]>([]) // 所有教师原始数据
+const teacherOptions = ref<{ label: string; value: number }[]>([]) // 绑定 Select
 const teacherLoading = ref(false)
 
-const courseFormSchema = reactive<FormSchema[]>([ 
+const courseFormSchema = reactive<FormSchema[]>([
   {
     field: 'name',
     label: '课程名称',

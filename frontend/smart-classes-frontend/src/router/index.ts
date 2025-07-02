@@ -167,13 +167,13 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             hidden: true,
             canTo: true
           },
-          children:[
+          children: [
             {
               path: 'form',
               component: () => import('@/views/SmartClass/TeacherEnd/components/MissionForm.vue'),
               name: 'CourseDetailForm',
               meta: {
-                title: t('teacher.courseCreate'),
+                title: t('teacher.missionCreate'),
                 userType: 'teacher',
                 noCache: true,
                 hidden: true,
@@ -290,7 +290,7 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
           component: () => import('@/views/SmartClass/StudentEnd/HomeworkDetail.vue'),
           name: 'HomeworkDetail',
           meta: {
-            title: t('student.homeworkList'),
+            title: t('student.homeworkDetail'),
             userType: 'student',
             hidden: true,
             canTo: true,

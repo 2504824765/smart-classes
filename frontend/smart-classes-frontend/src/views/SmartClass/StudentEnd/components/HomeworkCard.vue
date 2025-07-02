@@ -1,25 +1,27 @@
 <template>
   <el-card class="homework-card" shadow="hover" @click="$emit('view-detail', homework)">
     <div class="card-header">
-      <div class="title">{{ homework.missionId ? `任务 #${homework.missionId}` : '未知任务' }}</div>
+      <div class="title">{{
+        homework.classMission.id ? `任务 # ${homework.classMission.type} ` : '未知任务'
+      }}</div>
       <el-tag
-        :type="homework.isDone ? 'success' : homework.isActive ? 'warning' : 'danger'"
+        :type="homework.done ? 'success' : homework.active ? 'warning' : 'danger'"
         size="small"
       >
-        {{ homework.isDone ? '已完成' : homework.isActive ? '未完成' : '已截止' }}
+        {{ homework.done ? '已完成' : homework.active ? '未完成' : '已截止' }}
       </el-tag>
     </div>
     <p class="brief">成绩：{{ homework.score ?? '未评分' }}</p>
   </el-card>
 </template>
 
-
 <script setup lang="ts">
 import type { StudentMission } from '@/api/studentMission/types' // 根据路径调整
 
-defineProps<{
+const props = defineProps<{
   homework: StudentMission
 }>()
+console.log(props.homework)
 
 defineEmits(['view-detail'])
 </script>
@@ -57,7 +59,7 @@ defineEmits(['view-detail'])
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;     /* 显示两行 */
+  -webkit-line-clamp: 2; /* 显示两行 */
   -webkit-box-orient: vertical;
 }
 </style>

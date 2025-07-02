@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref } from 'vue'
 import G6 from '@antv/g6'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import FileDisplay from './components/FileDisplay.vue'
 import ChatGPT from './components/ChatGPT.vue'
+import { getResourceByClassIdApi } from '@/api/resource'
 
 const { push } = useRouter()
+const route = useRoute()
+const classId = Number(route.params.classId)
 // 页面数据
 const courseTitle = ref('Python 深度学习')
 const progress = ref(65)
@@ -53,6 +56,7 @@ const treeData = ref([
     ]
   }
 ])
+
 const defaultProps = {
   children: 'children',
   label: 'label'

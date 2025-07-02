@@ -1,10 +1,19 @@
 <template>
   <el-card shadow="never" class="mission-list">
+    <ElButton
+      type="primary"
+      style="margin-bottom: 10px"
+      @click="push({ path: '/course/detail/form' })"
+      >添加任务</ElButton
+    >
     <draggable v-model="missions" item-key="id" animation="200">
       <template #item="{ element }">
         <MissionCard :mission="element" />
       </template>
     </draggable>
+  </el-card>
+  <el-card>
+    <KnowledgeGraph v-if="classId !== undefined" :classId="classId" />
   </el-card>
 </template>
 
@@ -14,10 +23,12 @@ import draggable from 'vuedraggable'
 import MissionCard from './components/MissionCard.vue'
 import { getClassMissionByCidApi } from '@/api/classMission/index'
 import type { ClassMission } from '@/api/classMission/types'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import KnowledgeGraph from './components/KnowledgeGraph.vue'
 
 const route = useRoute()
-const classId = ref<number | null>(null)
+const { push } = useRouter()
+const classId = ref<number>()
 
 const missions = ref<ClassMission[]>([])
 

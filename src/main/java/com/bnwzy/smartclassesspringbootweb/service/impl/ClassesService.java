@@ -37,7 +37,7 @@ public class ClassesService implements IClassesService {
         classes.setDescription(classesCreateDTO.getDescription());
         classes.setActive(classesCreateDTO.getActive());
         classes.setImageUrl(classesCreateDTO.getImageUrl());
-        return classesRepository.save(classes);
+        return  classesRepository.save(classes);
     }
 
     @Override

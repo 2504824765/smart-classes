@@ -4,8 +4,8 @@ export type Student = {
   id: number
   name: string
   gender: string
-  // dept: string
-  dept: Department
+  username: string
+  department: Department
   gpa: number
 }
 

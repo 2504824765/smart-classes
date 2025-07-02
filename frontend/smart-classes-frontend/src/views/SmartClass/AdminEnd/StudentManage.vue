@@ -38,7 +38,7 @@ setProps({
     { field: 'id', label: '学号', width: 100 },
     { field: 'name', label: '姓名' },
     { field: 'gender', label: '性别', width: 80 },
-    { field: 'dept', label: '学院' },
+    { field: 'department', label: '学院', formatter: (_: Recordable, __: TableColumn, value: any) => value?.name || value },
     {
       field: 'gpa',
       label: '绩点',
@@ -58,7 +58,7 @@ setProps({
               <BaseButton
                 type="primary"
                 size="small"
-                onClick={() => console.log('编辑学生', data.row)}
+                onClick={() => push({ path: '/admin/studentManage/form', query: { id: data.row.id } })}
               >
                 编辑
               </BaseButton>

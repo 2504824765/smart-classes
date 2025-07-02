@@ -2,13 +2,29 @@
 import { Form, FormSchema } from '@/components/Form'
 import { ContentWrap } from '@/components/ContentWrap'
 import { BaseButton } from '@/components/Button'
-import { reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { createStudentApi } from '@/api/student/index'
-import type { Student, StudentCreateDTO } from '@/api/student/types'
+import { createStudentApi, updateStudentApi, getStudentByIdApi } from '@/api/student/index'
+import { getAllDeptApi } from '@/api/department/index'
+import type { Student, StudentCreateDTO, StudentUpdateDTO } from '@/api/student/types'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const isEdit = ref(false)
+const studentId = ref<number | null>(null)
+const deptOptions = ref<{ label: string; value: number }[]>([])
 
 const studentFormSchema = reactive<FormSchema[]>([
+  {
+    field: 'username',
+    label: '用户名',
+    component: 'Input',
+    formItemProps: {
+      required: true
+    }
+  },
   {
     field: 'name',
     label: '学生姓名',
@@ -32,9 +48,12 @@ const studentFormSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'dept',
+    field: 'deptId',
     label: '所属院系',
-    component: 'Input',
+    component: 'Select',
+    componentProps: {
+      options: deptOptions
+    },
     formItemProps: {
       required: true
     }
@@ -67,7 +86,34 @@ const studentFormSchema = reactive<FormSchema[]>([
 ])
 
 const { formRegister, formMethods } = useForm()
-const { getElFormExpose, getFormData } = formMethods
+const { getElFormExpose, getFormData, setValues } = formMethods
+
+const loadDepartments = async () => {
+  const res = await getAllDeptApi()
+  deptOptions.value = res.data.map((d: any) => ({ label: d.name, value: d.id }))
+}
+
+const loadStudent = async (id: number) => {
+  const res = await getStudentByIdApi(id)
+  const student = res.data
+  setValues({
+    username: student.username,
+    name: student.name,
+    gender: student.gender,
+    deptId: student.dept?.id || student.department?.id,
+    gpa: student.gpa
+  })
+}
+
+onMounted(async () => {
+  await loadDepartments()
+  const id = route.query.id
+  if (id) {
+    isEdit.value = true
+    studentId.value = Number(id)
+    await loadStudent(studentId.value)
+  }
+})
 
 const handleSubmit = async () => {
   const elForm = await getElFormExpose()
@@ -78,23 +124,27 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写学生信息')
       return
     }
-
-    const formData = await getFormData<StudentCreateDTO>()
+    const formData = await getFormData<StudentCreateDTO & { deptId: number }>()
     try {
-      await createStudentApi(formData)
-      ElMessage.success('学生添加成功')
-      elForm.resetFields()
+      if (isEdit.value && studentId.value) {
+        await updateStudentApi({ ...formData, id: studentId.value })
+        ElMessage.success('学生信息更新成功')
+      } else {
+        await createStudentApi(formData)
+        ElMessage.success('学生添加成功')
+      }
+      router.push({ path: '/admin/studentManage' })
     } catch (err) {
-      console.error('学生添加失败', err)
-      ElMessage.error('添加失败，请稍后重试')
+      ElMessage.error('操作失败，请稍后重试')
     }
   })
 }
 </script>
 
 <template>
-  <ContentWrap title="新增学生">
+  <ContentWrap :title="isEdit ? '编辑学生' : '新增学生'">
     <Form :schema="studentFormSchema" @register="formRegister" />
     <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">提交</BaseButton>
+    <BaseButton style="margin-top: 16px; margin-left: 8px" @click="() => router.push({ path: '/admin/studentManage' })">返回</BaseButton>
   </ContentWrap>
 </template>

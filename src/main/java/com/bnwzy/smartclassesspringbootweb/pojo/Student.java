@@ -15,7 +15,7 @@ public class Student {
     private String username;
     @Column(name = "gender")
     private String gender;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
     @Column(name = "gpa")

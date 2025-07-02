@@ -2,6 +2,7 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Department;
 import com.bnwzy.smartclassesspringbootweb.pojo.Student;
@@ -83,7 +84,11 @@ public class StudentService implements IStudentService {
             student.setName(studentCreateDTO.getName());
             student.setGender(studentCreateDTO.getGender());
             student.setGpa(studentCreateDTO.getGpa());
-            student.setUsername(studentCreateDTO.getUsername());
+            if (userRepository.findByUsername(studentCreateDTO.getUsername()).isPresent()) {
+                throw new UserAlreadyExistException("<User Already Exist>");
+            } else {
+                student.setUsername(studentCreateDTO.getUsername());
+            }
             return studentRepository.save(student);
         }
     }

@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/dify")
+@RequestMapping("/api/dify")
 public class DifyController {
 
     @Autowired

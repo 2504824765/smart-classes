@@ -34,3 +34,7 @@ export const createStudentApi = (data: StudentCreateDTO): Promise<IResponse<Stud
 export const deleteStudentApi = (id: number | string) => {
   return request.delete({ url: `/api/student/${id}` })
 }
+
+export const getStudentCountApi = () => {
+  return request.get({ url: '/api/student/count' })
+}

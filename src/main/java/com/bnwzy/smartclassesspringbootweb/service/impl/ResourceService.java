@@ -32,7 +32,7 @@ public class ResourceService implements IResourceService {
         } else {
             Resource resource = new Resource();
             BeanUtils.copyProperties(resourceCreateDTO, resource);
-            if (!classesRepository.findById(resourceCreateDTO.getClassId()).isPresent()) {
+            if (classesRepository.findById(resourceCreateDTO.getClassId()).isEmpty()) {
                 throw new ClassesNotFoundException("<Resource class not found>");
             } else {
                 resource.setClasses(classesRepository.findById(resourceCreateDTO.getClassId()).get());
@@ -54,11 +54,11 @@ public class ResourceService implements IResourceService {
 
     @Override
     public Resource updateResource(ResourceUpdateDTO resourceUpdateDTO) {
-        if (!resourceRepository.findById(resourceUpdateDTO.getId()).isPresent()) {
+        if (resourceRepository.findById(resourceUpdateDTO.getId()).isEmpty()) {
             throw new ResourceNotFoundException("<Resource not found>");
         } else {
             Resource resource = resourceRepository.findById(resourceUpdateDTO.getId()).get();
-            if (!classesRepository.findById(resourceUpdateDTO.getClassId()).isPresent()) {
+            if (classesRepository.findById(resourceUpdateDTO.getClassId()).isEmpty()) {
                 throw new ClassesNotFoundException("<Resouce class not found>");
             } else {
                 resource.setClasses(classesRepository.findById(resourceUpdateDTO.getClassId()).get());
@@ -72,13 +72,12 @@ public class ResourceService implements IResourceService {
 
     @Override
     public List<Resource> getAllResource() {
-        List<Resource> resourceList = resourceRepository.findAll();
-        return resourceList;
+        return resourceRepository.findAll();
     }
 
     @Override
     public Resource getResourceById(Long id) {
-        if (!resourceRepository.findById(id).isPresent()) {
+        if (resourceRepository.findById(id).isEmpty()) {
             throw new ResourceNotFoundException("<Resource not found>");
         } else {
             return resourceRepository.findById(id).get();

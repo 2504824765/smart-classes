@@ -85,33 +85,45 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
     {
       path: '/teacher',
       component: Layout,
-      redirect: '/teacher/dashboard',
       name: 'Teacher',
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher',
-        alwaysShow: true
+        userType: 'teacher'
       },
       children: [
         {
           path: 'dashboard',
-          component: () => import('@/views/Dashboard/Analysis.vue'),
+          component: () => import('@/views/SmartClass/TeacherEnd/TeacherDashboard.vue'),
           name: 'TeacherDashboard',
           meta: {
             title: t('teacher.dashboard'),
             userType: 'teacher',
             noCache: true,
-            affix: true
+            affix: true,
+            icon: 'vi-ant-design:dashboard-filled'
           }
-        },
-        //教师-学生管理
+        }
+      ]
+    },
+    //教师-学生管理
+    {
+      path: '/teacher/studentManage',
+      component: Layout,
+      name: 'TeacherStudentManage',
+      meta: {
+        title: t('teacher.studentManage'),
+        userType: 'teacher',
+        noCache: true
+      },
+      children: [
         {
-          path: 'studentManage',
+          path: '',
+          name: 'StudentManage',
           component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
-          name: 'TeacherStudentManage',
           meta: {
             title: t('teacher.studentManage'),
+            icon: 'vi-ant-design:user-outlined',
             userType: 'teacher',
             noCache: true
           }
@@ -138,6 +150,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
           name: 'CourseContent',
           meta: {
             title: t('teacher.courseList'),
+            icon: 'ep:collection-tag',
             userType: 'teacher',
             noCache: true,
             affix: true

@@ -2,8 +2,6 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.*;
 import com.bnwzy.smartclassesspringbootweb.pojo.Classes;
-import com.bnwzy.smartclassesspringbootweb.pojo.Department;
-import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.Teacher;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassesCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassesUpdateDTO;
@@ -27,7 +25,7 @@ public class ClassesService implements IClassesService {
     public Classes addClass(ClassesCreateDTO classesCreateDTO) {
         Classes classes = new Classes();
         classes.setName(classesCreateDTO.getName());
-        if (!teacherRepository.findById(classesCreateDTO.getTeacherId()).isPresent()) {
+        if (teacherRepository.findById(classesCreateDTO.getTeacherId()).isEmpty()) {
             throw new TeacherNotFoundException("Teacher not found");
         } else {
             Teacher teacher = teacherRepository.findById(classesCreateDTO.getTeacherId()).get();
@@ -44,7 +42,7 @@ public class ClassesService implements IClassesService {
 
     @Override
     public boolean deleteClass(Long id) {
-        if (!classesRepository.findById(id).isPresent()) {
+        if (classesRepository.findById(id).isEmpty()) {
             throw new ClassesNotFoundException("Class not found");
         } else {
             classesRepository.deleteById(id);
@@ -55,11 +53,11 @@ public class ClassesService implements IClassesService {
 
     @Override
     public Classes updateClass(ClassesUpdateDTO classesUpdateDTO) {
-        if (!classesRepository.findById(classesUpdateDTO.getId()).isPresent()) {
+        if (classesRepository.findById(classesUpdateDTO.getId()).isEmpty()) {
             throw new ClassesNotFoundException("<Class Not Found>");
         } else {
             Classes classes = classesRepository.findById(classesUpdateDTO.getId()).get();
-            if (!teacherRepository.findById(classesUpdateDTO.getTeacherId()).isPresent()) {
+            if (teacherRepository.findById(classesUpdateDTO.getTeacherId()).isEmpty()) {
                 throw new TeacherNotFoundException("Teacher not found");
             } else {
                 Teacher teacher = teacherRepository.findById(classesUpdateDTO.getTeacherId()).get();
@@ -79,14 +77,12 @@ public class ClassesService implements IClassesService {
 
     @Override
     public List<Classes> getAllClasses() {
-        List<Classes> classesList = new ArrayList<>();
-        classesRepository.findAll().forEach(classesList::add);
-        return classesList;
+        return new ArrayList<>(classesRepository.findAll());
     }
 
     @Override
     public Classes getClassById(Long id) {
-        if (!classesRepository.findById(id).isPresent()) {
+        if (classesRepository.findById(id).isEmpty()) {
             throw new ClassesNotFoundException("Class not found");
         } else {
             return classesRepository.findById(id).get();
@@ -95,7 +91,7 @@ public class ClassesService implements IClassesService {
 
     @Override
     public Classes getClassByName(String name) {
-        if (!classesRepository.findByName(name).isPresent()) {
+        if (classesRepository.findByName(name).isEmpty()) {
             throw new ClassesNotFoundException("Class not found");
         } else {
             return classesRepository.findByName(name).get();
@@ -103,11 +99,12 @@ public class ClassesService implements IClassesService {
     }
 
     @Override
-    public Classes getClassByTeacherId(Long teacherId) {
-        if (!teacherRepository.findById(teacherId).isPresent()) {
+    public List<Classes> getClassByTeacherId(Long teacherId) {
+        if (teacherRepository.findById(teacherId).isEmpty()) {
             throw new TeacherNotFoundException("Teacher not found");
         } else {
-            return classesRepository.findById(teacherId).get();
+            Teacher teacher = teacherRepository.findById(teacherId).get();
+            return classesRepository.findByTeacher(teacher);
         }
     }
 

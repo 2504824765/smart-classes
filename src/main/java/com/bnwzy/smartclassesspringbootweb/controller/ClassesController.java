@@ -4,6 +4,7 @@ import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassesCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassesUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IClassesService;
+import jakarta.transaction.Transactional;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,7 @@ public class ClassesController {
     private IClassesService classesService;
 
     @PostMapping("/add")
+    @Transactional
     public ResponseMessage addClass(@RequestBody ClassesCreateDTO classesCreateDTO) {
         return ResponseMessage.success("<Add Class>", classesService.addClass(classesCreateDTO));
     }

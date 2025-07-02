@@ -3,14 +3,16 @@ package com.bnwzy.smartclassesspringbootweb.controller;
 import com.bnwzy.smartclassesspringbootweb.pojo.ResponseMessage;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyCreateGraphDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyGenerateQuestionDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyReportCommentDTO;
 import com.bnwzy.smartclassesspringbootweb.service.IDifyCreateGraphService;
 import com.bnwzy.smartclassesspringbootweb.service.IDifyGenerateQuestionService;
+import com.bnwzy.smartclassesspringbootweb.service.IDifyReportCommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @CrossOrigin
@@ -23,6 +25,9 @@ public class DifyController {
 
     @Autowired
     private IDifyGenerateQuestionService difyGenerateQuestionService;
+
+    @Autowired
+    private IDifyReportCommentService difyReportCommentService;
 
     /**
      * 创建工作流（同步阻塞方式）
@@ -78,6 +83,24 @@ public class DifyController {
         try {
             log.info("收到创建请求: {}", difyGenerateQuestionDTO);
             String result = difyGenerateQuestionService.generateQuestion(difyGenerateQuestionDTO).block();
+            return ResponseEntity.ok(ResponseMessage.success("工作流创建成功", result));
+        } catch (IllegalArgumentException e) {
+            log.warn("参数校验失败: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ResponseMessage.fail(400, "参数错误: " + e.getMessage()));
+        } catch (Exception e) {
+            log.error("API调用异常", e);
+            return ResponseEntity.internalServerError()
+                    .body(ResponseMessage.fail(500, "服务处理失败"));
+        }
+    }
+
+    @PostMapping("/reportComment")
+    public ResponseEntity<ResponseMessage> reportComment(
+            @Validated @RequestBody DifyReportCommentDTO difyReportCommentDTO) {
+        try {
+            log.info("收到创建请求: {}", difyReportCommentDTO);
+            String result = difyReportCommentService.reportComment(difyReportCommentDTO).block();
             return ResponseEntity.ok(ResponseMessage.success("工作流创建成功", result));
         } catch (IllegalArgumentException e) {
             log.warn("参数校验失败: {}", e.getMessage());

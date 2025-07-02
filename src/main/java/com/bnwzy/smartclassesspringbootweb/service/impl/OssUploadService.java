@@ -72,10 +72,10 @@ public class OssUploadService implements IOssUploadService {
         }
 
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-        Set<String> allowedExtensions = new HashSet<>(List.of("json"));
-        if (!allowedExtensions.contains(extension)) {
-            throw new ImageUploadException("<仅支持上传:json>");
-        }
+//        Set<String> allowedExtensions = new HashSet<>(List.of("json"));
+//        if (!allowedExtensions.contains(extension)) {
+//            throw new ImageUploadException("<仅支持上传:json>");
+//        }
 
 
         String filename = "class/"+"json/"+"知识图谱"+"." + extension;

@@ -44,4 +44,9 @@ public class ResourceController {
     public ResponseMessage getResourceByType(@PathVariable("type") String type) {
         return ResponseMessage.success("<Get resources by type>", resourceService.getResourcesByType(type));
     }
+
+    @GetMapping("/getResourceByClassId/{id}")
+    public ResponseMessage getResourceByClassId(@PathVariable("id") Long classId) {
+        return ResponseMessage.success("<Get resource>", resourceService.getResourceByClassId(classId));
+    }
 }

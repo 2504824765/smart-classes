@@ -34,3 +34,7 @@ export const createStudentApi = (data: any) => {
 export const deleteStudentApi = (id: number | string) => {
   return request.delete({ url: `/api/student/${id}` })
 }
+
+export const getStudentCountApi = () => {
+  return request.get({ url: '/api/student/count' })
+}

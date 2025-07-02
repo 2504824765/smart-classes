@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentMissionService implements IStudentMissionService {
@@ -125,18 +126,18 @@ public class StudentMissionService implements IStudentMissionService {
 
     @Override
     public List<Student> getAllStudentsOfClassMission(Long id) {
-        if (classMissionRepository.findById(id).isEmpty()) {
-            throw new ClassMissionNotFoundException("<Class mission not found>");
-        } else {
-            ClassMission classMission = classMissionRepository.findById(id).orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
-            Classes classes = classMission.getClasses();
-            List<Student> students = new ArrayList<>();
-            List<StudentClasses> studentClasses = studentClassesRepository.findByClasses(classes);
-            for (StudentClasses studentClass : studentClasses) {
-                students.add(studentClass.getStudent());
-            }
-            return students;
+        ClassMission classMission = classMissionRepository.findById(id)
+                .orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
+
+        // 添加null检查
+        Classes classes = classMission.getClasses();
+        if (classes == null) {
+            throw new ClassesNotFoundException("<Class not found>");
         }
+
+        return studentClassesRepository.findByClasses(classes).stream()
+                .map(StudentClasses::getStudent)
+                .collect(Collectors.toList());
     }
 
     @Override

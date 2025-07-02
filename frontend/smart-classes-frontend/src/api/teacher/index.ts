@@ -7,7 +7,7 @@ export const getTeacherListApi = (params: any) => {
 
 // 根据ID获取教师
 export const getTeacherByIdApi = (id: number): Promise<IResponse<Teacher>> => {
-  return request.get({ url: `/api/teacher/${id}` })
+  return request.get({ url: `/api/teacher/getTeacherById/${id}` })
 }
 
 // 更新教师信息

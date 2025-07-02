@@ -1,7 +1,9 @@
+import { Teacher } from '../teacher/types'
+
 export type Classes = {
   id: number
   name: string
-  teacherId: number
+  teacher: Teacher
   credit: number
   classHours: number
   graph: string
@@ -18,8 +20,27 @@ export type CourseDisplayData = {
   total: number
 }
 
-export type ClassesCreateDTO = Omit<Classes, 'id'>
+// 创建课程时，只需要teacherId，不需要完整的teacher对象
+export type ClassesCreateDTO = {
+  name: string
+  teacherId: number
+  credit: number
+  classHours: number
+  graph: string
+  active: boolean
+  description: string
+  imageUrl: string
+}
 
-export type ClassesUpdateDTO = Partial<Omit<Classes, 'id'>> & {
-  id: number // 更新时必须包含id
+// 更新课程时，需要id和teacherId
+export type ClassesUpdateDTO = {
+  id: number
+  name: string
+  teacherId: number
+  credit: number
+  classHours: number
+  graph: string
+  active: boolean
+  description: string
+  imageUrl: string
 }

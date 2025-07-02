@@ -138,7 +138,10 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
       name: 'Course',
       meta: {
         title: t('teacher.courseList'),
-        userType: 'teacher'
+        icon: 'vi-ant-design:book-outlined',
+        userType: 'teacher',
+        alwaysShow: true,
+        noCache: true
       },
       children: [
         {
@@ -163,110 +166,33 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             noCache: true,
             hidden: true,
             canTo: true
-          }
-        }
-      ]
-    },
-    //任务
-    {
-      path: '/teacher/Mission',
-      component: Layout,
-      name: 'Mission',
-      meta: {
-        title: t('teacher.mission'),
-        userType: 'teacher',
-        noCache: true,
-        affix: true
-      },
-      children: [
-        {
-          path: '',
-          name: 'TeacherTask',
-          component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
-          meta: {
-            title: t('teacher.task'),
-            icon: 'vi-ri:function-fill',
-            userType: 'teacher',
-            noCache: true,
-            affix: true
-          }
-        }
-      ]
-    },
-    {
-      path: '/teacher/CreateMission',
-      component: Layout,
-      name: 'CreateMission',
-      meta: {
-        title: t('teacher.createMission'),
-        userType: 'teacher',
-        noCache: true,
-        affix: true,
-        hidden: true
-      },
-      children: [
-        {
-          path: '',
-          name: 'TeacherCreateMission',
-          component: () => import('@/views/SmartClass/TeacherEnd/Mission.vue'),
-          meta: {
-            title: t('teacher.createMission'),
-            userType: 'teacher',
-            noCache: true,
-            affix: true
-          }
-        }
-      ]
-    },
-    //班级管理
-    {
-      path: '/teacher/ClassManage',
-      component: Layout,
-      name: 'ClassManage',
-      meta: {
-        title: t('teacher.classManage'),
-        userType: 'teacher',
-        noCache: true,
-        affix: true
-      },
-      children: [
-        {
-          path: '',
-          name: 'TeacherClassManage',
-          component: () => import('@/views/SmartClass/TeacherEnd/ClassManage.vue'),
-          meta: {
-            title: t('teacher.classManage'),
-            icon: 'material-symbols:groups',
-            userType: 'teacher',
-            noCache: true,
-            affix: true
-          }
-        }
-      ]
-    },
-    //成绩管理
-    {
-      path: '/teacher/GradeManage',
-      component: Layout,
-      name: 'GradeManage',
-      meta: {
-        title: t('teacher.gradeManage'),
-        userType: 'teacher',
-        noCache: true,
-        affix: true
-      },
-      children: [
-        {
-          path: '',
-          name: 'TeacherGradeManage',
-          component: () => import('@/views/SmartClass/TeacherEnd/GradeManage.vue'),
-          meta: {
-            title: t('teacher.gradeManage'),
-            icon: 'material-symbols:grade',
-            userType: 'teacher',
-            noCache: true,
-            affix: true
-          }
+          },
+          children:[
+            {
+              path: 'form',
+              component: () => import('@/views/SmartClass/TeacherEnd/components/MissionForm.vue'),
+              name: 'CourseDetailForm',
+              meta: {
+                title: t('teacher.courseCreate'),
+                userType: 'teacher',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            },
+            {
+              path: 'mission',
+              component: () => import('@/views/SmartClass/TeacherEnd/MissionDetail.vue'),
+              name: 'CourseDetailMission',
+              meta: {
+                title: t('teacher.missionDetail'),
+                userType: 'teacher',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            }
+          ]
         }
       ]
     }
@@ -486,37 +412,24 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             }
           ]
         },
-        //任务
         {
-          path: '/mission',
-          component: Layout,
-          name: 'Mission',
+          path: 'missionManage',
+          name: 'AdminMissionManage',
+          component: () => import('@/views/SmartClass/AdminEnd/MissionManage.vue'),
           meta: {
-            title: t('teacher.mission'),
-            userType: 'teacher',
-            icon: 'vi-ant-design:ordered-list',
+            title: t('admin.mission'),
+            userType: 'admin',
             noCache: true,
-            alwaysShow: true
+            affix: true
           },
           children: [
             {
-              path: 'content',
-              name: 'MissionContent',
-              component: () => import('@/views/SmartClass/AdminEnd/MissionManage.vue'),
-              meta: {
-                title: t('teacher.task'),
-                userType: 'teacher',
-                noCache: true,
-                affix: true
-              }
-            },
-            {
-              path: 'create',
+              path: 'form',
               name: 'MissionCreate',
-              component: () => import('@/views/SmartClass/AdminEnd/CreateMission.vue'),
+              component: () => import('@/views/SmartClass/AdminEnd/components/MissionForm.vue'),
               meta: {
-                title: t('teacher.createMission'),
-                userType: 'teacher',
+                title: t('admin.createMission'),
+                userType: 'admin',
                 noCache: true,
                 affix: true,
                 hidden: true,
@@ -524,6 +437,16 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               }
             }
           ]
+        },
+        {
+          path: 'departmentManage',
+          component: () => import('@/views/SmartClass/AdminEnd/DepartmentManage.vue'),
+          name: 'AdminDepartmentManage',
+          meta: {
+            title: t('admin.department'),
+            userType: 'admin',
+            noCache: true
+          }
         }
       ]
     }

@@ -23,7 +23,6 @@ const studentId = ref<number | null>(null)
 const getStudentId = async (username: string) => {
   const res = await getStudentByUsernameApi(username)
   studentId.value = res.data.id
-  console.log(studentId.value)
 }
 
 const userStore = useUserStore()
@@ -32,7 +31,6 @@ const initialize = async ()  => {
   if (loginInfo) {
     const username = loginInfo.username
     await getStudentId(username)
-    console.log('studentId', studentId.value)
   }
 }
 

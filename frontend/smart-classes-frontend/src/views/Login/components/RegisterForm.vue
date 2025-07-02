@@ -90,7 +90,7 @@ const schema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'select_role',
+    field: 'role',
     label: t('login.role'),
     component: 'Select',
     colProps: {
@@ -174,9 +174,9 @@ const rules: FormRules = {
   password: [
     required(),
     {
-      min: 8,
+      min: 4,
       max: 20,
-      message: '密码长度必须在8到20个字符之间',
+      message: '密码长度必须在4到20个字符之间',
       trigger: 'blur' // 触发时机（blur或change）
     }
   ],
@@ -214,9 +214,7 @@ const loginRegister = async () => {
     if (valid) {
       try {
         const formData = await getFormData<UserType>()
-        const userInfo = {
-          
-        }
+        console.log(formData)
         const res = await registerApi(formData)
         if (res.data === true) {
           loading.value = true

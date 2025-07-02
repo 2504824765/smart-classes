@@ -2,13 +2,13 @@ import { Classes } from '../classes/types'
 
 export type ClassMission = {
   id: number
-  // cid: number
-  class: Classes
+  classes: Classes
   type: string
   description: string
   deadline: string
   submitMethod: string
   score: number
+  resource: number
 }
 
 export type ClassMissionCreateDTO = {

@@ -1,8 +1,9 @@
 import request from '@/axios';
 import { StudentMission, StudentMissionCreateDTO } from './types';
+import { Student } from '../student/types';
 
 export const getStudentMissionByClass = async (classId: number, studentId: number): Promise<IResponse<StudentMission[]>> => {
-    return request.get({ url: '/api/studentMission/class' , params: { classId, studentId } });
+    return request.post({ url: '/api/studentMission/getStudentsAllClassMission' , data: { classId, studentId } });
 }
 
 export const getStudentMissionByStudent = async (studentId: number): Promise<IResponse<StudentMission[]>> => {
@@ -10,7 +11,7 @@ export const getStudentMissionByStudent = async (studentId: number): Promise<IRe
 }
 
 export const getStudentMissionByMission = async (missionId: number): Promise<IResponse<StudentMission[]>> => {
-    return request.get({ url: '/api/studentMission/mission' , params: { missionId } });
+    return request.get({ url: `/api/allStudentsOfClassMission/${missionId}`  });
 }
 
 export const getStudentMissionById = async (id: number): Promise<IResponse<StudentMission>> => {

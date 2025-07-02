@@ -29,3 +29,7 @@ export const getallClassMissionApi = (): Promise<IResponse<ClassMission[]>> => {
 export const getClassMissionByCidApi = (cid: number): Promise<IResponse<ClassMission[]>> => {
   return request.get({ url: `/api/classMission/getClassMissionByCid/${cid}` })
 }
+
+export const getClassMissionByIdApi = (id: number): Promise<IResponse<ClassMission>> => {
+  return request.get({ url: `/api/classMission/getClassMissionById/${id}` })
+}

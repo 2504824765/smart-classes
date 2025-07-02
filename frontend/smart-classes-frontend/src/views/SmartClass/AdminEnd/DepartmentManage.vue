@@ -41,7 +41,7 @@ const fetchDepartmentTree = async () => {
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: async () => {
     if (!selectedDepartmentId.value) return { list: [], total: 0 }
-    const res = await getMembersByDepartmentApi(selectedDepartmentId.value)
+    const res = await getMembersByDeptIdApi(selectedDepartmentId.value)
     return {
       list: res.data,
       total: res.data.length

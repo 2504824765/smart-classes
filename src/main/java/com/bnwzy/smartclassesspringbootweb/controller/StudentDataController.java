@@ -16,9 +16,9 @@ public class StudentDataController {
     @Autowired
     private IStudentDataService studentDataService;
 
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseMessage createStudentData(@Validated @RequestBody StudentDataCreateDTO studentDataCreateDTO) {
-        return ResponseMessage.success("<Create studentData>", studentDataService.createStudentDate(studentDataCreateDTO));
+        return ResponseMessage.success("<Add studentData>", studentDataService.createStudentDate(studentDataCreateDTO));
     }
 
     @DeleteMapping("/delete/{id}")

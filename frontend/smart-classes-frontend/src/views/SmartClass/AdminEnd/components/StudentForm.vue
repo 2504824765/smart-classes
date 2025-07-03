@@ -14,7 +14,17 @@ const router = useRouter()
 const route = useRoute()
 const isEdit = ref(false)
 const studentId = ref<number | null>(null)
-const deptOptions = ref<{ label: string; value: number }[]>([])
+const deptTreeOptions = ref<any[]>([])
+
+function listToTree(list: any[], parentId = 0) {
+  return list
+    .filter(item => item.parentId === parentId)
+    .map(item => ({
+      label: item.name,
+      value: item.id,
+      children: listToTree(list, item.id)
+    }))
+}
 
 const studentFormSchema = reactive<FormSchema[]>([
   {
@@ -23,6 +33,9 @@ const studentFormSchema = reactive<FormSchema[]>([
     component: 'Input',
     formItemProps: {
       required: true
+    },
+    componentProps: {
+      disabled: isEdit
     }
   },
   {
@@ -50,9 +63,12 @@ const studentFormSchema = reactive<FormSchema[]>([
   {
     field: 'deptId',
     label: '所属院系',
-    component: 'Select',
+    component: 'Cascader',
     componentProps: {
-      options: deptOptions
+      options: deptTreeOptions,
+      props: { checkStrictly: true, emitPath: false },
+      clearable: true,
+      placeholder: '请选择院系'
     },
     formItemProps: {
       required: true
@@ -90,7 +106,7 @@ const { getElFormExpose, getFormData, setValues } = formMethods
 
 const loadDepartments = async () => {
   const res = await getAllDeptApi()
-  deptOptions.value = res.data.map((d: any) => ({ label: d.name, value: d.id }))
+  deptTreeOptions.value = listToTree(res.data)
 }
 
 const loadStudent = async (id: number) => {
@@ -100,7 +116,7 @@ const loadStudent = async (id: number) => {
     username: student.username,
     name: student.name,
     gender: student.gender,
-    deptId: student.dept?.id || student.department?.id,
+    deptId: student.department?.id,
     gpa: student.gpa
   })
 }
@@ -124,7 +140,11 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写学生信息')
       return
     }
-    const formData = await getFormData<StudentCreateDTO & { deptId: number }>()
+    let formData = await getFormData<StudentCreateDTO & { deptId: number | number[] }>()
+    // 取多级选择的最后一级id
+    if (Array.isArray(formData.deptId)) {
+      formData.deptId = formData.deptId[formData.deptId.length - 1]
+    }
     try {
       if (isEdit.value && studentId.value) {
         await updateStudentApi({ ...formData, id: studentId.value })

@@ -49,4 +49,9 @@ public class StudentController {
     public ResponseMessage getStudentCount() {
         return ResponseMessage.success("<Get student count>", studentService.getStudentCount());
     }
+
+    @GetMapping("/getStudentsOfDept/{deptId}")
+    public ResponseMessage getStudentOfDept(@PathVariable("deptId") Long deptId) {
+        return ResponseMessage.success("<Get students of department>", studentService.getStudentOfDept(deptId));
+    }
 }

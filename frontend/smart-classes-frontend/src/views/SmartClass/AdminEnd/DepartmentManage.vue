@@ -73,25 +73,33 @@ const isEdit = ref(false)
 const formData = reactive({
   id: null as number | null,
   name: '',
-  parentId: 0,
-  departmentLevel: 0
+  parentId: 0
 })
 
-const parentOptions = ref<{ label: string; value: number }[]>([])
+const parentTreeOptions = ref<any[]>([])
+function listToTree(list: any[], parentId = 0) {
+  return list
+    .filter(item => item.parentId === parentId)
+    .map(item => ({
+      label: item.name,
+      value: item.id,
+      children: listToTree(list, item.id)
+    }))
+}
 
 const openDialog = (type: 'add' | 'edit', node?: Department) => {
   isEdit.value = type === 'edit'
   if (isEdit.value && node) {
     Object.assign(formData, node)
+    formData.parentId = node.parentId
   } else {
-    Object.assign(formData, { id: null, name: '', parentId: 0, departmentLevel: 0 })
+    Object.assign(formData, { id: null, name: '', parentId: 0 })
     if (node) {
       formData.parentId = node.id
-      formData.departmentLevel = (node.departmentLevel || 0) + 1
     }
   }
-  // 构建父级下拉选项
-  parentOptions.value = deptTree.value.map(d => ({ label: d.name, value: d.id }))
+  // 构建父级下拉选项为树结构
+  parentTreeOptions.value = listToTree(deptTree.value)
   dialogVisible.value = true
 }
 
@@ -108,8 +116,7 @@ const handleSubmit = async () => {
     await updateDepartmentApi({
       id: formData.id as number,
       name: formData.name,
-      parentId: formData.parentId,
-      departmentLevel: formData.departmentLevel
+      parentId: formData.parentId
     })
     ElMessage.success('编辑成功')
   } else {
@@ -174,13 +181,13 @@ onMounted(fetchDepartmentTree)
           <el-input v-model="formData.name" placeholder="请输入部门名称" />
         </el-form-item>
         <el-form-item label="父级部门">
-          <el-select v-model="formData.parentId" placeholder="请选择父级部门">
-            <el-option :label="'无（顶级）'" :value="0" />
-            <el-option v-for="item in parentOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="层级">
-          <el-input-number v-model="formData.departmentLevel" :min="0" />
+          <el-cascader
+            v-model="formData.parentId"
+            :options="parentTreeOptions"
+            :props="{ checkStrictly: true, emitPath: false }"
+            clearable
+            placeholder="请选择父级部门"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -193,7 +200,6 @@ onMounted(fetchDepartmentTree)
         <el-descriptions-item label="ID">{{ detailData?.id }}</el-descriptions-item>
         <el-descriptions-item label="名称">{{ detailData?.name }}</el-descriptions-item>
         <el-descriptions-item label="父级ID">{{ detailData?.parentId }}</el-descriptions-item>
-        <el-descriptions-item label="层级">{{ detailData?.departmentLevel }}</el-descriptions-item>
       </el-descriptions>
       <template #footer>
         <el-button @click="detailDialogVisible = false">关闭</el-button>

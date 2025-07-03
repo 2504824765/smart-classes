@@ -4,9 +4,13 @@ import com.bnwzy.smartclassesspringbootweb.exception.DepartmentAlreadyExistExcep
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.IllegalParentDeptException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Department;
+import com.bnwzy.smartclassesspringbootweb.pojo.Student;
+import com.bnwzy.smartclassesspringbootweb.pojo.Teacher;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.TeacherRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IDepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,10 @@ import java.util.List;
 public class DepartmentService implements IDepartmentService {
     @Autowired
     private DepartmentRepository departmentRepository;
+    @Autowired
+    private TeacherRepository teacherRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Override
     public Department createDept(DeptCreateDTO deptCreateDTO) {
@@ -49,7 +57,20 @@ public class DepartmentService implements IDepartmentService {
     @Override
     public Boolean deleteDept(Long id) {
         if (departmentRepository.findById(id).isPresent()) {
-            departmentRepository.deleteById(id);
+            Department department = departmentRepository.findById(id).get();
+            List<Teacher> teacherList = teacherRepository.findByDepartment(department);
+            if (!teacherList.isEmpty()) {
+                for (Teacher teacher : teacherList) {
+                    teacher.setDepartment(null);
+                }
+            }
+            List<Student> studentList = studentRepository.findByDepartment(department);
+            if (!studentList.isEmpty()) {
+                for (Student student : studentList) {
+                    student.setDepartment(null);
+                }
+            }
+            departmentRepository.delete(department);
             return true;
         } else {
             throw new DepartmentNotFoundException("<Department not found>");

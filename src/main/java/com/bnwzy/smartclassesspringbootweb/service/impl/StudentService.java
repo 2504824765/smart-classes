@@ -111,4 +111,13 @@ public class StudentService implements IStudentService {
     public Long getStudentCount() {
         return studentRepository.count();
     }
+
+    @Override
+    public List<Student> getStudentOfDept(Long deptId) {
+        if (departmentRepository.findById(deptId).isEmpty()) {
+            throw new DepartmentNotFoundException("<Department Not Found>");
+        } else {
+            return studentRepository.findByDepartment(departmentRepository.findById(deptId).get());
+        }
+    }
 }

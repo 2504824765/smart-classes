@@ -22,4 +22,6 @@ public interface ITeacherService {
     List<Teacher> getAllTeacher();
 
     Long getTeacherCount();
+
+    List<Teacher> getTeachersOfDept(Long deptId);
 }

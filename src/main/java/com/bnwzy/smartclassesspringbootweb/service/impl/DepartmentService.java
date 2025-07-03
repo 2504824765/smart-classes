@@ -8,6 +8,7 @@ import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.Teacher;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptUpdateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.DeptDetailDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.TeacherRepository;
@@ -33,23 +34,16 @@ public class DepartmentService implements IDepartmentService {
         } else {
             Department department = new Department();
             department.setName(deptCreateDTO.getName());
-            // 如果是顶级组织，则父级组织id为0
-            if (deptCreateDTO.getDepartmentLevel() == 0) {
-                department.setParentId((long) 0);
-            }
-            // 如果不是顶级组织，寻找父级组织存不存在
-            else if (departmentRepository.findById(deptCreateDTO.getParentId()).isPresent()) {
-                Department parentDepartment = departmentRepository.findById(deptCreateDTO.getParentId()).get();
-                // 如果选择的父组织不是上一级组织
-                if (parentDepartment.getDepartmentLevel() != deptCreateDTO.getDepartmentLevel() - 1) {
-                    throw new IllegalParentDeptException("<Target department is not parentDepartment>");
-                } else {
-                    department.setParentId(deptCreateDTO.getParentId());
-                }
+            if (deptCreateDTO.getParentId() == null || deptCreateDTO.getParentId() == 0) {
+                department.setParentId(0L);
+                department.setDepartmentLevel(0);
+            } else if (departmentRepository.findById(deptCreateDTO.getParentId()).isPresent()) {
+                department.setParentId(deptCreateDTO.getParentId());
+                Department parent = departmentRepository.findById(deptCreateDTO.getParentId()).get();
+                department.setDepartmentLevel(parent.getDepartmentLevel() + 1);
             } else {
                 throw new DepartmentNotFoundException("<Parent department not found>");
             }
-            department.setDepartmentLevel(deptCreateDTO.getDepartmentLevel());
             return departmentRepository.save(department);
         }
     }
@@ -58,6 +52,10 @@ public class DepartmentService implements IDepartmentService {
     public Boolean deleteDept(Long id) {
         if (departmentRepository.findById(id).isPresent()) {
             Department department = departmentRepository.findById(id).get();
+            List<Department> children = departmentRepository.findByParentId(id);
+            if (children != null && !children.isEmpty()) {
+                throw new RuntimeException("该部门有子部门，不能直接删除！");
+            }
             List<Teacher> teacherList = teacherRepository.findByDepartment(department);
             if (!teacherList.isEmpty()) {
                 for (Teacher teacher : teacherList) {
@@ -83,24 +81,17 @@ public class DepartmentService implements IDepartmentService {
             throw new DepartmentNotFoundException("<Department not found>");
         } else {
             Department oldDepartment = departmentRepository.findById(newDeptDTO.getId()).get();
-            // 判断是否是顶级组织
-            if (newDeptDTO.getDepartmentLevel() == 0) {
-                oldDepartment.setParentId((long) 0);
-            }
-            // 判断目标父组织存不存在
-            else if (departmentRepository.findById(newDeptDTO.getParentId()).isEmpty()) {
-                throw new DepartmentNotFoundException("<Parent oldDepartment not found>");
+            if (newDeptDTO.getParentId() == null || newDeptDTO.getParentId() == 0) {
+                oldDepartment.setParentId(0L);
+                oldDepartment.setDepartmentLevel(0);
+            } else if (departmentRepository.findById(newDeptDTO.getParentId()).isPresent()) {
+                oldDepartment.setParentId(newDeptDTO.getParentId());
+                Department parent = departmentRepository.findById(newDeptDTO.getParentId()).get();
+                oldDepartment.setDepartmentLevel(parent.getDepartmentLevel() + 1);
             } else {
-                // 如果存在，判断是否为上一级
-                Department parentDepartment = departmentRepository.findById(newDeptDTO.getParentId()).get();
-                if (!newDeptDTO.getDepartmentLevel().equals(parentDepartment.getDepartmentLevel() + 1)) {
-                    throw new IllegalParentDeptException("<Target oldDepartment is not parentDepartment>");
-                } else {
-                    oldDepartment.setParentId(newDeptDTO.getParentId());
-                }
+                throw new DepartmentNotFoundException("<Parent department not found>");
             }
             oldDepartment.setName(newDeptDTO.getName());
-            oldDepartment.setDepartmentLevel(newDeptDTO.getDepartmentLevel());
             return departmentRepository.save(oldDepartment);
         }
     }
@@ -126,5 +117,18 @@ public class DepartmentService implements IDepartmentService {
         } else {
             return departmentRepository.findByName(name).get();
         }
+    }
+
+    @Override
+    public DeptDetailDTO getDeptDetailById(Long id) {
+        Department dept = departmentRepository.findById(id)
+            .orElseThrow(() -> new DepartmentNotFoundException("<Department not found>"));
+        List<Teacher> teachers = teacherRepository.findByDepartment(dept);
+        List<Student> students = studentRepository.findByDepartment(dept);
+        DeptDetailDTO dto = new DeptDetailDTO();
+        dto.setDepartment(dept);
+        dto.setTeachers(teachers);
+        dto.setStudents(students);
+        return dto;
     }
 }

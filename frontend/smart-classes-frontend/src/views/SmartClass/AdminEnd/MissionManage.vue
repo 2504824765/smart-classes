@@ -47,11 +47,6 @@ const columns: TableColumn[] = [
     label: t('task.deadline')
   },
   {
-    field: 'submitMethod',
-    label: t('task.submit_method'),
-    formatter: (row: any) => row.submitMethod || row.submit_method || ''
-  },
-  {
     field: 'score',
     label: t('task.score')
   },
@@ -98,7 +93,9 @@ getTableList()
 // 弹窗表单相关
 const dialogVisible = ref(false)
 const isEdit = ref(false)
-const formData = reactive<Partial<ClassMissionCreateDTO & { id?: number }>>({})
+const formData = reactive<Partial<ClassMissionCreateDTO & { id?: number }>>({
+  deadline: ''
+})
 
 const allClasses = ref<Classes[]>([])
 const classOptions = ref<{ label: string; value: number }[]>([])
@@ -113,19 +110,17 @@ loadClasses()
 
 const openCreate = () => {
   isEdit.value = false
-  Object.assign(formData, { type: '', description: '', deadline: '', submitMethod: '', score: 0, cid: undefined, id: undefined })
+  Object.assign(formData, { type: '', description: '', deadline: '', score: 0, cid: undefined, id: undefined })
   dialogVisible.value = true
 }
 
 const onEdit = (row: ClassMission) => {
   isEdit.value = true
-  // 兼容 classes 结构，确保 id/cid 都有
   Object.assign(formData, {
     id: row.id,
     type: row.type,
     description: row.description,
-    deadline: row.deadline,
-    submitMethod: (row as any).submitMethod || (row as any).submit_method,
+    deadline: typeof row.deadline === 'string' ? row.deadline : '',
     score: row.score,
     cid: (row.classes as any)?.id || (row as any).cid
   })
@@ -156,7 +151,7 @@ const handleSubmit = async () => {
   <ContentWrap>
     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px">
       <span style="font-size: 18px; font-weight: bold">{{ t('teacher.mission') }}</span>
-      <el-button @click="getTableList" style="margin-left: 30px">刷新</el-button>
+      <!-- <el-button @click="getTableList" style="margin-left: 30px">刷新</el-button> -->
     </div>
     <BaseButton type="primary" @click="openCreate" style="margin-bottom: 16px" round>
       <Icon icon="ep:plus" class="mr-5px" />
@@ -193,9 +188,6 @@ const handleSubmit = async () => {
             value-format="yyyy-MM-dd HH:mm:ss"
             style="width: 100%"
           />
-        </el-form-item>
-        <el-form-item label="提交方式">
-          <el-input v-model="formData.submitMethod" placeholder="请输入提交方式" />
         </el-form-item>
         <el-form-item label="得分">
           <el-input-number v-model="formData.score" :min="0" />

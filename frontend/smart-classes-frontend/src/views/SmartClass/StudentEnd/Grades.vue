@@ -1,37 +1,36 @@
 <template>
-  <div class="student-grade-container">
-    <el-row justify="center">
-      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-        <el-card>
-          <h2 style="text-align: center;">学生成绩查看</h2>
-          <p style="text-align: center; margin-bottom: 20px;">
-            学生姓名: {{ student.name }}（ID: {{ student.id }}）
-          </p>
+  <ContentWrap>
+    <el-card shadow="hover" class="grade-card">
+      <h2 class="title">学生成绩查看</h2>
+      <p class="student-info">
+        学生姓名: {{ student.name }}（ID: {{ student.id }}）
+      </p>
 
-          <el-table :data="grades" stripe border style="width: 100%; margin-top: 20px">
-            <el-table-column prop="name" label="课程名称" />
-            <el-table-column prop="credit" label="学分" />
-            <el-table-column prop="class_hours" label="学时" />
-            <el-table-column prop="grade" label="成绩" />
-          </el-table>
+      <el-table
+        :data="grades"
+        stripe
+        border
+        class="grade-table"
+      >
+        <el-table-column prop="name" label="课程名称" min-width="240" align="center" />
+        <el-table-column prop="credit" label="学分" width="100" align="center" />
+        <el-table-column prop="class_hours" label="学时" width="100" align="center" />
+        <el-table-column prop="grade" label="成绩" width="100" align="center" />
+      </el-table>
 
-          <div style="margin-top: 30px; font-weight: bold; font-size: 18px; text-align: center;">
-            综合绩点 GPA: {{ gpa.toFixed(2) }}
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-    
-
-  </div>
+      <div class="gpa-info">
+        综合绩点 GPA: <span class="gpa-value">{{ gpa.toFixed(2) }}</span>
+      </div>
+    </el-card>
+  </ContentWrap>
 </template>
 
+
 <script setup lang="ts">
-import axios from 'axios'
+
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store/modules/user'
 import { getStudentByUsernameApi, getStudentByIdApi } from '@/api/student/index'
-import { getClassesByIdApi } from '@/api/classes/index'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 
 
@@ -136,9 +135,43 @@ onMounted(async () => {
 
 
 <style scoped>
-.student-grade-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px;
+.grade-card {
+  background: #fff;
+  border: 1px solid #e4e7ed;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 30px;
 }
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.student-info {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #666;
+}
+
+.grade-table {
+  margin-top: 20px;
+}
+
+.gpa-info {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+}
+
+.gpa-value {
+  color: #409eff;
+  margin-left: 8px;
+}
+
+
 </style>

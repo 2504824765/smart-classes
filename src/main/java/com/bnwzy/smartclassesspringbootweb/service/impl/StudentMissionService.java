@@ -128,14 +128,11 @@ public class StudentMissionService implements IStudentMissionService {
         ClassMission classMission = classMissionRepository.findById(id)
                 .orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
 
-        // 添加null检查
-        Classes classes = classMission.getClasses();
-        if (classes == null) {
-            throw new ClassesNotFoundException("<Class not found>");
-        }
-
-        return studentClassesRepository.findByClasses(classes).stream()
-                .map(StudentClasses::getStudent)
+        // 只返回领取了该任务的学生
+        List<StudentMission> studentMissions = studentMissionRepository.findByClassMission(classMission);
+        return studentMissions.stream()
+                .map(StudentMission::getStudent)
+                .distinct()
                 .collect(Collectors.toList());
     }
 

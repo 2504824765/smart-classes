@@ -1,11 +1,22 @@
 package com.bnwzy.smartclassesspringbootweb.pojo.dto;
 
+import com.bnwzy.smartclassesspringbootweb.pojo.StudentData;
+
 public class StudentCreateDTO {
     private String name;
     private String username;
     private String gender;
     private Long deptId;
     private Double gpa;
+    private StudentData studentData;
+
+    public StudentData getStudentData() {
+        return studentData;
+    }
+
+    public void setStudentData(StudentData studentData) {
+        this.studentData = studentData;
+    }
 
     public Double getGpa() {
         return gpa;

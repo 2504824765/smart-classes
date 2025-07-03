@@ -55,6 +55,7 @@ public class StudentService implements IStudentService {
                 student.setDepartment(department);
             }
             student.setGpa(studentUpdateDTO.getGpa());
+            student.setStudentData(studentUpdateDTO.getStudentData());
             return studentRepository.save(student);
         }
     }
@@ -89,6 +90,7 @@ public class StudentService implements IStudentService {
             student.setGender(studentCreateDTO.getGender());
             student.setGpa(studentCreateDTO.getGpa());
             student.setUsername(studentCreateDTO.getUsername());
+            student.setStudentData(studentCreateDTO.getStudentData());
             return studentRepository.save(student);
         }
     }

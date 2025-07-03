@@ -13,4 +13,5 @@ public interface StudentMissionRepository extends JpaRepository<StudentMission,L
     List<StudentMission> findByClassMissionInAndStudent(List<ClassMission> classMissions, Student student);
     List<StudentMission> findByStudent(Student student);
     StudentMission findByClassMissionAndStudent(ClassMission classMission, Student student);
+    List<StudentMission> findByClassMission(ClassMission classMission);
 }

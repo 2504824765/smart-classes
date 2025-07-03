@@ -47,15 +47,20 @@ const courseFormSchema = reactive<FormSchema[]>([
       options: teacherOptions,
       filterMethod: (query: string) => {
         if (!query) {
-          teacherOptions.value = allTeachers.value.map(t => ({
+          teacherOptions.value = allTeachers.value.map((t) => ({
             label: `${t.name}（${t.dept?.name || '未分配院系'}）`,
             value: t.id
           }))
           return
         }
         teacherOptions.value = allTeachers.value
-          .filter(t => t.name.includes(query) || t.dept?.name?.includes(query) || String(t.id).includes(query))
-          .map(t => ({
+          .filter(
+            (t) =>
+              t.name.includes(query) ||
+              t.dept?.name?.includes(query) ||
+              String(t.id).includes(query)
+          )
+          .map((t) => ({
             label: `${t.name}（${t.dept?.name || '未分配院系'}）`,
             value: t.id
           }))
@@ -144,11 +149,11 @@ onMounted(async () => {
   try {
     const res = await getAllTeacherApi()
     allTeachers.value = res.data
-    teacherOptions.value = res.data.map(t => ({
+    teacherOptions.value = res.data.map((t) => ({
       label: `${t.name}（${t.dept?.name || '未分配院系'}）`,
       value: t.id
     }))
-    
+
     // 编辑模式：拉取课程详情
     const id = route.query.id
     if (id) {
@@ -193,7 +198,7 @@ const handleSubmit = async () => {
 
     try {
       const formData = await getFormData<ClassesCreateDTO>()
-      
+
       if (isEdit.value) {
         if (!courseId.value) {
           ElMessage.error('课程ID缺失，无法编辑')
@@ -210,7 +215,7 @@ const handleSubmit = async () => {
       if (!isEdit.value && pendingResources.value.length > 0) {
         // 获取新创建的课程ID
         const newCourseId = courseId.value || 0
-        
+
         for (const resource of pendingResources.value) {
           const uploadRes = await uploadResourcesApi(resource.file, '课程资料')
           const filePath = uploadRes.data.url

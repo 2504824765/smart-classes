@@ -1,22 +1,23 @@
 <template>
-  <div class="course-list">
-    <el-row>
-      <el-col :span="6" v-for="course in courses" :key="course.name">
-        <CourseHCard :course="course" @view-homework="goToHomework(course)" />
-      </el-col>
-    </el-row>
-  </div>
+  <draggable v-model="courses" item-key="id" class="card-grid" animation="200">
+    <template #item="{ element }">
+      <CourseHCard :course="element" @view-homework="goToHomework(element)" />
+    </template>
+  </draggable>
 </template>
 
 <script setup lang="ts">
 import CourseHCard from './components/CourseHCard.vue'
 import { useRouter } from 'vue-router'
+import draggable from 'vuedraggable'
 import { Classes, CourseDisplayData } from '@/api/classes/types'
-import { getAllClassesApi } from '@/api/classes/index'
+import { getClassesByIdApi } from '@/api/classes/index'
 import { getStudentByUsernameApi } from '@/api/student/index'
+import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 import { getStudentMissionByClass } from '@/api/studentMission/index'
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/store/modules/user'
+
 const { push } = useRouter()
 
 const studentId = ref<number | null>(null)
@@ -41,8 +42,29 @@ const loadCourses = async () => {
   // 假设当前用户名存在 store 中
   if (!studentId.value) return
   // 获取所有课程
-  const classRes = await getAllClassesApi()
-  classes.value = classRes.data
+  try {
+    // 获取所有选课关联记录
+    if(!studentId.value){ 
+      return
+    }
+    console.log(studentId.value)
+    const associatedRes = await getAssociatedBySidApi(studentId.value)
+    console.log('选课关联记录：', associatedRes)
+    const associatedList = associatedRes.data // 每项应包含 cid
+
+    const cidList: number[] = associatedList.map((item) => item.classes.id)
+    console.log('选课课程ID列表：', cidList)
+    // 并发获取所有课程信息
+    const classPromises = cidList.map((cid) => getClassesByIdApi(cid))
+    const classResults = await Promise.all(classPromises)
+
+    // 提取课程数据
+    classes.value = classResults.map((res) => res.data)
+
+    console.log('选课课程列表：', classes.value)
+  } catch (err) {
+    console.error('加载课程列表失败', err)
+  }
 
   const courseList: CourseDisplayData[] = []
 
@@ -79,7 +101,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.course-list {
-  padding: 20px;
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 </style>

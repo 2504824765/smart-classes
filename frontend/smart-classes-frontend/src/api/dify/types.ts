@@ -50,3 +50,24 @@ export function createDifyGraphRequestMulti(urls: string[], user = 'test-user'):
     user
   }
 }
+
+export function createDifyGenerateQuestionRequest(
+  urls: string[],
+  nodeName: string,
+  quantity: number,
+  user = 'test-user'
+): DifyGenerateQuestionRequest {
+  return {
+    inputs: {
+      file: urls.map((url) => ({
+        type: 'document',
+        transfer_method: 'remote_url',
+        url
+      })),
+      nodeName,
+      quantity
+    },
+    response_mode: 'streaming',
+    user
+  }
+}

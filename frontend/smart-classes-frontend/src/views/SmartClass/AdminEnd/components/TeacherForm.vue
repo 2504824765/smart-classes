@@ -132,6 +132,10 @@ const handleSubmit = async () => {
   <ContentWrap :title="isEdit ? '编辑教师' : '新增教师'">
     <Form :schema="teacherFormSchema" @register="formRegister" />
     <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">提交</BaseButton>
-    <BaseButton style="margin-top: 16px; margin-left: 8px" @click="() => router.push({ path: '/admin/teacherManage' })">返回</BaseButton>
+    <BaseButton
+      style="margin-top: 16px; margin-left: 8px"
+      @click="() => router.push({ path: '/admin/teacherManage' })"
+      >返回</BaseButton
+    >
   </ContentWrap>
 </template>

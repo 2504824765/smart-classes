@@ -20,6 +20,17 @@ public class Student {
     private Department department;
     @Column(name = "gpa")
     private Double gpa;
+    @OneToOne
+    @JoinColumn(name = "student_data_id")
+    private StudentData studentData;
+
+    public StudentData getStudentData() {
+        return studentData;
+    }
+
+    public void setStudentData(StudentData studentData) {
+        this.studentData = studentData;
+    }
 
     public String getGender() {
         return gender;

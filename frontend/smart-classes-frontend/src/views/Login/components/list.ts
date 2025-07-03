@@ -7,7 +7,9 @@ const studentList: string[] = [
   '/homework',
   '/homework/list',
   '/homework/detail',
-  '/grades'
+  '/data',
+  '/data/grades',
+  '/data/assessment'
 ]
 
 // 教师端路由权限列表 - 对应router/index.ts中getTeacherRoutes()的路径

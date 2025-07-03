@@ -18,4 +18,6 @@ public interface IClassMissionService {
     List<ClassMission> getAllClassMission();
 
     List<ClassMission> getCLassMissionByCid(Long cid);
+
+    ClassMission getClassMissionById(Long id);
 }

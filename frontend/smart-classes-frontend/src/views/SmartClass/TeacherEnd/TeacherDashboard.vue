@@ -21,6 +21,9 @@ import {
   getStudentCountApi
 } from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
+import { getUserByIdApi } from '@/api/login'
+import { useUserStore } from '@/store/modules/user'
+import { getClassCountApi } from '@/api/classes'
 // import { getMissionListApi } from '@/api/mission'
 import { Icon } from '@/components/Icon'
 
@@ -46,6 +49,7 @@ interface Statistics {
 
 const router = useRouter()
 const { t } = useI18n()
+const userStore = useUserStore()
 
 // 教师信息
 const teacherInfo = ref({
@@ -67,20 +71,42 @@ const statistics = ref<Statistics>({
 // 获取当前登录教师信息
 const getCurrentTeacher = async () => {
   try {
-    // 暂时只设置默认数据，避免API调用导致的路由问题
-    teacherInfo.value = {
-      name: '张老师',
-      username: 'teacher001',
-      avatar: ''
+    const currentUser = userStore.getUserInfo
+    console.log('当前用户信息:', currentUser)
+
+    if (currentUser?.roleId) {
+      console.log('准备调用API获取用户详情, ID:', currentUser.roleId)
+      // 调用后端API获取用户信息
+      const userRes = await getUserByIdApi(currentUser.roleId)
+      console.log('API响应:', userRes)
+
+      if (userRes?.data) {
+        console.log('成功获取用户数据:', userRes.data)
+        teacherInfo.value = {
+          name: userRes.data.username, // 使用用户名作为显示名称
+          username: userRes.data.username,
+          avatar: userRes.data.imageURL || ''
+        }
+      } else {
+        console.log('API调用失败，使用当前用户信息')
+        // 如果API调用失败，使用当前用户信息
+        teacherInfo.value = {
+          name: currentUser.username || '老师',
+          username: currentUser.username || 'teacher001',
+          avatar: ''
+        }
+      }
+    } else {
+      console.log('没有找到用户信息或roleId，使用默认数据')
+      // 如果没有用户信息，使用默认数据
+      teacherInfo.value = {
+        name: '张老师',
+        username: 'teacher001',
+        avatar: ''
+      }
     }
 
-    // 设置统计数据
-    statistics.value = {
-      studentCount: 0,
-      courseCount: 0,
-      assignmentCount: 0,
-      completionRate: 0
-    }
+    console.log('最终教师信息:', teacherInfo.value)
 
     // 设置课程数据
     recentCourses.value = [
@@ -131,6 +157,26 @@ const getTeacherStatistics = async () => {
       console.error('获取学生数量失败:', error)
       statistics.value.studentCount = 0
     }
+
+    // 获取课程数量
+    try {
+      const courseCountRes = await getClassCountApi()
+      console.log('课程数量API响应:', courseCountRes)
+      if (courseCountRes && courseCountRes.data !== undefined) {
+        statistics.value.courseCount = Number(courseCountRes.data)
+        console.log('成功获取课程数量:', courseCountRes.data)
+      } else {
+        statistics.value.courseCount = 0
+        console.warn('课程数量API响应格式异常，设为0')
+      }
+    } catch (error) {
+      console.error('获取课程数量失败:', error)
+      statistics.value.courseCount = 0
+    }
+
+    // 可以继续添加获取任务数量和完成率的逻辑
+    // TODO: 添加获取任务数量的API调用
+    // TODO: 添加计算完成率的逻辑
   } catch (error) {
     console.error('获取统计数据失败:', error)
     statistics.value = {
@@ -233,21 +279,6 @@ onMounted(() => {
             </div>
           </el-card>
         </el-col>
-        <el-col :span="6">
-          <el-card shadow="hover" class="stat-card stat-card-4">
-            <el-statistic
-              :value="statistics.completionRate"
-              :value-style="{ fontSize: '32px', fontWeight: 'bold', color: 'white' }"
-            >
-              <template #title>
-                <span style="font-size: 16px; font-weight: 600; color: white">作业完成率</span>
-              </template>
-            </el-statistic>
-            <div class="card-footer">
-              <el-button type="text" plain @click="gotoStudentManagement">查看详情</el-button>
-            </div>
-          </el-card>
-        </el-col>
       </el-row>
     </div>
 
@@ -294,7 +325,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-2"
-            @click="router.push('/teacher/CreateMission')"
+            @click="router.push('/course/form')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:edit-pen" :size="24" />

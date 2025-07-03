@@ -1,8 +1,8 @@
 <template>
   <div class="homework-detail">
-    <el-page-header content="作业详情" @back="router.back" style="margin-bottom: 10px;"/>
+    <el-page-header content="作业详情" @back="router.back" style="margin-bottom: 10px" />
     <el-card>
-      <h2>{{  }}</h2>
+      <h2>{{}}</h2>
       <p>这里将展示作业的详细要求、上传入口等内容（待开发）。</p>
     </el-card>
   </div>

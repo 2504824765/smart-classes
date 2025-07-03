@@ -131,10 +131,13 @@ const editFn = (data) => {
 
 const onEditSave = async (newData) => {
   try {
+    console.log('发送编辑数据:', newData)
     await updateStudentApi(newData)
     ElMessage.success('保存成功')
+    editDialogVisible.value = false
     getTableList() // 刷新表格
   } catch (e) {
+    console.error('编辑失败:', e)
     ElMessage.error('保存失败')
   }
 }
@@ -166,11 +169,34 @@ const addFn = () => {
 
 const onAddSave = async (newData) => {
   try {
-    await createStudentApi(newData)
+    console.log('发送添加数据:', newData)
+    console.log('数据类型检查:', {
+      username: typeof newData.username,
+      name: typeof newData.name,
+      gender: typeof newData.gender,
+      deptId: typeof newData.deptId,
+      gpa: typeof newData.gpa
+    })
+
+    const response = await createStudentApi(newData)
+    console.log('添加学生API响应:', response)
     ElMessage.success('添加成功')
+    addDialogVisible.value = false
     getTableList() // 刷新表格
-  } catch (e) {
-    ElMessage.error('添加失败')
+  } catch (e: any) {
+    console.error('添加失败详细错误:', e)
+    console.error('错误响应:', e.response)
+    console.error('错误状态:', e.response?.status)
+    console.error('错误数据:', e.response?.data)
+
+    let errorMessage = '添加失败'
+    if (e.response?.data?.message) {
+      errorMessage = e.response.data.message
+    } else if (e.message) {
+      errorMessage = e.message
+    }
+
+    ElMessage.error(errorMessage)
   }
 }
 

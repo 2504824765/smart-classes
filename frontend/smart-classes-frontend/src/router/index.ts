@@ -86,12 +86,10 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
       path: '/teacher',
       component: Layout,
       name: 'Teacher',
-      redirect: '/teacher/dashboard',
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher',
-        alwaysShow: true
+        userType: 'teacher'
       },
       children: [
         {
@@ -102,6 +100,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             title: t('teacher.dashboard'),
             userType: 'teacher',
             noCache: true,
+            icon: 'vi-ant-design:dashboard-filled',
             affix: true
           }
         }
@@ -203,6 +202,29 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
 export const getStudentRoutes = (): AppRouteRecordRaw[] => {
   return [
     {
+      path: '/student',
+      component: Layout,
+      name: 'StudentDashboard',
+      meta: {
+        title: t('teacher.dashboard'),
+        icon: 'vi-ant-design:book-outlined',
+        userType: 'student'
+      },
+      children: [
+        {
+          path: 'dashboard',
+          component: () => import('@/views/SmartClass/StudentEnd/StudentDashboard.vue'),
+          name: 'StdDashboard',
+          meta: {
+            title: t('teacher.dashboard'),
+            userType: 'student',
+            noCache: true,
+            affix: true
+          }
+        }
+      ]
+    },
+    {
       path: '/course',
       component: Layout,
       redirect: '/course/content',
@@ -210,8 +232,7 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
       meta: {
         title: t('student.courseList'),
         icon: 'vi-ant-design:book-outlined',
-        userType: 'student',
-        alwaysShow: true
+        userType: 'student'
       },
       children: [
         {
@@ -259,7 +280,6 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
         title: t('student.homework'),
         icon: 'vi-ant-design:file-done-outlined',
         userType: 'student',
-        alwaysShow: true,
         noCache: true
       },
       children: [
@@ -306,9 +326,7 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
       meta: {
         title: t('student.grades'),
         icon: 'vi-ant-design:bar-chart-outlined',
-        userType: 'student',
-        alwaysShow: true,
-        noCache: true
+        userType: 'student'
       },
       children: [
         {
@@ -419,7 +437,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
           meta: {
             title: t('admin.mission'),
             userType: 'admin',
-            noCache: true,
+            noCache: true
           },
           children: [
             {

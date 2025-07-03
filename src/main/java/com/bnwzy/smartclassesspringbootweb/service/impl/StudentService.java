@@ -9,11 +9,13 @@ import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.StudentClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.UserRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ public class StudentService implements IStudentService {
     DepartmentRepository departmentRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    StudentClassesRepository studentClassesRepository;
 
     @Override
     public Student getStudentById(Long id) {
@@ -84,34 +88,21 @@ public class StudentService implements IStudentService {
             student.setName(studentCreateDTO.getName());
             student.setGender(studentCreateDTO.getGender());
             student.setGpa(studentCreateDTO.getGpa());
-            if (userRepository.findByUsername(studentCreateDTO.getUsername()).isPresent()) {
-                throw new UserAlreadyExistException("<User Already Exist>");
-            } else {
-                student.setUsername(studentCreateDTO.getUsername());
-            }
+            student.setUsername(studentCreateDTO.getUsername());
             return studentRepository.save(student);
         }
     }
 
     @Override
+    @Transactional
     public Boolean deleteStudent(Long id) {
         if (studentRepository.findById(id).isEmpty()) {
             throw new StudentNotFoundException("<Student Not Found>");
         } else {
-            studentRepository.deleteById(id); // 部门不会被删除
-            // 在删除部门时，应先解除关系再删除部门
-//            public void deleteDepartment(Long departmentId) {
-//                // 查找关联的学生
-//                Optional<Student> studentOpt = studentRepository.findByDepartmentId(departmentId);
-//
-//                if(studentOpt.isPresent()) {
-//                    Student student = studentOpt.get();
-//                    student.setDepartment(null); // 解除关系
-//                    studentRepository.save(student);
-//                }
-//
-//                departmentRepository.deleteById(departmentId);
-//            }
+            // 先删除所有与该学生相关的选课关联
+            studentClassesRepository.deleteByStudent_Id(id);
+            // 再删除学生本身
+            studentRepository.deleteById(id);
             return true;
         }
     }

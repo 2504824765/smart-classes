@@ -30,7 +30,7 @@ public class TeacherService implements ITeacherService {
 
     @Override
     public Teacher addTeacher(TeacherCreateDTO teacherCreateDTO) {
-        if(teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isEmpty()){
+        if(!teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()){
             Teacher teacher = new Teacher();
             teacher.setUsername(teacherCreateDTO.getUsername());
             teacher.setName(teacherCreateDTO.getName());
@@ -40,7 +40,7 @@ public class TeacherService implements ITeacherService {
             }else{
                 throw new DepartmentNotFoundException("Department not found");
             }
-            if (userRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()) {
+            if (!userRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()) {
                 throw new UserAlreadyExistException("Teacher already exist");
             } else {
                 teacher.setUsername(teacherCreateDTO.getUsername());

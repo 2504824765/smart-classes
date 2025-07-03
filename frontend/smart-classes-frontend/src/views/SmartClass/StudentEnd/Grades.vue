@@ -64,10 +64,13 @@ const student = ref({
   id: studentId,
   name: studentName
 })
-const grades = ref([])
+const grades = ref[]([])
 
 // 获取学生姓名
 const fetchStudentInfo = async () => {
+  if(!student.value.id) {
+    return
+  }
   try {
     const res = await getStudentByIdApi(student.value.id)
     studentName.value = res.data.name
@@ -78,6 +81,9 @@ const fetchStudentInfo = async () => {
 
 // 获取学生的选课记录
 const fetchStudentGrades = async () => {
+  if(!student.value.id || grades.value) {
+    return
+  }
   try {
     const res = await getAssociatedBySidApi(student.value.id)
     console.log('获取到的 res：', res)

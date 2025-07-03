@@ -592,6 +592,7 @@ export default {
     gpa: '绩点',
     courseDetail: '课程详情',
     courseList: '课程列表',
+    courseSelect: '选课',
     study: '学习',
     videoWatch: '视频观看',
     homework: '作业',

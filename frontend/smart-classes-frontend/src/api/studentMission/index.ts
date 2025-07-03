@@ -25,7 +25,7 @@ export const getStudentMissionByMission = async (
 }
 
 export const getStudentMissionById = async (id: number): Promise<IResponse<StudentMission>> => {
-  return request.get({ url: `/api/studentMission/${id}` })
+  return request.get({ url: `/api/studentMission/getStudentMissionById/${id}` })
 }
 
 export const addStudentMission = async (
@@ -40,4 +40,8 @@ export const updateStudentMission = async (data: StudentMission) => {
 
 export const deleteStudentMission = async (id: number): Promise<IResponse<boolean>> => {
   return request.delete({ url: `/api/studentMission/delete/${id}` })
+}
+
+export const getStudentMissionByStudentIdAndClassMissionId = async (studentId:number, classMissionId:number): Promise<IResponse<StudentMission>> => {
+  return request.get({ url: `/api/studentMission/getStudentMissionByStudentIdAndClassMissionId/`, data:{studentId, classMissionId} })
 }

@@ -2,6 +2,7 @@
 const studentList: string[] = [
   '/course',
   '/course/content',
+  '/course/select',
   '/course/detail',
   '/course/knowledge',
   '/homework',

@@ -30,7 +30,7 @@
     </div>
 
     <div class="right-panel flex flex-col">
-      <ChatGPT />
+      <ChatGPT :question="questionToAsk"/>
     </div>
   </div>
 
@@ -68,6 +68,12 @@ interface QuestionItem {
   question: string
   options: Record<string, string>
   answer: string
+}
+
+const questionToAsk = ref('')
+
+function sendToChatGPT() {
+  questionToAsk.value = '请介绍神经网络的基本结构'
 }
 
 const route = useRoute()

@@ -424,7 +424,7 @@ const deleteKnowledgeGraph = async () => {
 
     await updateClassApi(updateClass)
     ElMessage.success('知识图谱删除成功')
-    await initGraph()
+    initGraph()
   } catch (err) {
     console.error('图谱删除失败', err)
     ElMessage.error('图谱删除失败')

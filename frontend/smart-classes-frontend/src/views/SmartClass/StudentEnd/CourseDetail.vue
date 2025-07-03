@@ -6,6 +6,9 @@ import FileDisplay from './components/FileDisplay.vue'
 import ChatGPT from './components/ChatGPT.vue'
 import { getClassesByIdApi } from '@/api/classes'
 import { PREFIX } from '@/constants/index'
+import { getResourceByClassIdApi } from '@/api/resource/index'
+import type { Resource } from '@/api/resource/types'
+import { ElMessage } from 'element-plus'
 
 const { push } = useRouter()
 const route = useRoute()
@@ -15,48 +18,7 @@ const courseTitle = ref('课程学习')
 const progress = ref(65)
 const activeTab = ref('graph')
 // 树结构数据
-const treeData = ref([
-  {
-    id: '1',
-    label: 'Python',
-    children: [
-      {
-        id: '1-1',
-        label: '深度学习',
-        children: [
-          {
-            id: '1-1-1',
-            label: '神经网络',
-            children: [
-              {
-                id: '1-1-1-1',
-                label: '卷积神经网络',
-                children: [
-                  { id: '1-1-1-1-1', label: '过滤器' },
-                  { id: '1-1-1-1-2', label: '池化算法' }
-                ]
-              },
-              { id: '1-1-1-2', label: '密集连接网络' },
-              { id: '1-1-1-3', label: '分层表示学习' }
-            ]
-          },
-          { id: '1-1-2', label: '反向传播算法' },
-          { id: '1-1-3', label: '正则化' }
-        ]
-      },
-      {
-        id: '1-2',
-        label: '机器学习',
-        children: [
-          { id: '1-2-1', label: '核方法' },
-          { id: '1-2-2', label: '梯度提升机' }
-        ]
-      },
-      { id: '1-3', label: '向量化实现' },
-      { id: '1-4', label: '距离函数' }
-    ]
-  }
-])
+const treeData = ref<any[]>([])
 
 const defaultProps = {
   children: 'children',
@@ -342,6 +304,10 @@ const initGraph = async () => {
 
 const fetchGraphData = async () => {
   const res = await getClassesByIdApi(classId!)
+  if (!res.data.graph) {
+    ElMessage.warning('该课程暂无图谱数据,请等待老师创建图谱')
+    return
+  }
   const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
 
   const graphJson = await fetch(fullUrl)
@@ -368,6 +334,16 @@ const fetchGraphData = async () => {
   initGraph()
 }
 
+const fetchFiles = async () => {
+  const res = await getResourceByClassIdApi(classId!)
+  fileCards.value = res.data.map((resource: Resource) => ({
+    name: resource.name,
+    type: resource.type,
+    url: resource.path
+  }))
+}
+
+
 const questionToAsk = ref('')
 
 function sendToChatGPT() {
@@ -377,6 +353,7 @@ function sendToChatGPT() {
 // 页面挂载后初始化图谱
 onMounted(() => {
   registerCustomNode()
+  fetchFiles()
   fetchGraphData()
 })
 </script>

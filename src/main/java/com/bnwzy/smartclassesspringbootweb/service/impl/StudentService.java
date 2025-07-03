@@ -1,17 +1,12 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
-import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
-import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
-import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.*;
 import com.bnwzy.smartclassesspringbootweb.pojo.Department;
 import com.bnwzy.smartclassesspringbootweb.pojo.Student;
+import com.bnwzy.smartclassesspringbootweb.pojo.StudentData;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentUpdateDTO;
-import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
-import com.bnwzy.smartclassesspringbootweb.repository.StudentClassesRepository;
-import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
-import com.bnwzy.smartclassesspringbootweb.repository.UserRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.*;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +25,8 @@ public class StudentService implements IStudentService {
     UserRepository userRepository;
     @Autowired
     StudentClassesRepository studentClassesRepository;
+    @Autowired
+    private StudentDataRepository studentDataRepository;
 
     @Override
     public Student getStudentById(Long id) {
@@ -55,8 +52,13 @@ public class StudentService implements IStudentService {
                 student.setDepartment(department);
             }
             student.setGpa(studentUpdateDTO.getGpa());
-            student.setStudentData(studentUpdateDTO.getStudentData());
-            return studentRepository.save(student);
+            if (studentDataRepository.findById(studentUpdateDTO.getStudentDataId()).isEmpty()) {
+                throw new StudentDataNotFoundException("<StudentData Not Found>");
+            } else {
+                StudentData studentData = studentDataRepository.findById(studentUpdateDTO.getStudentDataId()).get();
+                student.setStudentData(studentData);
+                return studentRepository.save(student);
+            }
         }
     }
 
@@ -90,8 +92,13 @@ public class StudentService implements IStudentService {
             student.setGender(studentCreateDTO.getGender());
             student.setGpa(studentCreateDTO.getGpa());
             student.setUsername(studentCreateDTO.getUsername());
-            student.setStudentData(studentCreateDTO.getStudentData());
-            return studentRepository.save(student);
+            if (studentDataRepository.findById(studentCreateDTO.getStudentDataId()).isEmpty()) {
+                throw new StudentDataNotFoundException("<StudentData Not Found>");
+            } else {
+                StudentData studentData = studentDataRepository.findById(studentCreateDTO.getStudentDataId()).get();
+                student.setStudentData(studentData);
+                return studentRepository.save(student);
+            }
         }
     }
 

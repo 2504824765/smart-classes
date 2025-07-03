@@ -8,6 +8,6 @@ public class StudentDataUpdateDTO {
     private String conceptUnderstanding;
     private String logicalReasoning;
     private String problemSolving;
-    private String ExpressionNorms;
+    private String expressionNorms;
     private String innovativeThinking;
 }

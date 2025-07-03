@@ -8,11 +8,11 @@ import * as echarts from 'echarts'
 
 const props = defineProps<{
   abilities: {
-    conceptUnderstanding: number
-    logicalReasoning: number
-    problemSolving: number
-    creativeThinking: number
-    expressionClarity: number
+    conceptUnderstanding: number,
+    logicalReasoning: number,
+    problemSolving: number,
+    innovativeThinking: number,
+    expressionNorms: number
   }
 }>()
 
@@ -57,8 +57,8 @@ const initChart = () => {
               props.abilities.conceptUnderstanding,
               props.abilities.logicalReasoning,
               props.abilities.problemSolving,
-              props.abilities.creativeThinking,
-              props.abilities.expressionClarity
+              props.abilities.innovativeThinking,
+              props.abilities.expressionNorms
             ],
             name: '能力评估',
             areaStyle: {

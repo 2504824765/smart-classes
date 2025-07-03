@@ -3,6 +3,7 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentDataNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.StudentData;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentDataCreateDTO;
+import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentDataUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentDataRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentDataService;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +29,21 @@ public class StudentDataService implements IStudentDataService {
             return true;
         } else {
             throw new StudentDataNotFoundException("<StudentData not found>");
+        }
+    }
+
+    @Override
+    public StudentData updateStudentData(StudentDataUpdateDTO studentDataUpdateDTO) {
+        if (studentDataRepository.findById(studentDataUpdateDTO.getId()).isEmpty()) {
+            throw new StudentDataNotFoundException("<StudentData not found>");
+        } else {
+            StudentData studentData = studentDataRepository.findById(studentDataUpdateDTO.getId()).get();
+            studentData.setConceptUnderstanding(studentDataUpdateDTO.getConceptUnderstanding());
+            studentData.setExpressionNorms(studentDataUpdateDTO.getExpressionNorms());
+            studentData.setProblemSolving(studentDataUpdateDTO.getProblemSolving());
+            studentData.setLogicalReasoning(studentDataUpdateDTO.getLogicalReasoning());
+            studentData.setInnovativeThinking(studentDataUpdateDTO.getInnovativeThinking());
+            return studentDataRepository.save(studentData);
         }
     }
 }

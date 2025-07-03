@@ -4,12 +4,7 @@
       <strong>{{ question }}</strong>
     </div>
     <el-radio-group v-model="selected" @change="emitUpdate">
-      <el-radio
-        v-for="(label, key) in options"
-        :key="key"
-        :label="key"
-        class="block mb-1"
-      >
+      <el-radio v-for="(label, key) in options" :key="key" :label="key" class="block mb-1">
         {{ key }}. {{ label }}
       </el-radio>
     </el-radio-group>

@@ -3,13 +3,22 @@
     <el-card class="col-span-3 overflow-auto">
       <el-tree :data="treeData" :props="defaultProps" />
     </el-card>
-    <el-card class="col-span-9 flex flex-col">
+    <el-card v-loading="loading" class="col-span-9 flex flex-col">
       <el-tabs v-model="activeTab" class="flex-1" tab-position="top">
         <!-- 图谱 tab -->
         <el-tab-pane label="图谱" name="graph">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center">
-              <ElButton type="primary" @click="createKnowledgeGraph" :disabled="hasGraph">生成图谱</ElButton>
+              <ElButton type="primary" @click="createKnowledgeGraph" :disabled="hasGraph"
+                >生成图谱</ElButton
+              >
+              <ElButton
+                type="primary"
+                class="ml-2"
+                @click="deleteKnowledgeGraph"
+                :disabled="!hasGraph"
+                >删除图谱</ElButton
+              >
             </div>
           </div>
           <div
@@ -39,10 +48,12 @@ import G6 from '@antv/g6'
 import FileDisplay from './FileDisplay.vue'
 import { getResourceByClassIdApi } from '@/api/resource/index'
 import type { Resource } from '@/api/resource/types'
-import { getClassesByIdApi } from '@/api/classes'
+import { getClassesByIdApi, updateClassApi } from '@/api/classes'
 import { PREFIX } from '@/constants/index'
 import { createGraphApi } from '@/api/dify/index'
 import { createDifyGraphRequestMulti } from '@/api/dify/types'
+import { ElMessage } from 'element-plus'
+import { ClassesUpdateDTO } from '@/api/classes/types'
 
 const props = defineProps<{ classId: number | undefined }>()
 
@@ -259,7 +270,7 @@ const initGraph = async () => {
   graph.data({ nodes, edges })
   graph.render()
 
-    const highlightRelatedNodes = (currentNode) => {
+  const highlightRelatedNodes = (currentNode) => {
     graph.setAutoPaint(false)
     const relatedNodes = new Set()
     const relatedEdges = new Set()
@@ -314,39 +325,123 @@ const initGraph = async () => {
 
     graph.getEdges().forEach((edge) => edge.show())
   })
-
 }
+
+const loading = ref(false)
 
 async function createKnowledgeGraph() {
   if (!props.classId) {
     console.warn('classId 不存在，跳过图谱加载')
     return
   }
-  const resourcesRes = await getResourceByClassIdApi(props.classId)
-  console.log('resourcesRes', resourcesRes)
-  const resources = resourcesRes.data
-  if (!resourcesRes) return
-  const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
-  const requestBody = createDifyGraphRequestMulti(urls)
-  const graphRes = await createGraphApi(requestBody)
-  const graphJson = await fetch(graphRes.data)
-    .then((res) => res.json())
-    .catch((err) => {
-      console.error('下载或解析 JSON 失败', err)
-      return null
-    })
 
-  if (graphJson) {
-    console.log('解析后的图谱数据：', graphJson)
-    treeData.value = graphJson
+  try {
+    loading.value = true
+
+    const resourcesRes = await getResourceByClassIdApi(props.classId)
+    const resources = resourcesRes.data
+    if (!resourcesRes || !resources.length) {
+      ElMessage.warning('没有可用的资源')
+      return
+    }
+
+    const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
+    console.log('urls', urls)
+    const requestBody = createDifyGraphRequestMulti(urls)
+
+    const graphRes = await createGraphApi(requestBody)
+
+    const graphJson = await fetch(graphRes.data)
+      .then((res) => res.json())
+      .catch((err) => {
+        console.error('下载或解析 JSON 失败', err)
+        return null
+      })
+
+    if (graphJson) {
+      console.log('解析后的图谱数据：', graphJson)
+      treeData.value = graphJson
+    }
+
+    const normalizeNode = (node: any): any => {
+      node.label = node.name || node.label || ''
+      node.children = Array.isArray(node.children) ? node.children.map(normalizeNode) : []
+      return node
+    }
+
+    treeData.value = [normalizeNode(graphJson)]
+
+    const classRes = await getClassesByIdApi(props.classId)
+    const relativePath = graphRes.data.replace(PREFIX, '')
+
+    classRes.data.graph = relativePath
+
+    const updateClass: ClassesUpdateDTO = {
+      id: classRes.data.id,
+      name: classRes.data.name,
+      teacherId: classRes.data.teacher.id,
+      credit: classRes.data.credit,
+      classHours: classRes.data.classHours,
+      graph: classRes.data.graph,
+      active: classRes.data.active,
+      description: classRes.data.description,
+      imageUrl: classRes.data.imageUrl
+    }
+
+    await updateClassApi(updateClass)
+    await initGraph()
+    ElMessage.success('知识图谱创建成功')
+  } catch (err) {
+    console.error('图谱生成失败', err)
+    ElMessage.error('图谱生成失败')
+  } finally {
+    loading.value = false
   }
-  await initGraph()
+}
+
+const deleteKnowledgeGraph = async () => {
+  if (!props.classId) {
+    console.warn('classId 不存在，跳过图谱删除')
+    return
+  }
+
+  try {
+    const classRes = await getClassesByIdApi(props.classId)
+
+    const updateClass: ClassesUpdateDTO = {
+      id: classRes.data.id,
+      name: classRes.data.name,
+      teacherId: classRes.data.teacher.id,
+      credit: classRes.data.credit,
+      classHours: classRes.data.classHours,
+      graph: '',
+      active: classRes.data.active,
+      description: classRes.data.description,
+      imageUrl: classRes.data.imageUrl
+    }
+
+    treeData.value = []
+
+    await updateClassApi(updateClass)
+    ElMessage.success('知识图谱删除成功')
+    await initGraph()
+  } catch (err) {
+    console.error('图谱删除失败', err)
+    ElMessage.error('图谱删除失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 const fetchGraphData = async () => {
   const res = await getClassesByIdApi(props.classId!)
-  const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
+  if (!res.data.graph) {
+    ElMessage.warning('该课程暂无图谱数据,请创建图谱')
+    return
+  }
 
+  const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
+  console.log('fullUrl', fullUrl)
   const graphJson = await fetch(fullUrl)
     .then((r) => r.json())
     .catch((err) => {
@@ -362,18 +457,14 @@ const fetchGraphData = async () => {
 
   const normalizeNode = (node: any): any => {
     node.label = node.name || node.label || ''
-    node.children = Array.isArray(node.children)
-      ? node.children.map(normalizeNode)
-      : []
+    node.children = Array.isArray(node.children) ? node.children.map(normalizeNode) : []
     return node
   }
 
   treeData.value = [normalizeNode(graphJson)]
-  
+
   initGraph()
 }
-
-
 
 const fetchFiles = async () => {
   const res = await getResourceByClassIdApi(props.classId!)

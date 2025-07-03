@@ -102,7 +102,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             title: t('teacher.dashboard'),
             userType: 'teacher',
             noCache: true,
-            affix: true,
+            affix: true
           }
         }
       ]
@@ -153,7 +153,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             title: t('teacher.courseList'),
             icon: 'ep:collection-tag',
             userType: 'teacher',
-            noCache: true,
+            noCache: true
           }
         },
         {

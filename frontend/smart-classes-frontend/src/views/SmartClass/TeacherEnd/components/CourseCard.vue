@@ -1,5 +1,4 @@
 <template>
-  
   <el-card
     class="course-card"
     shadow="hover"

@@ -1,7 +1,10 @@
+import { Classes } from "../classes/types"
+import { Student } from "../student/types"
+
 export type StudentClasses = {
   id: number
-  sid: number
-  cid: number
+  classes: Classes
+  student: Student
   grade: number
 }
 

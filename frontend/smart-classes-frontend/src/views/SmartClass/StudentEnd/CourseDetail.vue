@@ -331,12 +331,14 @@ const initGraph = async () => {
     const node = e.item
     if (!node) return
 
-    const model = node.getModel() 
-    const knowledgeName = model.label 
-    push({ path: '/course/knowledge', query: { classId: classId, knowledgeName: knowledgeName as string} })
+    const model = node.getModel()
+    const knowledgeName = model.label
+    push({
+      path: '/course/knowledge',
+      query: { classId: classId, knowledgeName: knowledgeName as string }
+    })
   })
 }
-
 
 const fetchGraphData = async () => {
   const res = await getClassesByIdApi(classId!)
@@ -357,14 +359,12 @@ const fetchGraphData = async () => {
 
   const normalizeNode = (node: any): any => {
     node.label = node.name || node.label || ''
-    node.children = Array.isArray(node.children)
-      ? node.children.map(normalizeNode)
-      : []
+    node.children = Array.isArray(node.children) ? node.children.map(normalizeNode) : []
     return node
   }
 
   treeData.value = [normalizeNode(graphJson)]
-  
+
   initGraph()
 }
 

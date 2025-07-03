@@ -39,7 +39,11 @@ setProps({
     { field: 'username', label: '用户名' },
     { field: 'name', label: '姓名' },
     { field: 'gender', label: '性别' },
-    { field: 'department', label: '所属院系', formatter: (_: any, __: any, value: any) => value?.name || value },
+    {
+      field: 'department',
+      label: '所属院系',
+      formatter: (_: any, __: any, value: any) => value?.name || value
+    },
     {
       field: 'action',
       label: '操作',
@@ -48,7 +52,13 @@ setProps({
         default: (data: TableSlotDefault) => {
           return (
             <>
-              <BaseButton type="primary" size="small" onClick={() => push({ path: '/admin/teacherManage/form', query: { id: data.row.id } })}>
+              <BaseButton
+                type="primary"
+                size="small"
+                onClick={() =>
+                  push({ path: '/admin/teacherManage/form', query: { id: data.row.id } })
+                }
+              >
                 编辑
               </BaseButton>
               <BaseButton type="danger" size="small" onClick={() => handleDelete(data.row)}>

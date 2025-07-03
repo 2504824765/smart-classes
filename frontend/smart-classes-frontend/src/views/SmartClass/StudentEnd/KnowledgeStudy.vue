@@ -12,9 +12,7 @@
           :key="res.id"
         >
           <VideoPlay v-if="res.type === 'video'" :url="res.url" />
-          <div v-else-if="res.type === 'text'" class="p-4 bg-white rounded shadow">
-            
-          </div>
+          <div v-else-if="res.type === 'text'" class="p-4 bg-white rounded shadow"> </div>
           <div v-else-if="res.type === 'question'" class="text-gray-400">
             <QuestionCard
               v-for="(q, index) in questions"
@@ -35,6 +33,20 @@
       <ChatGPT />
     </div>
   </div>
+
+  <el-dialog
+    v-model="loading"
+    title="题目生成中"
+    width="300px"
+    :close-on-click-modal="false"
+    :show-close="true"
+    @close="cancelRequest"
+  >
+    <p>正在生成题目，请稍候...</p>
+    <template #footer>
+      <el-button type="danger" @click="cancelRequest">取消生成</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -49,11 +61,13 @@ import type { Resource } from '@/api/resource/types'
 import { PREFIX } from '@/constants/index'
 import { createDifyGenerateQuestionRequest } from '@/api/dify/types'
 import { generateQuestionApi } from '@/api/dify'
+import { ElMessageBox, ElLoading } from 'element-plus'
 
+let controller: AbortController | null = null
 interface QuestionItem {
   question: string
-  options: Record<string, string>  
-  answer: string 
+  options: Record<string, string>
+  answer: string
 }
 
 const route = useRoute()
@@ -68,7 +82,7 @@ const answers = ref<(string | null)[]>([])
 const submitted = ref(false)
 
 watch(currentResourceId, async (newId) => {
-  const questionTabId = 'r3' 
+  const questionTabId = 'r3'
   if (newId === questionTabId && questions.value.length === 0) {
     loading.value = true
     try {
@@ -130,25 +144,52 @@ const fetchQuestions = async () => {
     console.warn('classId 不存在，跳过图谱加载')
     return
   }
-  const resourcesRes = await getResourceByClassIdApi(classId)
-  console.log('resourcesRes', resourcesRes)
-  const resources = resourcesRes.data
-  if (!resourcesRes) return
-  const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
-  console.log('urls', urls)
-  const requestBody = createDifyGenerateQuestionRequest(urls,knowledgeName,5)
-  console.log('requestBody', requestBody)
-  const urlRes = await generateQuestionApi(requestBody)
-  console.log('urlRes', urlRes)
-  const res = await fetch(urlRes.data)
-    .then(r => r.json())
-    .catch(err => {
-      console.error('下载题目 JSON 失败', err)
-      return []
-    })
-  console.log('res', res)
-  questions.value = res  
-  answers.value = Array(res.length).fill(null) 
+
+  loading.value = true
+  controller = new AbortController()
+
+  const loadingInstance = ElLoading.service({
+    lock: true,
+    text: '正在生成题目...',
+    background: 'rgba(0, 0, 0, 0.3)'
+  })
+
+  try {
+    const resourcesRes = await getResourceByClassIdApi(classId)
+    const resources = resourcesRes.data
+    const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
+
+    const requestBody = createDifyGenerateQuestionRequest(urls, knowledgeName, 5)
+
+    const urlRes = await generateQuestionApi(requestBody)
+
+    // fetch JSON 文件并处理格式
+    let rawText = await fetch(urlRes.data, { signal: controller.signal }).then((r) => r.text())
+
+    // 清理掉前缀 “```json”和结尾“```” —— 如果有
+    rawText = rawText.trim()
+    rawText = rawText.replace(/^```json/, '').replace(/```$/, '')
+    console.log('原始题目 JSON 文本：', rawText)
+    const res = JSON.parse(rawText)
+
+    questions.value = res
+    answers.value = Array(res.length).fill(null)
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      console.warn('题目请求被用户中止')
+    } else {
+      console.error('题目生成失败', err)
+    }
+  } finally {
+    loadingInstance.close()
+    loading.value = false
+  }
+}
+
+const cancelRequest = () => {
+  if (controller) {
+    controller.abort()
+  }
 }
 
 watch(currentResourceId, (newId) => {

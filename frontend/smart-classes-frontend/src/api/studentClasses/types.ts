@@ -8,7 +8,10 @@ export type StudentClasses = {
   grade: number
 }
 
-export type StudentClassesCreateDTO = Omit<StudentClasses, 'id'>
+export type StudentClassesCreateDTO = Omit<StudentClasses, 'id' | 'classes' | 'student'> & {
+  cid: number
+  sid: number
+}
 
 export type StudentClassesUpdateDTO = Partial<Omit<StudentClasses, 'id'>> & {
   id: number

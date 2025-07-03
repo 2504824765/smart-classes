@@ -40,12 +40,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useIcon } from '@/hooks/web/useIcon'
 import { ElButton } from 'element-plus'
+import { fetchDifyAnswerStream } from '@/api/dify/index'
+import { DifyChatRequest } from '@/api/dify/types'
 
 const userInput = ref('')
 const messages = ref<{ role: 'user' | 'ai'; content: string }[]>([])
+
+const props = defineProps<{
+  question: string
+}>()
+
+const conversationId = ref<string | null>(null)
+
+// 流式响应处理
+const fetchAnswer = async (question: string) => {
+  messages.value.push({ role: 'user', content: question })
+  const controller = new AbortController()
+  let aiContent = ''
+  messages.value.push({ role: 'ai', content: '' })
+
+  try {
+    const request: DifyChatRequest = {
+      inputs: {},
+      query: question,
+      response_mode: 'streaming',
+      user: 'test-user',
+      auto_generate_name: false,
+      files: [],
+      ...(conversationId.value && { conversation_id: conversationId.value })
+    }
+
+    await fetchDifyAnswerStream(request, (chunk) => {
+      if (chunk.event === 'message') {
+        if (chunk.conversation_id && !conversationId.value) {
+          conversationId.value = chunk.conversation_id
+        }
+        aiContent += chunk.answer || ''
+        messages.value[messages.value.length - 1].content = aiContent
+      }
+    }, controller.signal)
+  } catch (e) {
+    console.error('流式对话失败', e)
+  }
+}
+
+watch(() => props.question, (newQ) => {
+  if (newQ) fetchAnswer(newQ)
+})
 
 const quickActions = [
   { label: '路径推荐', text: '推荐学习路径', iconName: 'vi-ant-design:project-outlined' },
@@ -57,13 +101,11 @@ const quickActions = [
   }
 ]
 
-// ✅ 这里在 setup 顶部统一处理所有图标组件，避免响应式陷阱
 const quickActionsWithIcon = quickActions.map((item) => ({
   ...item,
   iconComponent: useIcon({ icon: item.iconName })
 }))
 
-// ✅ 单独定义发送按钮图标
 const sendIcon = useIcon({ icon: 'vi-ant-design:send-outlined' })
 
 const submitMessage = () => {

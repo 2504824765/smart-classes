@@ -368,6 +368,12 @@ const fetchGraphData = async () => {
   initGraph()
 }
 
+const questionToAsk = ref('')
+
+function sendToChatGPT() {
+  questionToAsk.value = '请介绍神经网络的基本结构'
+}
+
 // 页面挂载后初始化图谱
 onMounted(() => {
   registerCustomNode()
@@ -420,7 +426,7 @@ onMounted(() => {
 
       <!-- 右：ChatGPT -->
       <div class="col-span-3 h-[80vh]">
-        <ChatGPT />
+        <ChatGPT :question="questionToAsk"/>
       </div>
     </div>
   </div>

@@ -420,7 +420,6 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             title: t('admin.mission'),
             userType: 'admin',
             noCache: true,
-            affix: true
           },
           children: [
             {
@@ -431,7 +430,6 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
                 title: t('admin.createMission'),
                 userType: 'admin',
                 noCache: true,
-                affix: true,
                 hidden: true,
                 canTo: true
               }

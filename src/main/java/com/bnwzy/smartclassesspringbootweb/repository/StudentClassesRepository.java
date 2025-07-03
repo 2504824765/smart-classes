@@ -12,4 +12,6 @@ import java.util.List;
 public interface StudentClassesRepository extends JpaRepository<StudentClasses,Long> {
 
     List<StudentClasses> findByClasses(Classes classes);
+
+    void deleteByStudent_Id(Long studentId);
 }

@@ -38,8 +38,9 @@ export type Department = {
   departmentLevel: number
 }
 
-export type DepartmentCreateDTO = Omit<Department, 'id'>
+export type DepartmentCreateDTO = Omit<Department, 'id'> & { departmentLevel?: number }
 
 export type DepartmentUpdateDTO = Partial<Omit<Department, 'id'>> & {
   id: number
+  departmentLevel?: number
 }

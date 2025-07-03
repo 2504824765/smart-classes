@@ -22,4 +22,6 @@ public interface IStudentService {
     Boolean deleteStudent(Long id);
 
     Long getStudentCount();
+
+    List<Student> getStudentOfDept(Long deptId);
 }

@@ -12,9 +12,12 @@ const { push } = useRouter()
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: async () => {
     const res = await getAllTeacherApi()
+    const allData = res.data
+    const start = (tableState.currentPage.value - 1) * tableState.pageSize.value
+    const end = start + tableState.pageSize.value
     return {
-      list: res.data,
-      total: res.data.length
+      list: allData.slice(start, end),
+      total: allData.length
     }
   }
 })
@@ -39,7 +42,7 @@ setProps({
     { field: 'username', label: '用户名' },
     { field: 'name', label: '姓名' },
     { field: 'gender', label: '性别' },
-    { field: 'department', label: '所属院系', formatter: (_: any, __: any, value: any) => value?.name || value },
+    { field: 'dept', label: '所属院系' },
     {
       field: 'action',
       label: '操作',
@@ -48,7 +51,7 @@ setProps({
         default: (data: TableSlotDefault) => {
           return (
             <>
-              <BaseButton type="primary" size="small" onClick={() => push({ path: '/admin/teacherManage/form', query: { id: data.row.id } })}>
+              <BaseButton type="primary" size="small" onClick={() => console.log('编辑', data.row)}>
                 编辑
               </BaseButton>
               <BaseButton type="danger" size="small" onClick={() => handleDelete(data.row)}>

@@ -4,7 +4,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import { getTableListApi } from '@/api/table'
 import { TableData } from '@/api/table/types'
-import { ref, h, reactive } from 'vue'
+import { ref, h, reactive, computed } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
@@ -72,6 +72,16 @@ const columns: TableColumn[] = [
 
 const loading = ref(false)
 const tableDataList = ref<ClassMission[]>([])
+
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = computed(() => tableDataList.value.length)
+const pagedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return tableDataList.value.slice(start, end)
+})
 
 const getTableList = async () => {
   loading.value = true
@@ -154,9 +164,12 @@ const handleSubmit = async () => {
     </BaseButton>
     <Table
       :columns="columns"
-      :data="tableDataList"
+      :data="pagedData"
       :loading="loading"
       :defaultSort="{ prop: 'id', order: 'descending' }"
+      v-model:currentPage="currentPage"
+      v-model:pageSize="pageSize"
+      :pagination="{ total }"
     />
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑任务' : '创建任务'" width="500px">
       <el-form :model="formData" label-width="100px">

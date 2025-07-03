@@ -13,10 +13,12 @@ const { push } = useRouter()
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: async () => {
     const res = await getAllClassesApi()
-
+    const allData = res.data
+    const start = (tableState.currentPage.value - 1) * tableState.pageSize.value
+    const end = start + tableState.pageSize.value
     return {
-      list: res.data,
-      total: res.data.length
+      list: allData.slice(start, end),
+      total: allData.length
     }
   }
 })

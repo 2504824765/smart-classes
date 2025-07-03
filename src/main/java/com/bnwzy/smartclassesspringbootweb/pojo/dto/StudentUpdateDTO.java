@@ -8,14 +8,14 @@ public class StudentUpdateDTO {
     private String gender;
     private Long deptId;
     private Double gpa;
-    private StudentData studentData;
+    private Long studentDataId;
 
-    public StudentData getStudentData() {
-        return studentData;
+    public Long getStudentDataId() {
+        return studentDataId;
     }
 
-    public void setStudentData(StudentData studentData) {
-        this.studentData = studentData;
+    public void setStudentDataId(Long studentDataId) {
+        this.studentDataId = studentDataId;
     }
 
     public Long getId() {

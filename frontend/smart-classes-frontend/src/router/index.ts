@@ -420,7 +420,6 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
             title: t('admin.mission'),
             userType: 'admin',
             noCache: true,
-            affix: true
           },
           children: [
             {

@@ -43,7 +43,7 @@ export const addDepartmentApi = (data: DepartmentCreateDTO): Promise<IResponse<D
 
 // 删除组织
 export const deleteDepartmentApi = (id: number) => {
-  return request.delete({ url: `/api/dept/${id}` })
+  return request.delete({ url: `/api/dept/delete/${id}` })
 }
 
 // 更新组织

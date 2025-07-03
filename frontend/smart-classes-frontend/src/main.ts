@@ -1,6 +1,7 @@
 import 'vue/jsx'
 
 import ElementPlus from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 import 'element-plus/dist/index.css'
 
@@ -56,8 +57,8 @@ const setupAll = async () => {
 
   setupPermission(app)
 
+  app.use(ElementPlus, { locale: zhCn })
   app.mount('#app')
-  app.use(ElementPlus)
 }
 
 setupAll()

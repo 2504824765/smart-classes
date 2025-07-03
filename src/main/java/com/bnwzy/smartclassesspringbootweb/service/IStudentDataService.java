@@ -11,4 +11,5 @@ public interface IStudentDataService {
 
     StudentData updateStudentData(StudentDataUpdateDTO studentDataUpdateDTO);
 
+    StudentData getStudentDataById(Long id);
 }

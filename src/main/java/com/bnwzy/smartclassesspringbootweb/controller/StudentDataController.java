@@ -30,4 +30,9 @@ public class StudentDataController {
     public ResponseMessage updateStudentData(@Validated @RequestBody StudentDataUpdateDTO studentDataUpdateDTO) {
         return ResponseMessage.success("<Update studentData", studentDataService.updateStudentData(studentDataUpdateDTO));
     }
+
+    @GetMapping("/getStudentDataById/{id}")
+    public ResponseMessage getStudentDataById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get studentData>", studentDataService.getStudentDataById(id));
+    }
 }

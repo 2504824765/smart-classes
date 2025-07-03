@@ -46,4 +46,13 @@ public class StudentDataService implements IStudentDataService {
             return studentDataRepository.save(studentData);
         }
     }
+
+    @Override
+    public StudentData getStudentDataById(Long id) {
+        if (studentDataRepository.findById(id).isPresent()) {
+            return studentDataRepository.findById(id).get();
+        } else {
+            throw new StudentDataNotFoundException("<StudentData not found>");
+        }
+    }
 }

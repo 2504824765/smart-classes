@@ -22,6 +22,16 @@ public class StudentMission {
     private Boolean isDone;
     @Column(name = "is_actice")
     private Boolean isActive;
+    @Column(name = "report_url")
+    private String reportUrl;
+
+    public String getReportUrl() {
+        return reportUrl;
+    }
+
+    public void setReportUrl(String reportUrl) {
+        this.reportUrl = reportUrl;
+    }
 
     public ClassMission getClassMission() {
         return classMission;

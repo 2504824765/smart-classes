@@ -82,6 +82,7 @@ public class StudentMissionService implements IStudentMissionService {
                     studentMission.setScore(studentMissionUpdateDTO.getScore());
                     studentMission.setDone(studentMissionUpdateDTO.getDone());
                     studentMission.setActive(studentMissionUpdateDTO.getActive());
+                    studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());
                     return studentMissionRepository.save(studentMission);
                 }
             }

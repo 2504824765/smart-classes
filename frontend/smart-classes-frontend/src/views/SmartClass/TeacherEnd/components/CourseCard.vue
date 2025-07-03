@@ -65,7 +65,11 @@ const goToCourseDetail = () => {
 }
 .course-card.is-disabled {
   opacity: 0.6;
-  pointer-events: none; /* 不可点击 */
   cursor: not-allowed;
+}
+
+/* 单独阻止点击行为（不影响拖动） */
+.course-card.is-disabled * {
+  pointer-events: none;
 }
 </style>

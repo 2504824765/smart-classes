@@ -94,4 +94,13 @@ public class ResourceService implements IResourceService {
         });
         return  resourceList;
     }
+
+    @Override
+    public List<Resource> getResourceByClassId(Long classId) {
+        if (classesRepository.findById(classId).isEmpty()) {
+            throw new ClassesNotFoundException("<Class not found>");
+        } else {
+            return resourceRepository.findByClasses(classesRepository.findById(classId).get());
+        }
+    }
 }

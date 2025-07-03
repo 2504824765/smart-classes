@@ -1,46 +1,76 @@
 <template>
-  <div class="student-grade-container">
-    <el-row justify="center">
-      <el-col :xs="24" :sm="20" :md="18" :lg="16" :xl="14">
-        <el-card>
-          <h2>学生成绩查看</h2>
-          <p>学生姓名: {{ student.name }}（ID: {{ student.id }}）</p>
+  <ContentWrap>
+    <el-card shadow="hover" class="grade-card">
+      <h2 class="title">学生成绩查看</h2>
+      <p class="student-info">
+        学生姓名: {{ student.name }}（ID: {{ student.id }}）
+      </p>
 
-          <el-table :data="grades" stripe border style="width: 100%; margin-top: 20px">
-            <el-table-column prop="name" label="课程名称" />
-            <el-table-column prop="credit" label="学分" />
-            <el-table-column prop="class_hours" label="学时" />
-            <el-table-column prop="grade" label="成绩" />
-          </el-table>
+      <el-table
+        :data="grades"
+        stripe
+        border
+        class="grade-table"
+      >
+        <el-table-column prop="name" label="课程名称" min-width="240" align="center" />
+        <el-table-column prop="credit" label="学分" width="100" align="center" />
+        <el-table-column prop="class_hours" label="学时" width="100" align="center" />
+        <el-table-column prop="grade" label="成绩" width="100" align="center" />
+      </el-table>
 
-          <div style="margin-top: 20px; font-weight: bold">
-            综合绩点 GPA: {{ gpa.toFixed(2) }}
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-  </div>
+      <div class="gpa-info">
+        综合绩点 GPA: <span class="gpa-value">{{ gpa.toFixed(2) }}</span>
+      </div>
+    </el-card>
+  </ContentWrap>
 </template>
 
-<script setup>
-import axios from 'axios'
+
+<script setup lang="ts">
+
 import { ref, computed, onMounted } from 'vue'
+import { useUserStore } from '@/store/modules/user'
+import { getStudentByUsernameApi, getStudentByIdApi } from '@/api/student/index'
+import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 
-// 登录后从localStorage拿studentId
-const studentId = Number(localStorage.getItem('studentId') || 0)
 
+const studentId = ref<number | null>(null)
+
+const getStudentId = async (username: string) => {
+  const res = await getStudentByUsernameApi(username)
+  studentId.value = res.data.id
+  console.log(studentId.value)
+}
+
+const userStore = useUserStore()
+const loginInfo = userStore.getLoginInfo
+const initialize = async () => {
+  if (loginInfo && loginInfo.username) {
+    await getStudentId(loginInfo.username)
+
+    if (studentId.value) {
+      student.value.id = studentId.value
+
+      await fetchStudentInfo()
+      await fetchStudentGrades()
+    } else {
+      console.error('未能获取 studentId')
+    }
+  }
+}
+
+const studentName = ref<string | null>(null)
 const student = ref({
   id: studentId,
-  name: ''
+  name: studentName
 })
-
 const grades = ref([])
 
 // 获取学生姓名
 const fetchStudentInfo = async () => {
   try {
-    const res = await axios.get(`/api/student/getStudentById/${student.value.id}`)
-    student.value.name = res.data.name
+    const res = await getStudentByIdApi(student.value.id)
+    studentName.value = res.data.name
   } catch (error) {
     console.error('获取学生信息失败:', error)
   }
@@ -49,52 +79,99 @@ const fetchStudentInfo = async () => {
 // 获取学生的选课记录
 const fetchStudentGrades = async () => {
   try {
-    const res = await axios.get(`/api/scAssociated/getAssociatedBySid/${student.value.id}`)
-    const associatedList = res.data.data
+    const res = await getAssociatedBySidApi(student.value.id)
+    console.log('获取到的 res：', res)
+    const associatedList = Array.isArray(res.data) ? res.data: []
+    console.log('提取到的 associatedList：', associatedList)
 
-    // 对每个课程ID，请求classes信息
-    const classRequests = associatedList.map(async (item) => {
-      const classRes = await axios.get(`/api/class/getClassById/${item.cid}`)
-      const classData = classRes.data
+    if (associatedList.length === 0) {
+      console.warn('该学生没有选课记录')
+      grades.value = []
+      return
+    }
+
+    grades.value = associatedList.map((item: any) => {
+      const classData = item.classes
       return {
-        name: classData.name,
-        credit: classData.credit,
-        class_hours: classData.classHours,
-        grade: item.grade
+        name: classData?.name || '未知课程',
+        credit: Number(classData?.credit || 0),
+        class_hours: Number(classData?.classHours || 0),
+        grade: Number(item.grade || 0)
       }
     })
 
-    // 等待所有课程信息加载完成
-    grades.value = await Promise.all(classRequests)
+    console.log('成绩数据：', grades.value)
+
   } catch (error) {
     console.error('获取选课或课程信息失败:', error)
   }
 }
 
+
 // GPA
 const gpa = computed(() => {
   if (grades.value.length === 0) return 0
+
   const total = grades.value.reduce(
     (acc, cur) => {
-      acc.totalGrade += cur.grade * cur.credit
+      const gradePoint = Math.max((cur.grade - 50) / 10, 0) // 按照你的规则换算 GPA
+      acc.totalGpa += gradePoint * cur.credit
       acc.totalCredit += cur.credit
       return acc
     },
-    { totalGrade: 0, totalCredit: 0 }
+    { totalGpa: 0, totalCredit: 0 }
   )
-  return total.totalCredit > 0 ? total.totalGrade / total.totalCredit : 0
+
+  return total.totalCredit > 0 ? total.totalGpa / total.totalCredit : 0
 })
 
+
 onMounted(async () => {
-  await fetchStudentInfo()
-  await fetchStudentGrades()
+  await initialize()
+    console.log('成绩数据：', grades.value)
 })
 </script>
 
+
+
 <style scoped>
-.student-grade-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+.grade-card {
+  background: #fff;
+  border: 1px solid #e4e7ed;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 30px;
 }
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.student-info {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #666;
+}
+
+.grade-table {
+  margin-top: 20px;
+}
+
+.gpa-info {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+}
+
+.gpa-value {
+  color: #409eff;
+  margin-left: 8px;
+}
+
+
 </style>

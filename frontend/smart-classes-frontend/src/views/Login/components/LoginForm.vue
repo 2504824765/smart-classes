@@ -177,12 +177,6 @@ const signIn = async () => {
       try {
         const res = await loginApi(formData)
         if (res.data === true) {
-          // 取用户名
-          const infoRes = await axios.get(`/api/student/getStudentByUsername/${formData.username}`)
-          const student = infoRes.data
-
-          localStorage.setItem('studentId', student.id)
-          localStorage.setItem('studentName', student.name)
 
           ElMessage.success('登录成功')
           const user = await getUserInfoApi(formData.username)

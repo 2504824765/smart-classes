@@ -21,9 +21,10 @@ import type { StudentMission } from '@/api/studentMission/types' // 根据路径
 const props = defineProps<{
   homework: StudentMission
 }>()
-console.log(props.homework)
 
-defineEmits(['view-detail'])
+defineEmits<{
+  (e: 'view-detail', homework: StudentMission): void
+}>()
 </script>
 
 <style scoped>

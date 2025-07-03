@@ -1,11 +1,19 @@
 <template>
   <div class="homework-list">
     <el-page-header content="作业列表" @back="router.back" />
-    <el-row>
-      <el-col :span="6" v-for="hw in homeworks" :key="hw.id">
-        <HomeworkCard :homework="hw" @view-detail="goToDetail(hw)" />
-      </el-col>
-    </el-row>
+
+    <draggable
+      v-model="homeworks"
+      item-key="id"
+      class="grid"
+      animation="200"
+    >
+      <template #item="{ element }">
+        <el-col :span="6">
+          <HomeworkCard :homework="element" @view-detail="goToDetail" />
+        </el-col>
+      </template>
+    </draggable>
   </div>
 </template>
 
@@ -13,10 +21,11 @@
 import HomeworkCard from './components/HomeworkCard.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import type { StudentMission } from '@/api/studentMission/types' // 根据你项目中的路径调整
-import { getStudentMissionByClass } from '@/api/studentMission/index' // TODO: 接口名你来补全
+import type { StudentMission } from '@/api/studentMission/types' 
+import { getStudentMissionByClass } from '@/api/studentMission/index' 
 import { useUserStore } from '@/store/modules/user'
 import { getStudentByUsernameApi } from '@/api/student/index'
+import draggable from 'vuedraggable'
 
 const router = useRouter()
 const route = useRoute()
@@ -52,7 +61,7 @@ onMounted(async () => {
 function goToDetail(hw: StudentMission) {
   router.push({
     name: 'HomeworkDetail',
-    query: { missionId: hw.classMission.id }
+    query: { missionId: hw.classMission.id, studentMissionId: hw.id}
   })
 }
 </script>
@@ -60,5 +69,16 @@ function goToDetail(hw: StudentMission) {
 <style scoped>
 .homework-list {
   padding: 20px;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.grid > .el-col {
+  flex: 0 0 25%; /* 等价于 span=6 */
+  max-width: 25%;
 }
 </style>

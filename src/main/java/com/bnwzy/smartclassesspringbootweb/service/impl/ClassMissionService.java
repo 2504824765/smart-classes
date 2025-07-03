@@ -77,4 +77,13 @@ public class ClassMissionService implements IClassMissionService {
     public List<ClassMission> getCLassMissionByCid(Long cid) {
         return classMissionRepository.findByClasses_Id(cid);
     }
+
+    @Override
+    public ClassMission getClassMissionById(Long id) {
+        if (classMissionRepository.findById(id).isEmpty()) {
+            throw new ClassMissionNotFoundException("<Class mission not found>");
+        } else {
+            return classMissionRepository.findById(id).get();
+        }
+    }
 }

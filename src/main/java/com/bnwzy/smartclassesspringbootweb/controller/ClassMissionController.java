@@ -39,4 +39,9 @@ public class ClassMissionController {
     public ResponseMessage getClassMissionByCid(@PathVariable("cid") Long cid) {
         return ResponseMessage.success("<Get class mission>", classMissionService.getCLassMissionByCid(cid));
     }
+
+    @GetMapping("getClassMissionById/{id}")
+    public ResponseMessage getClassMissionById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get class mission>", classMissionService.getClassMissionById(id));
+    }
 }

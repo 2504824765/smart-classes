@@ -2,11 +2,11 @@
   <div class="chat-wrapper">
     <!-- 聊天内容区域 -->
     <div class="chat-body">
-      <div v-for="(msg, index) in messages" :key="index" class="chat-message" :class="msg.role">
+      <div v-for="(msg, index) in messages" :key="index" class="chat-message"  :class="msg.role">
         <div class="message-bubble">
-          <span v-if="msg.role === 'user'" class="name">你：</span>
-          <span v-else class="name">AI：</span>
-          <div class="content">{{ msg.content }}</div>
+          <span v-if="msg.role === 'user'" class="name"></span>
+          <span v-else class="name"></span>
+          <div class="content" v-html="renderMarkdown(msg.content)"></div>
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
       <ElButton
         v-for="item in quickActionsWithIcon"
         :key="item.label"
-        @click="askAI(item.text)"
+        @click="submitMessage"
         size="small"
         round
         class="quick-button"
@@ -33,8 +33,9 @@
         :autosize="{ minRows: 1, maxRows: 4 }"
         class="chat-textarea"
         @keyup.enter.exact="submitMessage"
+        :disabled="generating"
       />
-      <ElButton type="primary" class="send-button" @click="submitMessage" :icon="sendIcon" circle />
+      <ElButton type="primary" :disabled="generating" class="send-button" @click="submitMessage" :icon="sendIcon" circle />
     </div>
   </div>
 </template>
@@ -45,14 +46,16 @@ import { useIcon } from '@/hooks/web/useIcon'
 import { ElButton } from 'element-plus'
 import { fetchDifyAnswerStream } from '@/api/dify/index'
 import { DifyChatRequest } from '@/api/dify/types'
+import MarkdownIt from 'markdown-it'
 
+const md = new MarkdownIt()
+
+const renderMarkdown = (text: string) => {
+  return md.render(text)
+}
 const userInput = ref('')
 const messages = ref<{ role: 'user' | 'ai'; content: string }[]>([])
-
-const props = defineProps<{
-  question: string
-}>()
-
+const generating = ref(false)
 const conversationId = ref<string | null>(null)
 
 // 流式响应处理
@@ -61,7 +64,7 @@ const fetchAnswer = async (question: string) => {
   const controller = new AbortController()
   let aiContent = ''
   messages.value.push({ role: 'ai', content: '' })
-
+  generating.value = true
   try {
     const request: DifyChatRequest = {
       inputs: {},
@@ -72,24 +75,26 @@ const fetchAnswer = async (question: string) => {
       files: [],
       ...(conversationId.value && { conversation_id: conversationId.value })
     }
-
+    console.log('[fetchAnswer] request body:', request)
     await fetchDifyAnswerStream(request, (chunk) => {
+      console.log('[stream chunk received]:', chunk)
       if (chunk.event === 'message') {
         if (chunk.conversation_id && !conversationId.value) {
           conversationId.value = chunk.conversation_id
+                console.log('[conversationId set to]:', conversationId.value)
         }
         aiContent += chunk.answer || ''
+            console.log('[AI message building up]:', aiContent)
         messages.value[messages.value.length - 1].content = aiContent
-      }
+      } 
     }, controller.signal)
   } catch (e) {
     console.error('流式对话失败', e)
+  }finally {
+    generating.value = false
   }
+  console.log('[messages list after AI reply]:', JSON.stringify(messages.value, null, 2))
 }
-
-watch(() => props.question, (newQ) => {
-  if (newQ) fetchAnswer(newQ)
-})
 
 const quickActions = [
   { label: '路径推荐', text: '推荐学习路径', iconName: 'vi-ant-design:project-outlined' },
@@ -110,15 +115,12 @@ const sendIcon = useIcon({ icon: 'vi-ant-design:send-outlined' })
 
 const submitMessage = () => {
   const question = userInput.value.trim()
+  console.log(question)
   if (!question) return
-
-  messages.value.push({ role: 'user', content: question })
+  fetchAnswer(question)
   userInput.value = ''
 }
 
-const askAI = (question: string) => {
-  userInput.value = question
-}
 </script>
 
 <style scoped>
@@ -174,6 +176,7 @@ const askAI = (question: string) => {
   white-space: pre-wrap;
   word-break: break-word;
   margin-top: 4px;
+  margin-left: 4px;
 }
 
 /* 快捷按钮样式 */

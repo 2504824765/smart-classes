@@ -30,7 +30,7 @@
     </div>
 
     <div class="right-panel flex flex-col">
-      <ChatGPT :question="questionToAsk"/>
+      <ChatGPT />
     </div>
   </div>
 
@@ -163,7 +163,8 @@ const fetchQuestions = async () => {
   try {
     const resourcesRes = await getResourceByClassIdApi(classId)
     const resources = resourcesRes.data
-    const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
+    const limitedResources = resources.slice(0, 8)
+    const urls = limitedResources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
 
     const requestBody = createDifyGenerateQuestionRequest(urls, knowledgeName, 5)
 

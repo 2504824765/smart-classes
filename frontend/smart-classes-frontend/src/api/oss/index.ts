@@ -8,7 +8,7 @@ import request from '@/axios'
 export const uploadResourcesApi = (
   file: File,
   message: string
-): Promise<IResponse<{ url: string }>> => {
+): Promise<IResponse<string>> => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('message', message)

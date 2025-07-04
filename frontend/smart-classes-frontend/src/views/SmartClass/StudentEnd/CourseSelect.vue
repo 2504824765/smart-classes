@@ -1,87 +1,106 @@
-    <script setup lang="ts">
-    import { ref, computed, onMounted } from 'vue'
-    import { ContentWrap } from '@/components/ContentWrap'
-    import { useI18n } from '@/hooks/web/useI18n'
-    import { Table } from '@/components/Table'
-    import { getAllClassesApi } from '@/api/classes/index'
-    import { addClassRecordApi } from '@/api/studentClasses/index'
-    import { getStudentByUsernameApi } from '@/api/student/index'
-    import { ElMessage, ElLink, ElTag, ElDivider, ElInput, ElSwitch } from 'element-plus'
-    import type { Classes } from '@/api/classes/types'
-    import type { StudentClassesCreateDTO} from '@/api/studentClasses/types'
-    import { useUserStore } from '@/store/modules/user'
-    const { t } = useI18n()
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { ContentWrap } from '@/components/ContentWrap'
+import { useI18n } from '@/hooks/web/useI18n'
+import { Table } from '@/components/Table'
+import { getAllClassesApi } from '@/api/classes/index'
+import { addClassRecordApi } from '@/api/studentClasses/index'
+import { getStudentByUsernameApi } from '@/api/student/index'
+import { ElMessage, ElLink, ElTag, ElDivider, ElInput, ElSwitch } from 'element-plus'
+import type { Classes } from '@/api/classes/types'
+import type { StudentClassesCreateDTO} from '@/api/studentClasses/types'
+import { useUserStore } from '@/store/modules/user'
+import { getAssociatedBySidApi } from '@/api/studentClasses/index'
+const { t } = useI18n()
 
-    const studentId = ref<number | null>(null)
-    const getStudentId = async (username: string) => {
+const studentId = ref<number | null>(null)
+const getStudentId = async (username: string) => {
     const res = await getStudentByUsernameApi(username)
     studentId.value = res.data.id
-    }
+}
 
-    const userStore = useUserStore()
-    const loginInfo = userStore.getLoginInfo
-    const initialize = async () => {
+const userStore = useUserStore()
+const loginInfo = userStore.getLoginInfo
+const initialize = async () => {
     if (loginInfo) {
         const username = loginInfo.username
         await getStudentId(username)
     }
-    }
+}
 
-    const loading = ref(true)
-    const classList = ref<Classes[]>([])
-    const searchKeyword = ref('')
-    const onlyShowActive = ref(false)
+const loading = ref(true)
+const classList = ref<Classes[]>([])
+const searchKeyword = ref('')
+const onlyShowActive = ref(false)
 
-    const getClassList = async () => {
-    loading.value = true
-    try {
-        const res = await getAllClassesApi()
-        console.log(res)
-        classList.value = res.data
-        console.log(classList)
-    } finally {
-        loading.value = false
-    }
-    }
+const selectedCids = ref<number[]>([]) // 学生已选课程 id 列表
 
-    const filteredList = computed(() => {
-    return classList.value
-        .filter((cls): cls is Classes => !!cls && typeof cls.active !== 'undefined') // 类型守卫
-        .filter((cls) => {
-        const matchKeyword = cls.name.includes(searchKeyword.value)
-        const matchActive = onlyShowActive.value ? cls.active : true
-        return matchKeyword && matchActive
-        })
+// 获取学生已选课程 id
+const fetchSelectedCids = async () => {
+  if (!studentId.value) return
+  const associatedRes = await getAssociatedBySidApi(studentId.value)
+  if (associatedRes.data) {
+    selectedCids.value = associatedRes.data.map((item) => item.classes.id)
+  }
+}
+
+// 获取所有课程，并排除已选课程
+const getClassList = async () => {
+  loading.value = true
+  try {
+    await fetchSelectedCids() // 先获取已选课程 id
+    const res = await getAllClassesApi()
+    const allClasses: Classes[] = res.data || []
+    // 排除已选课程
+    classList.value = allClasses.filter(
+      (cls) => !selectedCids.value.includes(cls.id)
+    )
+  } catch (e) {
+    ElMessage.error('获取课程失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 最终展示的课程：未选过 + 搜索匹配 + 状态匹配
+const filteredList = computed(() => {
+  return classList.value
+    .filter((cls): cls is Classes => !!cls && typeof cls.active !== 'undefined')
+    .filter((cls) => {
+      const matchKeyword = cls.name.includes(searchKeyword.value)
+      const matchActive = onlyShowActive.value ? cls.active : true
+      return matchKeyword && matchActive
     })
+})
 
-    const handleSelect = async (cls: Classes) => {
-    if (!cls.active) {
-        ElMessage.warning('该课程尚未开放')
-        return
-    }
-    if(!studentId.value) {
-        return
-    }
-    const dto: StudentClassesCreateDTO = {
-        cid: cls.id,
-        sid: studentId.value,
-        grade: 0 // 初始成绩为0
-    }
-    try {
-        await addClassRecordApi(dto)
-        ElMessage.success('选课成功')
-    } catch (e) {
-        ElMessage.error('选课失败，可能已选该课程')
-    }
-    }
+// 点击选课
+const handleSelect = async (cls: Classes) => {
+  if (!cls.active) {
+    ElMessage.warning('该课程尚未开放')
+    return
+  }
+  if (!studentId.value) return
+  const dto: StudentClassesCreateDTO = {
+    cid: cls.id,
+    sid: studentId.value,
+    grade: 0
+  }
+  try {
+    await addClassRecordApi(dto)
+    ElMessage.success('选课成功')
+    await getClassList() // 重新加载列表，更新状态
+  } catch (e) {
+    ElMessage.error('选课失败，可能已选该课程')
+  }
+}
 
-    onMounted(async() => {
-    await initialize()
-    await getClassList()
-    })
-    </script>
+onMounted(async () => {
+  await initialize()
+  await getClassList()
+})
+</script>
 
-    <template>
+<template>
     <ContentWrap title="课程选择">
         <div class="flex items-center mb-4 gap-4">
             <ElInput v-model="searchKeyword" placeholder="搜索课程名" clearable />
@@ -109,7 +128,7 @@
                 />
                 <div class="flex flex-col">
                     <div class="title">{{ cls.name }}</div>
-                    <div class="teacher">教师：{{ cls.teacher.name }}</div>
+                    <div class="teacher">教师：{{ cls.teacher?.name ?? '无' }}</div>
                     <div class="desc">{{ cls.description }}</div>
                 </div>
             </div>

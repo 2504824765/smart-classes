@@ -24,7 +24,7 @@ export async function fetchDifyAnswerStream(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer app-en9wHAJwHtXbetwFIp5G5aSK` // TODO: 替换为真实 key
+      Authorization: `Bearer app-en9wHAJwHtXbetwFIp5G5aSK`
     },
     body: JSON.stringify(body),
     signal
@@ -41,21 +41,27 @@ export async function fetchDifyAnswerStream(
     if (done) break
     buffer += decoder.decode(value, { stream: true })
 
-    const parts = buffer.split('\n')
-    for (let i = 0; i < parts.length - 1; i++) {
-      const line = parts[i].trim()
-      if (line.startsWith('{')) {
+    const lines = buffer.split('\n').filter(line => line.trim())
+    for (const line of lines) {
+      if (line.trim() === 'data: [DONE]') {
+        return
+      }
+
+      if (line.startsWith('data:')) {
+        const jsonStr = line.replace(/^data:\s*/, '')
         try {
-          const json = JSON.parse(line)
-          onMessage(json)
+          const data = JSON.parse(jsonStr)
+          onMessage(data)
         } catch (err) {
-          console.warn('JSON parse error:', err, line)
+          console.warn('JSON parse error:', err, jsonStr)
         }
       }
     }
-    buffer = parts[parts.length - 1]
+
+    buffer = ''
   }
 }
+
 
 
 export const createGraphApi = (data: DifyGraphRequest): Promise<IResponse<string>> => {

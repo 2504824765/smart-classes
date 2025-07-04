@@ -218,7 +218,7 @@ const handleSubmit = async () => {
 
         for (const resource of pendingResources.value) {
           const uploadRes = await uploadResourcesApi(resource.file, '课程资料')
-          const filePath = uploadRes.data.url
+          const filePath = uploadRes.data
 
           uploadedResources.push({
             name: resource.name,

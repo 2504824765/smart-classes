@@ -343,13 +343,6 @@ const fetchFiles = async () => {
   }))
 }
 
-
-const questionToAsk = ref('')
-
-function sendToChatGPT() {
-  questionToAsk.value = '请介绍神经网络的基本结构'
-}
-
 // 页面挂载后初始化图谱
 onMounted(() => {
   registerCustomNode()
@@ -383,10 +376,12 @@ onMounted(() => {
           <!-- 图谱 tab -->
           <el-tab-pane label="图谱" name="graph">
             <div
+              v-if ="treeData.length > 0"
               ref="graphContainer"
               class="w-full h-[calc(80vh-120px)]"
               style="min-height: 500px"
             ></div>
+            <el-empty v-else description="暂无图谱数据" />
           </el-tab-pane>
 
           <!-- 资源 tab -->
@@ -403,7 +398,7 @@ onMounted(() => {
 
       <!-- 右：ChatGPT -->
       <div class="col-span-3 h-[80vh]">
-        <ChatGPT :question="questionToAsk"/>
+        <ChatGPT />
       </div>
     </div>
   </div>

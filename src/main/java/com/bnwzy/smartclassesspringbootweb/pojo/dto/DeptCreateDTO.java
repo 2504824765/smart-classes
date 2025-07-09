@@ -6,5 +6,4 @@ import lombok.Data;
 public class DeptCreateDTO {
     private String name;
     private Long parentId;
-    private Integer departmentLevel;
 }

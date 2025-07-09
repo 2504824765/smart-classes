@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(DepartmentHasChildrenException.class)
+    public ResponseMessage DepartmentHasChildren(DepartmentHasChildrenException e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(513, "<该部门有子部门，不能直接删除！>", null);
+    }
     @ExceptionHandler(FileIsNullException.class)
     public ResponseMessage FileIsNullException(FileIsNullException e) {
         logger.error(e.getMessage());

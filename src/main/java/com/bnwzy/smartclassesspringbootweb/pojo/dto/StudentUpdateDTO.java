@@ -1,11 +1,22 @@
 package com.bnwzy.smartclassesspringbootweb.pojo.dto;
 
+import com.bnwzy.smartclassesspringbootweb.pojo.StudentData;
+
 public class StudentUpdateDTO {
     private Long id;
     private String name;
     private String gender;
     private Long deptId;
     private Double gpa;
+    private Long studentDataId;
+
+    public Long getStudentDataId() {
+        return studentDataId;
+    }
+
+    public void setStudentDataId(Long studentDataId) {
+        this.studentDataId = studentDataId;
+    }
 
     public Long getId() {
         return id;

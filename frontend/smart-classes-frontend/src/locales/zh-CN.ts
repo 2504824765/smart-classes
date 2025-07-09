@@ -596,7 +596,9 @@ export default {
     study: '学习',
     videoWatch: '视频观看',
     homework: '作业',
+    data: '成绩评估',
     grades: '成绩查看',
+    assessment: '能力评估',
     homeworkList: '作业清单',
     homeworkDetail: '作业详情'
   },

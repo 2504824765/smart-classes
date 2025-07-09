@@ -8,13 +8,24 @@ import { useForm } from '@/hooks/web/useForm'
 import { createTeacherApi, updateTeacherApi, getTeacherByIdApi } from '@/api/teacher/index'
 import { getAllDeptApi } from '@/api/department/index'
 import type { TeacherCreateDTO, TeacherUpdateDTO } from '@/api/teacher/types'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 const isEdit = ref(false)
 const teacherId = ref<number | null>(null)
-const deptOptions = ref<{ label: string; value: number }[]>([])
+const deptTreeOptions = ref<any[]>([])
+
+// 平铺转树
+function listToTree(list: any[], parentId = 0) {
+  return list
+    .filter(item => item.parentId === parentId)
+    .map(item => ({
+      label: item.name,
+      value: item.id,
+      children: listToTree(list, item.id)
+    }))
+}
 
 const teacherFormSchema = reactive<FormSchema[]>([
   {
@@ -23,6 +34,9 @@ const teacherFormSchema = reactive<FormSchema[]>([
     component: 'Input',
     formItemProps: {
       required: true
+    },
+    componentProps: {
+      disabled: isEdit
     }
   },
   {
@@ -50,9 +64,12 @@ const teacherFormSchema = reactive<FormSchema[]>([
   {
     field: 'departmentId',
     label: '所属院系',
-    component: 'Select',
+    component: 'Cascader',
     componentProps: {
-      options: deptOptions
+      options: deptTreeOptions,
+      props: { checkStrictly: true, emitPath: false },
+      clearable: true,
+      placeholder: '请选择院系'
     },
     formItemProps: {
       required: true
@@ -65,7 +82,7 @@ const { getElFormExpose, getFormData, setValues } = formMethods
 
 const loadDepartments = async () => {
   const res = await getAllDeptApi()
-  deptOptions.value = res.data.map((d: any) => ({ label: d.name, value: d.id }))
+  deptTreeOptions.value = listToTree(res.data)
 }
 
 const loadTeacher = async (id: number) => {
@@ -75,7 +92,7 @@ const loadTeacher = async (id: number) => {
     username: teacher.username,
     name: teacher.name,
     gender: teacher.gender,
-    departmentId: teacher.dept?.id
+    departmentId: (teacher as any).department?.id
   })
 }
 
@@ -89,7 +106,6 @@ onMounted(async () => {
   } else {
     isEdit.value = false
     teacherId.value = null
-    // 新增模式，什么都不做
   }
 })
 
@@ -102,11 +118,10 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写教师信息')
       return
     }
-    let formData = await getFormData<TeacherCreateDTO & { departmentId: number }>()
-    // 新增时去除 id 字段，避免后端addTeacher因id为null报错
-    if (!isEdit.value) {
-      const { id, ...rest } = formData as any
-      formData = rest
+    let formData = await getFormData<TeacherCreateDTO & { departmentId: number | number[] }>()
+    // 取多级选择的最后一级id
+    if (Array.isArray(formData.departmentId)) {
+      formData.departmentId = formData.departmentId[formData.departmentId.length - 1]
     }
     try {
       if (isEdit.value) {
@@ -114,11 +129,12 @@ const handleSubmit = async () => {
           ElMessage.error('教师ID缺失，无法编辑')
           return
         }
-        await updateTeacherApi({ ...formData, id: teacherId.value })
+        await updateTeacherApi({ ...formData, id: teacherId.value } as TeacherUpdateDTO)
         ElMessage.success('教师信息更新成功')
       } else {
-        await createTeacherApi(formData)
-        ElMessage.success('教师添加成功')
+      await createTeacherApi(formData)
+      ElMessage.success('教师添加成功')
+      elForm.resetFields()
       }
       router.push({ path: '/admin/teacherManage' })
     } catch (err) {
@@ -131,11 +147,7 @@ const handleSubmit = async () => {
 <template>
   <ContentWrap :title="isEdit ? '编辑教师' : '新增教师'">
     <Form :schema="teacherFormSchema" @register="formRegister" />
-    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">提交</BaseButton>
-    <BaseButton
-      style="margin-top: 16px; margin-left: 8px"
-      @click="() => router.push({ path: '/admin/teacherManage' })"
-      >返回</BaseButton
-    >
+    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">{{ isEdit ? '保存' : '提交' }}</BaseButton>
+    <BaseButton style="margin-top: 16px; margin-left: 8px" @click="() => router.push({ path: '/admin/teacherManage' })">返回</BaseButton>
   </ContentWrap>
 </template>

@@ -34,6 +34,13 @@ import { getStudentByUsernameApi, getStudentByIdApi } from '@/api/student/index'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 
 
+interface GradeItem {
+  name: string
+  credit: number
+  class_hours: number
+  grade: number
+}
+
 const studentId = ref<number | null>(null)
 
 const getStudentId = async (username: string) => {
@@ -64,11 +71,12 @@ const student = ref({
   id: studentId,
   name: studentName
 })
-const grades = ref[]([])
+const grades = ref<GradeItem[]>([])
 
 // 获取学生姓名
 const fetchStudentInfo = async () => {
-  if(!student.value.id) {
+  if (!student.value.id) {
+    console.error('学生ID为空')
     return
   }
   try {
@@ -81,14 +89,15 @@ const fetchStudentInfo = async () => {
 
 // 获取学生的选课记录
 const fetchStudentGrades = async () => {
-  if(!student.value.id || grades.value) {
+    if (!student.value.id) {
+    console.error('学生ID为空')
     return
   }
   try {
     const res = await getAssociatedBySidApi(student.value.id)
-    console.log('获取到的 res：', res)
+    // console.log('获取到的 res：', res)
     const associatedList = Array.isArray(res.data) ? res.data: []
-    console.log('提取到的 associatedList：', associatedList)
+    // console.log('提取到的 associatedList：', associatedList)
 
     if (associatedList.length === 0) {
       console.warn('该学生没有选课记录')
@@ -96,15 +105,17 @@ const fetchStudentGrades = async () => {
       return
     }
 
-    grades.value = associatedList.map((item: any) => {
-      const classData = item.classes
-      return {
-        name: classData?.name || '未知课程',
-        credit: Number(classData?.credit || 0),
-        class_hours: Number(classData?.classHours || 0),
-        grade: Number(item.grade || 0)
-      }
-    })
+    grades.value = associatedList
+      .filter((item: any) => item.grade !== null && item.grade !== undefined && item.grade !== '' && !isNaN(Number(item.grade)))
+      .map((item: any) => {
+        const classData = item.classes
+        return {
+          name: classData?.name || '未知课程',
+          credit: Number(classData?.credit || 0),
+          class_hours: Number(classData?.classHours || 0),
+          grade: Number(item.grade)
+        }
+      })
 
     console.log('成绩数据：', grades.value)
 
@@ -120,7 +131,7 @@ const gpa = computed(() => {
 
   const total = grades.value.reduce(
     (acc, cur) => {
-      const gradePoint = Math.max((cur.grade - 50) / 10, 0) // 按照你的规则换算 GPA
+      const gradePoint = Math.max((cur.grade - 50) / 10, 0)
       acc.totalGpa += gradePoint * cur.credit
       acc.totalCredit += cur.credit
       return acc

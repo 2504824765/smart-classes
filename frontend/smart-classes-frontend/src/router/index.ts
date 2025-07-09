@@ -310,11 +310,11 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
       ]
     },
     {
-      path: '/grades',
+      path: '/data',
       component: Layout,
-      name: 'Grades',
+      name: 'Data',
       meta: {
-        title: t('student.grades'),
+        title: t('student.data'),
         icon: 'vi-ant-design:bar-chart-outlined',
         userType: 'student',
         alwaysShow: true,
@@ -322,11 +322,21 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
       },
       children: [
         {
-          path: '',
+          path: 'grades',
           component: () => import('@/views/SmartClass/StudentEnd/Grades.vue'),
-          name: 'GradesContent',
+          name: 'DataGrades',
           meta: {
             title: t('student.grades'),
+            userType: 'student',
+            noCache: true
+          }
+        },
+        {
+          path: 'assessment',
+          component: () => import('@/views/SmartClass/StudentEnd/Assessment.vue'),
+          name: 'DataAssessment',
+          meta: {
+            title: t('student.assessment'),
             userType: 'student',
             noCache: true
           }

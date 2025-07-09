@@ -4,11 +4,14 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import { getTableListApi } from '@/api/table'
 import { TableData } from '@/api/table/types'
-import { ref, h, reactive } from 'vue'
+import { ref, h, reactive, onMounted } from 'vue'
 import { ElTag } from 'element-plus'
 import { Form, FormSchema } from '@/components/Form'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
+import { getClassMissionByIdApi } from '@/api/classMission'
+import { getResourceByClassIdApi } from '@/api/resource'
+import type { Resource } from '@/api/resource/types'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -55,6 +58,26 @@ const formData = reactive<FormData>({
   deadline: '',
   submit_method: '',
   score: null
+})
+
+const missionResource = ref<Resource[]>([])
+const route = useRouter().currentRoute
+const missionId = ref<number | null>(null)
+const classResources = ref<Resource[]>([])
+
+onMounted(async () => {
+  // 假设编辑时url带有id参数
+  const id = route.value.query.id
+  if (id) {
+    missionId.value = Number(id)
+    const missionRes = await getClassMissionByIdApi(missionId.value)
+    const mission = missionRes.data
+    // 拉取课程所有资源
+    if (mission.classes && mission.classes.id) {
+      const res = await getResourceByClassIdApi(mission.classes.id)
+      classResources.value = res.data
+    }
+  }
 })
 
 // const classList = ref([])
@@ -116,6 +139,16 @@ const goback = () => {
 <template>
   <ContentWrap>
     <Form ref="formRef" :schema="schema" v-model="formData" :rules="rules" />
+    <div v-if="classResources.length" style="margin: 24px 0 0 0;">
+      <div style="font-weight: bold; margin-bottom: 8px;">课程所有资源：</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div v-for="file in classResources" :key="file.id" style="border: 1px solid #eee; border-radius: 6px; padding: 12px 18px; min-width: 180px; background: #fafbfc;">
+          <div><b>文件名：</b>{{ file.name }}</div>
+          <div><b>类型：</b>{{ file.type }}</div>
+          <div v-if="file.path"><a :href="file.path" target="_blank" style="color: #409EFF;">下载/查看</a></div>
+        </div>
+      </div>
+    </div>
     <div style="text-align: center; margin-top: 20px">
       <BaseButton type="primary" @click="create">确定</BaseButton>
       <BaseButton type="info" @click="goback">返回</BaseButton>

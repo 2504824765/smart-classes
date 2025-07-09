@@ -132,9 +132,9 @@ const handleSubmit = async () => {
         await updateTeacherApi({ ...formData, id: teacherId.value } as TeacherUpdateDTO)
         ElMessage.success('教师信息更新成功')
       } else {
-        await createTeacherApi(formData)
-        ElMessage.success('教师添加成功')
-        elForm.resetFields()
+      await createTeacherApi(formData)
+      ElMessage.success('教师添加成功')
+      elForm.resetFields()
       }
       router.push({ path: '/admin/teacherManage' })
     } catch (err) {

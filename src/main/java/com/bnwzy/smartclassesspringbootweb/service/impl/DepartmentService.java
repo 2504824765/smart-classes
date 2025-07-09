@@ -1,6 +1,7 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentAlreadyExistException;
+import com.bnwzy.smartclassesspringbootweb.exception.DepartmentHasChildrenException;
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.IllegalParentDeptException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Department;
@@ -54,7 +55,7 @@ public class DepartmentService implements IDepartmentService {
             Department department = departmentRepository.findById(id).get();
             List<Department> children = departmentRepository.findByParentId(id);
             if (children != null && !children.isEmpty()) {
-                throw new RuntimeException("该部门有子部门，不能直接删除！");
+                throw new DepartmentHasChildrenException("<该部门有子部门，不能直接删除！>");
             }
             List<Teacher> teacherList = teacherRepository.findByDepartment(department);
             if (!teacherList.isEmpty()) {

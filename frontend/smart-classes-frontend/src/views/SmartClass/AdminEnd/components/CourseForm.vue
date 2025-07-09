@@ -222,7 +222,7 @@ const handleSubmit = async () => {
 
         for (const resource of pendingResources.value) {
           const uploadRes = await uploadResourcesApi(resource.file, '课程资料')
-          const filePath = uploadRes.data.url
+          const filePath = uploadRes.data
 
           uploadedResources.value.push({
             name: resource.name,
@@ -253,7 +253,7 @@ const handleFileUpload = async (file: File) => {
   const fileType = fileName.split('.').pop() || ''
   // 1. 上传文件到后端，获取url
   const uploadRes = await uploadResourcesApi(file, '课程资料')
-  const filePath = uploadRes.data.url
+  const filePath = uploadRes.data
   // 2. 保存资源信息到数据库
   const resource = await addResourceApi({
     name: fileName,
@@ -278,7 +278,8 @@ const handleResourceUpload = async (file: File) => {
     const fileType = fileName.split('.').pop() || ''
     // 1. 上传文件到后端，获取url
     const uploadRes = await uploadResourcesApi(file, '课程资料')
-    const filePath = uploadRes.data.url
+    const filePath = uploadRes.data
+    console.log(uploadRes)
     // 2. 保存资源信息到数据库
     await addResourceApi({
       name: fileName,

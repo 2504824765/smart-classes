@@ -89,17 +89,6 @@ function listToTree(list: any[], parentId = 0) {
     }))
 }
 
-function findPathToId(tree, targetId, path = []) {
-  for (const node of tree) {
-    const newPath = [...path, node.id]
-    if (node.id === targetId) return newPath
-    if (node.children) {
-      const res = findPathToId(node.children, targetId, newPath)
-      if (res) return res
-    }
-  }
-  return null
-}
 
 const openDialog = (type: 'add' | 'edit', node?: Department) => {
   isEdit.value = type === 'edit'
@@ -114,29 +103,50 @@ const openDialog = (type: 'add' | 'edit', node?: Department) => {
 }
 
 const handleDelete = async (node: Department) => {
-  await ElMessageBox.confirm(`确定要删除部门「${node.name}」吗？`, '提示', { type: 'warning' })
-  await deleteDepartmentApi(node.id)
-  ElMessage.success('删除成功')
-  await fetchDepartmentTree()
-  tableMethods.refresh()
+  try {
+    await ElMessageBox.confirm(`确定要删除部门「${node.name}」吗？`, '提示', { type: 'warning' })
+    await deleteDepartmentApi(node.id)
+    ElMessage.success('删除成功')
+    await fetchDepartmentTree()
+    tableMethods.refresh()
+  } catch (err: any) {
+    // 处理后端自定义异常（如有子部门不能删）
+    if (err?.response?.data?.message) {
+      ElMessage.error(err.response.data.message)
+    } else if (err?.message) {
+      ElMessage.error(err.message)
+    } else {
+      ElMessage.error('删除失败')
+    }
+  }
 }
 
 const handleSubmit = async () => {
-  if (isEdit.value) {
-    await updateDepartmentApi({
-      id: formData.id as number,
-      name: formData.name,
-      parentId: formData.parentId
-    })
-    ElMessage.success('编辑成功')
-  } else {
-    const { id, name, parentId } = formData
-    await addDepartmentApi({ name, parentId })
-    ElMessage.success('新增成功')
+  try {
+    if (isEdit.value) {
+      await updateDepartmentApi({
+        id: formData.id as number,
+        name: formData.name,
+        parentId: Number(formData.parentId)
+      })
+      ElMessage.success('编辑成功')
+    } else {
+      const { name, parentId } = formData
+      await addDepartmentApi({ name, parentId: Number(parentId), departmentLevel: 0 })
+      ElMessage.success('新增成功')
+    }
+    dialogVisible.value = false
+    await fetchDepartmentTree()
+    tableMethods.refresh()
+  } catch (err: any) {
+    if (err?.response?.data?.message) {
+      ElMessage.error(err.response.data.message)
+    } else if (err?.message) {
+      ElMessage.error(err.message)
+    } else {
+      ElMessage.error('操作失败')
+    }
   }
-  dialogVisible.value = false
-  await fetchDepartmentTree()
-  tableMethods.refresh()
 }
 
 function getDeptNameById(id) {

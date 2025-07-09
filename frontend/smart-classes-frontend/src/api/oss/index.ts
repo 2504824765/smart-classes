@@ -5,10 +5,7 @@ import request from '@/axios'
  * @param message 资源所属的文件夹名
  * @returns 上传后资源的访问 URL
  */
-export const uploadResourcesApi = (
-  file: File,
-  message: string
-): Promise<IResponse<string>> => {
+export const uploadResourcesApi = (file: File, message: string): Promise<IResponse<string>> => {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('message', message)

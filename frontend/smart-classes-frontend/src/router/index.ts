@@ -232,7 +232,7 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
           meta: {
             title: t('student.courseSelect'),
             userType: 'student',
-            noCache: true,
+            noCache: true
           }
         },
         {
@@ -429,7 +429,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
           meta: {
             title: t('admin.mission'),
             userType: 'admin',
-            noCache: true,
+            noCache: true
           },
           children: [
             {

@@ -1,11 +1,13 @@
 <template>
   <div class="homework-detail">
-    <el-page-header content="作业详情" @back="router.back" style="margin-bottom: 16px;" />
+    <el-page-header content="作业详情" @back="router.back" style="margin-bottom: 16px" />
 
     <el-card>
       <template #header>
         <div class="flex items-center justify-between">
-          <h2 class="text-xl font-bold">{{ classMission?.classes.name }} - {{ classMission?.type }}</h2>
+          <h2 class="text-xl font-bold"
+            >{{ classMission?.classes.name }} - {{ classMission?.type }}</h2
+          >
           <el-tag type="success" v-if="studentMission?.done">已完成</el-tag>
           <el-tag type="warning" v-else>未完成</el-tag>
         </div>
@@ -15,7 +17,9 @@
         <el-descriptions-item label="课程">{{ classMission?.classes.name }}</el-descriptions-item>
         <el-descriptions-item label="作业类型">{{ classMission?.type }}</el-descriptions-item>
         <el-descriptions-item label="截止时间">{{ classMission?.deadline }}</el-descriptions-item>
-        <el-descriptions-item label="提交方式">{{ classMission?.submitMethod }}</el-descriptions-item>
+        <el-descriptions-item label="提交方式">{{
+          classMission?.submitMethod
+        }}</el-descriptions-item>
         <el-descriptions-item label="作业说明" :span="2">
           {{ classMission?.description }}
         </el-descriptions-item>
@@ -24,7 +28,9 @@
       <el-divider>学生完成情况</el-divider>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="学生">{{ studentMission?.student.name }}</el-descriptions-item>
-        <el-descriptions-item label="得分">{{ studentMission?.score ?? '未评分' }}</el-descriptions-item>
+        <el-descriptions-item label="得分">{{
+          studentMission?.score ?? '未评分'
+        }}</el-descriptions-item>
       </el-descriptions>
 
       <!-- 可选：上传入口、文件查看等 -->
@@ -89,7 +95,6 @@ const fileList = ref<UploadFile[]>([])
 // 页面初始化时加载历史文件
 const loadHistoryFile = () => {
   const resource = studentMission.value?.resource
-  
 }
 
 // 选择新文件（覆盖旧的 fileList）
@@ -104,7 +109,7 @@ const handleSubmit = async () => {
     ElMessage.warning('请先选择一个文件')
     return
   }
-  if(!studentMission.value){
+  if (!studentMission.value) {
     ElMessage.warning('请先获取学生作业信息')
     return
   }

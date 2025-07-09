@@ -72,7 +72,7 @@ const uploadResource = async () => {
     return
   }
 
-  if(!classId.value){
+  if (!classId.value) {
     ElMessage.warning('请先选择课程')
     return
   }
@@ -85,7 +85,7 @@ const uploadResource = async () => {
       const res = await uploadResourcesApi(file, '')
       console.log(res)
       const url = res.data.replace(PREFIX, '')
-      
+
       const resource: ResourceCreateDTO = {
         name: file.name,
         path: url,
@@ -106,7 +106,6 @@ const uploadResource = async () => {
     uploading.value = false
   }
 }
-
 
 const fetchMissions = async () => {
   if (!route.query.classId) return

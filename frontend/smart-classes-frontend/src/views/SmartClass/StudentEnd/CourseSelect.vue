@@ -8,24 +8,24 @@ import { addClassRecordApi } from '@/api/studentClasses/index'
 import { getStudentByUsernameApi } from '@/api/student/index'
 import { ElMessage, ElLink, ElTag, ElDivider, ElInput, ElSwitch } from 'element-plus'
 import type { Classes } from '@/api/classes/types'
-import type { StudentClassesCreateDTO} from '@/api/studentClasses/types'
+import type { StudentClassesCreateDTO } from '@/api/studentClasses/types'
 import { useUserStore } from '@/store/modules/user'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 const { t } = useI18n()
 
 const studentId = ref<number | null>(null)
 const getStudentId = async (username: string) => {
-    const res = await getStudentByUsernameApi(username)
-    studentId.value = res.data.id
+  const res = await getStudentByUsernameApi(username)
+  studentId.value = res.data.id
 }
 
 const userStore = useUserStore()
 const loginInfo = userStore.getLoginInfo
 const initialize = async () => {
-    if (loginInfo) {
-        const username = loginInfo.username
-        await getStudentId(username)
-    }
+  if (loginInfo) {
+    const username = loginInfo.username
+    await getStudentId(username)
+  }
 }
 
 const loading = ref(true)
@@ -52,9 +52,7 @@ const getClassList = async () => {
     const res = await getAllClassesApi()
     const allClasses: Classes[] = res.data || []
     // 排除已选课程
-    classList.value = allClasses.filter(
-      (cls) => !selectedCids.value.includes(cls.id)
-    )
+    classList.value = allClasses.filter((cls) => !selectedCids.value.includes(cls.id))
   } catch (e) {
     ElMessage.error('获取课程失败')
   } finally {
@@ -101,66 +99,73 @@ onMounted(async () => {
 </script>
 
 <template>
-    <ContentWrap title="课程选择">
-        <div class="flex items-center mb-4 gap-4">
-            <ElInput v-model="searchKeyword" placeholder="搜索课程名" clearable />
-            <ElSwitch v-model="onlyShowActive" active-text="仅显示已开放课程" />
+  <ContentWrap title="课程选择">
+    <div class="flex items-center mb-4 gap-4">
+      <ElInput v-model="searchKeyword" placeholder="搜索课程名" clearable />
+      <ElSwitch v-model="onlyShowActive" active-text="仅显示已开放课程" />
+    </div>
+
+    <Table
+      v-if="!loading && filteredList.length > 0"
+      :columns="[]"
+      :data="filteredList"
+      :loading="loading"
+      custom-content
+      :card-wrap-style="{
+        width: '240px',
+        marginBottom: '20px',
+        marginRight: '20px'
+      }"
+    >
+      <template #content="cls">
+        <div class="flex cursor-pointer gap-3">
+          <img
+            :src="cls.imageUrl ? cls.imageUrl : 'default.png'"
+            class="w-64px h-64px rounded object-cover"
+            alt="课程封面"
+          />
+          <div class="flex flex-col">
+            <div class="title">{{ cls.name }}</div>
+            <div class="teacher">教师：{{ cls.teacher?.name ?? '无' }}</div>
+            <div class="desc">{{ cls.description }}</div>
+          </div>
         </div>
+      </template>
 
-        <Table
-        v-if="!loading && filteredList.length > 0"
-        :columns="[]"
-        :data="filteredList"
-        :loading="loading"
-        custom-content
-        :card-wrap-style="{
-            width: '240px',
-            marginBottom: '20px',
-            marginRight: '20px'
-        }"
-        >
-        <template #content="cls">
-            <div class="flex cursor-pointer gap-3">
-                <img
-                    :src="cls.imageUrl ? cls.imageUrl : 'default.png'"
-                    class="w-64px h-64px rounded object-cover"
-                    alt="课程封面"
-                />
-                <div class="flex flex-col">
-                    <div class="title">{{ cls.name }}</div>
-                    <div class="teacher">教师：{{ cls.teacher?.name ?? '无' }}</div>
-                    <div class="desc">{{ cls.description }}</div>
-                </div>
-            </div>
-        </template>
+      <template #content-footer="cls">
+        <div v-if="cls" class="flex justify-between items-center">
+          <ElTag
+            :type="cls.active === true ? 'success' : cls.active === false ? 'warning' : 'danger'"
+          >
+            {{ cls.active === true ? '已开放' : cls.active === false ? '未开放' : '未知状态' }}
+          </ElTag>
+          <ElLink
+            :underline="false"
+            :class="{ 'cursor-not-allowed text-gray-400': !cls.active }"
+            @click="() => handleSelect(cls)"
+            >选课</ElLink
+          >
+        </div>
+        <div v-else class="text-gray-400 text-sm">课程数据异常</div>
+      </template>
+    </Table>
 
-            <template #content-footer="cls">
-                <div v-if="cls" class="flex justify-between items-center">
-                    <ElTag :type="cls.active === true ? 'success' : cls.active === false ? 'warning' : 'danger'">
-                    {{ cls.active === true ? '已开放' : cls.active === false ? '未开放' : '未知状态' }}
-                    </ElTag>
-                    <ElLink :underline="false" :class="{ 'cursor-not-allowed text-gray-400': !cls.active }" @click="() => handleSelect(cls)">选课</ElLink>
-                </div>
-                <div v-else class="text-gray-400 text-sm">课程数据异常</div>
-            </template> 
-        </Table>
-
-        <el-empty v-else-if="!loading && filteredList.length === 0" description="暂无可选课程" />
-    </ContentWrap>
+    <el-empty v-else-if="!loading && filteredList.length === 0" description="暂无可选课程" />
+  </ContentWrap>
 </template>
 <style scoped>
 .line-clamp-2 {
-display: -webkit-box;
--webkit-box-orient: vertical;
-overflow: hidden;
--webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 
 .title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  -webkit-line-clamp: 2;  /* 固定两行 */
+  -webkit-line-clamp: 2; /* 固定两行 */
   max-width: 9rem;
   min-height: 2.8rem;
   font-weight: bold;

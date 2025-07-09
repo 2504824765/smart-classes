@@ -1,5 +1,5 @@
-import { Classes } from "../classes/types"
-import { Student } from "../student/types"
+import { Classes } from '../classes/types'
+import { Student } from '../student/types'
 
 export type StudentClasses = {
   id: number

@@ -3,8 +3,12 @@
     <el-card class="col-span-3 overflow-auto">
       <el-tree :data="treeData" :props="defaultProps" />
     </el-card>
-    
-    <el-card v-loading="loading" :element-loading-text="`图谱正在生成，请耐心等待... ${progress}%`" class="col-span-9 flex flex-col">
+
+    <el-card
+      v-loading="loading"
+      :element-loading-text="`图谱正在生成，请耐心等待... ${progressData}%`"
+      class="col-span-9 flex flex-col"
+    >
       <el-tabs v-model="activeTab" class="flex-1" tab-position="top">
         <!-- 图谱 tab -->
         <el-tab-pane label="图谱" name="graph">
@@ -82,21 +86,21 @@ const fileCards = ref([
 ])
 
 const loading = ref(false)
-const progress = ref(0) // 进度百分比
+const progressData = ref(0) // 进度百分比
 
 let timer: number | null = null
 
 // 监听loading变化，开始或停止进度计时
 watch(loading, (val) => {
   if (val) {
-    progress.value = 0
+    progressData.value = 0
     timer = window.setInterval(() => {
-      if (progress.value < 99) {
-        progress.value += 1
+      if (progressData.value < 99) {
+        progressData.value += 1
       }
     }, 2000) // 每2秒加1%
   } else {
-    progress.value = 100
+    progressData.value = 100
     if (timer) {
       clearInterval(timer)
       timer = null
@@ -221,6 +225,7 @@ const initGraph = async () => {
 
   const nodes: any[] = []
   const edges: any[] = []
+  const rootNode = ref<any>()
 
   const walkTreeList = (treeList: any[], parentId: string | null = null) => {
     for (const node of treeList) {
@@ -228,12 +233,16 @@ const initGraph = async () => {
         id: node.id,
         label: node.label,
         type: 'progress-node',
-        progress: node.progress ?? Math.random(), 
+        progress: node.progress ?? Math.random(),
         style: {
           fill: parentId ? '#4BABF4' : '#5B8FF9',
           stroke: '#5B8FF9'
         }
       })
+
+      if (parentId) {
+        rootNode.value = node
+      }
 
       if (parentId) {
         edges.push({
@@ -254,15 +263,16 @@ const initGraph = async () => {
     width: graphContainer.value!.offsetWidth,
     height: graphContainer.value!.offsetHeight,
     layout: {
-      type: 'radial',
-      center: [containerWidth / 2, containerHeight / 2], 
-      linkDistance: 100, 
-      maxIteration: 1000, 
-      focusNode: '1', 
+      type: 'force',
+      center: [containerWidth / 2, containerHeight / 2],
+      linkDistance: 10,
+      maxIteration: 1000,
+      focusNode: rootNode.value?.id,
       unitRadius: 120,
-      preventOverlap: true, 
-      nodeSize: 90, 
-      strictRadial: false 
+      preventOverlap: true,
+      nodeSize: 80,
+      nodeSpacing: 10, // 与 size 一起配合，给每个节点外留空间
+      strictRadial: false
     },
     modes: {
       default: ['drag-canvas', 'drag-node']

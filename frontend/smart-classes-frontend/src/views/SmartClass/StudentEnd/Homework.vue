@@ -12,9 +12,7 @@
         </router-link>
       </el-empty>
     </div>
-    <draggable
-      v-else
-      v-model="courses" item-key="id" class="card-grid" animation="200">
+    <draggable v-else v-model="courses" item-key="id" class="card-grid" animation="200">
       <template #item="{ element }">
         <CourseHCard :course="element" @view-homework="goToHomework(element)" />
       </template>
@@ -66,7 +64,7 @@ const loadCourses = async () => {
   // 获取所有课程
   try {
     // 获取所有选课关联记录
-    if(!studentId.value){ 
+    if (!studentId.value) {
       return
     }
 

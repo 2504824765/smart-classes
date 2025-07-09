@@ -193,7 +193,7 @@ const initGraph = async () => {
     width: graphContainer.value!.offsetWidth,
     height: graphContainer.value!.offsetHeight,
     layout: {
-      type: 'radial',
+      type: 'force',
       center: [containerWidth / 2, containerHeight / 2], // 设置中心点
       linkDistance: 100, // 连线长度
       maxIteration: 1000, // 最大迭代次数
@@ -330,8 +330,6 @@ const fetchGraphData = async () => {
   }
 
   treeData.value = [normalizeNode(graphJson)]
-
-  initGraph()
 }
 
 const fetchFiles = async () => {
@@ -344,10 +342,11 @@ const fetchFiles = async () => {
 }
 
 // 页面挂载后初始化图谱
-onMounted(() => {
+onMounted(async () => {
   registerCustomNode()
-  fetchFiles()
-  fetchGraphData()
+  await fetchFiles()
+  await fetchGraphData()
+  await initGraph()
 })
 </script>
 
@@ -367,7 +366,17 @@ onMounted(() => {
     <div class="grid grid-cols-12 gap-4 h-[80vh]">
       <!-- 左：树结构 -->
       <el-card class="col-span-2 overflow-auto">
-        <el-tree :data="treeData" :props="defaultProps" @node-click="handleTreeClick" />
+        <el-tree
+          :data="treeData"
+          :props="defaultProps"
+          @node-click="handleTreeClick"
+        >
+          <template #default="{ node, data }">
+            <div class="node-text">
+              {{ node.label }}
+            </div>
+          </template>
+        </el-tree>
       </el-card>
 
       <!-- 中：图谱/资源 tabs -->
@@ -376,7 +385,7 @@ onMounted(() => {
           <!-- 图谱 tab -->
           <el-tab-pane label="图谱" name="graph">
             <div
-              v-if ="treeData.length > 0"
+              v-if="treeData.length > 0"
               ref="graphContainer"
               class="w-full h-[calc(80vh-120px)]"
               style="min-height: 500px"
@@ -403,3 +412,13 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>  
+.node-text {
+  max-width: 160px; /* 根据需要设置最大宽度 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+</style>

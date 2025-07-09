@@ -41,7 +41,7 @@ export async function fetchDifyAnswerStream(
     if (done) break
     buffer += decoder.decode(value, { stream: true })
 
-    const lines = buffer.split('\n').filter(line => line.trim())
+    const lines = buffer.split('\n').filter((line) => line.trim())
     for (const line of lines) {
       if (line.trim() === 'data: [DONE]') {
         return
@@ -61,8 +61,6 @@ export async function fetchDifyAnswerStream(
     buffer = ''
   }
 }
-
-
 
 export const createGraphApi = (data: DifyGraphRequest): Promise<IResponse<string>> => {
   return request.post({ url: '/api/dify/createGraph', data })

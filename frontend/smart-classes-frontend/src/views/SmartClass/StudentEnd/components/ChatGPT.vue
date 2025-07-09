@@ -2,7 +2,7 @@
   <div class="chat-wrapper">
     <!-- 聊天内容区域 -->
     <div class="chat-body">
-      <div v-for="(msg, index) in messages" :key="index" class="chat-message"  :class="msg.role">
+      <div v-for="(msg, index) in messages" :key="index" class="chat-message" :class="msg.role">
         <div class="message-bubble">
           <span v-if="msg.role === 'user'" class="name"></span>
           <span v-else class="name"></span>
@@ -35,7 +35,14 @@
         @keyup.enter.exact="submitMessage"
         :disabled="generating"
       />
-      <ElButton type="primary" :disabled="generating" class="send-button" @click="submitMessage" :icon="sendIcon" circle />
+      <ElButton
+        type="primary"
+        :disabled="generating"
+        class="send-button"
+        @click="submitMessage"
+        :icon="sendIcon"
+        circle
+      />
     </div>
   </div>
 </template>
@@ -76,21 +83,25 @@ const fetchAnswer = async (question: string) => {
       ...(conversationId.value && { conversation_id: conversationId.value })
     }
     console.log('[fetchAnswer] request body:', request)
-    await fetchDifyAnswerStream(request, (chunk) => {
-      console.log('[stream chunk received]:', chunk)
-      if (chunk.event === 'message') {
-        if (chunk.conversation_id && !conversationId.value) {
-          conversationId.value = chunk.conversation_id
-                console.log('[conversationId set to]:', conversationId.value)
+    await fetchDifyAnswerStream(
+      request,
+      (chunk) => {
+        console.log('[stream chunk received]:', chunk)
+        if (chunk.event === 'message') {
+          if (chunk.conversation_id && !conversationId.value) {
+            conversationId.value = chunk.conversation_id
+            console.log('[conversationId set to]:', conversationId.value)
+          }
+          aiContent += chunk.answer || ''
+          console.log('[AI message building up]:', aiContent)
+          messages.value[messages.value.length - 1].content = aiContent
         }
-        aiContent += chunk.answer || ''
-            console.log('[AI message building up]:', aiContent)
-        messages.value[messages.value.length - 1].content = aiContent
-      } 
-    }, controller.signal)
+      },
+      controller.signal
+    )
   } catch (e) {
     console.error('流式对话失败', e)
-  }finally {
+  } finally {
     generating.value = false
   }
   console.log('[messages list after AI reply]:', JSON.stringify(messages.value, null, 2))
@@ -120,7 +131,6 @@ const submitMessage = () => {
   fetchAnswer(question)
   userInput.value = ''
 }
-
 </script>
 
 <style scoped>

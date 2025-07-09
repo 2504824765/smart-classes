@@ -13,19 +13,9 @@
       </el-empty>
     </div>
 
-    <draggable
-      v-else
-      v-model="displayList"
-      item-key="id"
-      class="course-list"
-      animation="200"
-    >
+    <draggable v-else v-model="displayList" item-key="id" class="course-list" animation="200">
       <template #item="{ element }">
-        <CourseCard
-          :course="element"
-          :key="element.id"
-          :disabled="!element.active"
-        />
+        <CourseCard :course="element" :key="element.id" :disabled="!element.active" />
       </template>
     </draggable>
   </div>
@@ -67,17 +57,17 @@ const courseList = ref<Classes[]>([])
 const queryCourseList = async () => {
   try {
     // 获取所有选课关联记录
-    if(!studentId.value){ 
+    if (!studentId.value) {
       return
     }
     const associatedRes = await getAssociatedBySidApi(studentId.value)
-    if(!associatedRes.data || associatedRes.data.length === 0){
+    if (!associatedRes.data || associatedRes.data.length === 0) {
       courseList.value = []
       return
     }
     // 获取所有课程信息
     const courseRes = await getClassesByIdApi
-    const associatedList = associatedRes.data 
+    const associatedList = associatedRes.data
 
     const cidList: number[] = associatedList.map((item) => item.classes.id)
     // 并发获取所有课程信息

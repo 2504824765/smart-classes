@@ -42,6 +42,12 @@ export const deleteStudentMission = async (id: number): Promise<IResponse<boolea
   return request.delete({ url: `/api/studentMission/delete/${id}` })
 }
 
-export const getStudentMissionByStudentIdAndClassMissionId = async (studentId:number, classMissionId:number): Promise<IResponse<StudentMission>> => {
-  return request.get({ url: `/api/studentMission/getStudentMissionByStudentIdAndClassMissionId/`, data:{studentId, classMissionId} })
+export const getStudentMissionByStudentIdAndClassMissionId = async (
+  studentId: number,
+  classMissionId: number
+): Promise<IResponse<StudentMission>> => {
+  return request.get({
+    url: `/api/studentMission/getStudentMissionByStudentIdAndClassMissionId/`,
+    data: { studentId, classMissionId }
+  })
 }

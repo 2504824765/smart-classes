@@ -4,7 +4,14 @@ import { ElTree, ElMessage, ElMessageBox } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Table, TableColumn } from '@/components/Table'
 import { useTable } from '@/hooks/web/useTable'
-import { getAllDeptApi, getDeptByIdApi, getMembersByDeptIdApi, addDepartmentApi, updateDepartmentApi, deleteDepartmentApi } from '@/api/department/index'
+import {
+  getAllDeptApi,
+  getDeptByIdApi,
+  getMembersByDeptIdApi,
+  addDepartmentApi,
+  updateDepartmentApi,
+  deleteDepartmentApi
+} from '@/api/department/index'
 
 import { Department } from '@/api/department/types'
 
@@ -91,7 +98,7 @@ const openDialog = (type: 'add' | 'edit', node?: Department) => {
     }
   }
   // 构建父级下拉选项
-  parentOptions.value = deptTree.value.map(d => ({ label: d.name, value: d.id }))
+  parentOptions.value = deptTree.value.map((d) => ({ label: d.name, value: d.id }))
   dialogVisible.value = true
 }
 
@@ -132,7 +139,7 @@ onMounted(fetchDepartmentTree)
         width: 100%;
         min-height: 600px;
         background: #f8fafc;
-        box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
+        box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
         border-radius: 18px;
         padding: 32px 40px 24px 40px;
         box-sizing: border-box;
@@ -146,23 +153,59 @@ onMounted(fetchDepartmentTree)
         highlight-current
         node-key="id"
         @node-click="handleDepartmentClick"
-        style="width: 100%; font-size: 17px;"
+        style="width: 100%; font-size: 17px"
         class="dept-tree-custom"
       >
         <template #default="{ node, data }">
-          <span style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 6px 0;">
-            <span style="font-weight: 600; color: #222;">{{ data.name }}</span>
-            <span style="display: flex; gap: 4px;">
-              <el-button size="small" type="primary" text style="padding: 0 6px;" @click.stop="openDialog('add', data)">新增</el-button>
-              <el-button size="small" type="success" text style="padding: 0 6px;" @click.stop="openDialog('edit', data)">编辑</el-button>
-              <el-button size="small" type="danger" text style="padding: 0 6px;" @click.stop="handleDelete(data)">删除</el-button>
+          <span
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              width: 100%;
+              padding: 6px 0;
+            "
+          >
+            <span style="font-weight: 600; color: #222">{{ data.name }}</span>
+            <span style="display: flex; gap: 4px">
+              <el-button
+                size="small"
+                type="primary"
+                text
+                style="padding: 0 6px"
+                @click.stop="openDialog('add', data)"
+                >新增</el-button
+              >
+              <el-button
+                size="small"
+                type="success"
+                text
+                style="padding: 0 6px"
+                @click.stop="openDialog('edit', data)"
+                >编辑</el-button
+              >
+              <el-button
+                size="small"
+                type="danger"
+                text
+                style="padding: 0 6px"
+                @click.stop="handleDelete(data)"
+                >删除</el-button
+              >
             </span>
           </span>
         </template>
       </el-tree>
       <el-button
         type="primary"
-        style="margin-top: 18px; width: 100%; font-weight: bold; letter-spacing: 2px; border-radius: 8px; box-shadow: 0 2px 8px 0 rgba(64,158,255,0.08);"
+        style="
+          margin-top: 18px;
+          width: 100%;
+          font-weight: bold;
+          letter-spacing: 2px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px 0 rgba(64, 158, 255, 0.08);
+        "
         @click="openDialog('add')"
       >
         新增顶级部门
@@ -176,7 +219,12 @@ onMounted(fetchDepartmentTree)
         <el-form-item label="父级部门">
           <el-select v-model="formData.parentId" placeholder="请选择父级部门">
             <el-option :label="'无（顶级）'" :value="0" />
-            <el-option v-for="item in parentOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option
+              v-for="item in parentOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="层级">

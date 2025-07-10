@@ -9,7 +9,8 @@ import javax.naming.Name;
 @Table(name = "tb_class")
 public class Classes {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "class_seq")
+    @SequenceGenerator(name = "class_seq", sequenceName = "tb_class_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "name")

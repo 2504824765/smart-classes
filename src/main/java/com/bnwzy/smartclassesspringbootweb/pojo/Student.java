@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 @Table(name = "tb_student")
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 默认自增生成方式
+//    @GeneratedValue(strategy = GenerationType.IDENTITY) // 默认自增生成方式
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq")
+    @SequenceGenerator(name = "student_seq", sequenceName = "tb_student_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "name")

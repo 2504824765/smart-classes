@@ -38,11 +38,21 @@ public class StudentDataService implements IStudentDataService {
             throw new StudentDataNotFoundException("<StudentData not found>");
         } else {
             StudentData studentData = studentDataRepository.findById(studentDataUpdateDTO.getId()).get();
-            studentData.setConceptUnderstanding(studentDataUpdateDTO.getConceptUnderstanding());
-            studentData.setExpressionNorms(studentDataUpdateDTO.getExpressionNorms());
-            studentData.setProblemSolving(studentDataUpdateDTO.getProblemSolving());
-            studentData.setLogicalReasoning(studentDataUpdateDTO.getLogicalReasoning());
-            studentData.setInnovativeThinking(studentDataUpdateDTO.getInnovativeThinking());
+            if (studentDataUpdateDTO.getConceptUnderstanding() != null) {
+                studentData.setConceptUnderstanding(studentDataUpdateDTO.getConceptUnderstanding());
+            }
+            if (studentDataUpdateDTO.getExpressionNorms() != null) {
+                studentData.setExpressionNorms(studentDataUpdateDTO.getExpressionNorms());
+            }
+            if (studentDataUpdateDTO.getProblemSolving() != null) {
+                studentData.setProblemSolving(studentDataUpdateDTO.getProblemSolving());
+            }
+            if (studentDataUpdateDTO.getLogicalReasoning() != null) {
+                studentData.setLogicalReasoning(studentDataUpdateDTO.getLogicalReasoning());
+            }
+            if (studentDataUpdateDTO.getInnovativeThinking() != null) {
+                studentData.setInnovativeThinking(studentDataUpdateDTO.getInnovativeThinking());
+            }
             return studentDataRepository.save(studentData);
         }
     }

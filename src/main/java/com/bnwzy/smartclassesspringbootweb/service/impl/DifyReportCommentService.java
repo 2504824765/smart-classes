@@ -39,7 +39,8 @@ public class DifyReportCommentService implements IDifyReportCommentService {
     private OssUploadService ossUploadService;
 
     public DifyReportCommentService() {
-        String apiKey = "app-IyD6i2DIxGDteTT2JoMethKN";
+//        String apiKey = "app-569FKczHOtQkaHwEFk0QdEcW"; // 本地
+        String apiKey = "app-72aF7vyTeccjC7y0ZMrgn8S4"; // 远程
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(300))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100000);
@@ -52,6 +53,7 @@ public class DifyReportCommentService implements IDifyReportCommentService {
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(exchangeStrategies)
                 .baseUrl("https://api.dify.ai/v1")
+//                .baseUrl("http://localhost/v1")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .build();

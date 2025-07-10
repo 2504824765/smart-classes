@@ -18,7 +18,7 @@ public class StudentData {
     @Column(name = "problem_solving")
     private String problemSolving;
     @Column(name = "expression norms")
-    private String ExpressionNorms;
+    private String expressionNorms;
     @Column(name = "innovative_thinking")
     private String innovativeThinking;
 }

@@ -3,6 +3,7 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyStudentAbilityAnalyzeDTO;
+import com.bnwzy.smartclassesspringbootweb.repository.StudentDataRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IDifyStudentAbilityAnalyzeService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,14 +24,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -43,9 +42,12 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
 
     @Autowired
     private OssUploadService ossUploadService;
+    @Autowired
+    private StudentDataRepository studentDataRepository;
 
     public DifyStudentAbilityAnalyzeService() {
-        String apiKey = "app-XWHo2AUJA4pKIoNX3yTLTgQq";
+//        String apiKey = "app-6rYPAA60WQdzgfucg9QIM2FR"; // 本地
+        String apiKey = "app-XWHo2AUJA4pKIoNX3yTLTgQq"; // 远程
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(300))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100000);
@@ -57,6 +59,7 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(exchangeStrategies)
+//                .baseUrl("http://localhost/v1")
                 .baseUrl("https://api.dify.ai/v1")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
@@ -123,13 +126,15 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
                         // 处理拼接后的完整JSON字符串
                         try {
                             String jsonString = jsonBuilder.toString();
-                            com.bnwzy.smartclassesspringbootweb.pojo.StudentData studentData = objectMapper.readValue(jsonString, com.bnwzy.smartclassesspringbootweb.pojo.StudentData.class);
+                            String cleanJson = jsonString.replaceAll("(?i)```json|```", "").trim();
+                            System.out.println(cleanJson);
+                            com.bnwzy.smartclassesspringbootweb.pojo.StudentData studentData = objectMapper.readValue(cleanJson, com.bnwzy.smartclassesspringbootweb.pojo.StudentData.class);
                             log.info("成功将JSON字符串转为StudentData对象: {}", studentData);
-                            // TODO: 这里可以继续将studentData存储到学生对象中
                             if (studentRepository.findById(dto.getStudentId()).isEmpty()) {
                                 throw new StudentNotFoundException("<Student not found>");
                             } else {
                                 Student student = studentRepository.findById(dto.getStudentId()).get();
+                                studentDataRepository.save(studentData);
                                 student.setStudentData(studentData);
                                 studentRepository.save(student);
                                 return Mono.just("success");

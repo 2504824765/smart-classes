@@ -262,6 +262,31 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
       ]
     },
     {
+      path: '/personal',
+      component: Layout,
+      redirect: '/personal/personal-center',
+      name: 'Personal',
+      meta: {
+        title: t('router.personal'),
+        hidden: true,
+        canTo: true,
+        userType: 'student'
+      },
+      children: [
+        {
+          path: 'personal-center',
+          component: () => import('@/views/Personal/PersonalCenter/PersonalCenter.vue'),
+          name: 'PersonalCenter',
+          meta: {
+            title: t('router.personalCenter'),
+            hidden: true,
+            canTo: true,
+            userType: 'student'
+          }
+        }
+      ]
+    },
+    {
       path: '/homework',
       component: Layout,
       name: 'Homework',

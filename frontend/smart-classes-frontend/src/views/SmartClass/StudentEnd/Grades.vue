@@ -41,7 +41,13 @@ interface GradeItem {
   grade: number
 }
 
+const student = ref({
+  id: null as number | null,
+  name: ''
+})
+
 const studentId = ref<number | null>(null)
+const grades = ref<GradeItem[]>([])
 
 const getStudentId = async (username: string) => {
   const res = await getStudentByUsernameApi(username)
@@ -66,13 +72,6 @@ const initialize = async () => {
   }
 }
 
-const studentName = ref<string | null>(null)
-const student = ref({
-  id: studentId,
-  name: studentName
-})
-const grades = ref<GradeItem[]>([])
-
 // 获取学生姓名
 const fetchStudentInfo = async () => {
   if (!student.value.id) {
@@ -81,7 +80,7 @@ const fetchStudentInfo = async () => {
   }
   try {
     const res = await getStudentByIdApi(student.value.id)
-    studentName.value = res.data.name
+    student.value.name = res.data.name
   } catch (error) {
     console.error('获取学生信息失败:', error)
   }
@@ -90,8 +89,8 @@ const fetchStudentInfo = async () => {
 // 获取学生的选课记录
 const fetchStudentGrades = async () => {
     if (!student.value.id) {
-    console.error('学生ID为空')
-    return
+      console.error('学生ID为空')
+      return
   }
   try {
     const res = await getAssociatedBySidApi(student.value.id)

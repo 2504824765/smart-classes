@@ -145,19 +145,19 @@ const getTeacherStatistics = async () => {
 }
 // 快捷跳转
 const gotoCourseManagement = () => {
-  router.push('/teacher/ClassManage')
+  router.push('/course/content')
 }
 
 const gotoStudentManagement = () => {
-  router.push('/teacher/studentManage')
+  router.push('/course/content')
 }
 
 const gotoAssignmentManagement = () => {
-  router.push('/teacher/gradeManage')
+  router.push('/course/content')
 }
 
 const gotoMissionManagement = () => {
-  router.push('/teacher/Mission')
+  router.push('/course/content')
 }
 
 onMounted(() => {
@@ -279,7 +279,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-1"
-            @click="router.push('/teacher/studentManage')"
+            @click="router.push('/studentManage/list')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:connection" :size="24" />
@@ -294,7 +294,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-2"
-            @click="router.push('/teacher/CreateMission')"
+            @click="router.push('/course/content')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:edit-pen" :size="24" />
@@ -309,7 +309,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-3"
-            @click="router.push('/teacher/ClassManage')"
+            @click="router.push('/course/content')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:upload" :size="24" />
@@ -324,7 +324,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-4"
-            @click="router.push('/teacher/gradeManage')"
+            @click="router.push('/course/content')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:trophy" :size="24" />

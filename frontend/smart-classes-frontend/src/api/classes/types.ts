@@ -7,7 +7,7 @@ export type Classes = {
   credit: number
   classHours: number
   graph: string
-  active: boolean
+  isActive: boolean
   description: string
   imageUrl: string
 }
@@ -19,7 +19,7 @@ export type CourseDisplayData = {
   description: string
   unfinished: number
   total: number
-  active: boolean
+  isActive: boolean
 }
 
 // 创建课程时，只需要teacherId，不需要完整的teacher对象
@@ -29,7 +29,7 @@ export type ClassesCreateDTO = {
   credit: number
   classHours: number
   graph: string
-  active: boolean
+  isActive: boolean
   description: string
   imageUrl: string
 }
@@ -42,7 +42,7 @@ export type ClassesUpdateDTO = {
   credit: number
   classHours: number
   graph: string
-  active: boolean
+  isActive: boolean
   description: string
   imageUrl: string
 }

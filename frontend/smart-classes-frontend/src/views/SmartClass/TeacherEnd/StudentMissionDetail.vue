@@ -139,7 +139,7 @@ const handleAutoGrade = async () => {
   try {
     const request = createDifyReportCommentRequest(studentFile.value.url, templateFile.value.url)
     const res = await commentReportApi(request)
-
+    console.log(res)
     const result = JSON.parse(res.data)
     commentResult.value = {
       score: result.score || '无评分',

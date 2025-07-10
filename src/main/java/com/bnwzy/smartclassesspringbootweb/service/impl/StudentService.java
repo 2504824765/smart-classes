@@ -57,7 +57,7 @@ public class StudentService implements IStudentService {
                     student.setDepartment(department);
                 }
             }
-            if (studentUpdateDTO.getGender() != null) {
+            if (studentUpdateDTO.getGpa() != null) {
                 student.setGpa(studentUpdateDTO.getGpa());
             }
             if (studentUpdateDTO.getStudentDataId() != null) {

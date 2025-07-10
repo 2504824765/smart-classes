@@ -65,15 +65,20 @@ public class TeacherService implements ITeacherService {
                 throw new TeacherNotFoundException("Teacher not found");
             }
             Teacher teacher=teacherRepository.findById(teacherUpdateDTO.getId()).get();
-            teacher.setName(teacherUpdateDTO.getName());
-            teacher.setGender(teacherUpdateDTO.getGender());
-            if(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).isPresent()){
-                teacher.setDepartment(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).get());
-                return teacherRepository.save(teacher);
+            if (teacherUpdateDTO.getName()!=null) {
+                teacher.setName(teacherUpdateDTO.getName());
             }
-            else{
-                throw new DepartmentNotFoundException("Department not found");
+            if (teacherUpdateDTO.getGender()!=null) {
+                teacher.setGender(teacherUpdateDTO.getGender());
             }
+            if (teacherUpdateDTO.getDepartmentId()!=null) {
+                if (departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).isPresent()) {
+                    teacher.setDepartment(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).get());
+                } else {
+                    throw new DepartmentNotFoundException("Department not found");
+                }
+            }
+            return teacherRepository.save(teacher);
         }else{
             throw new TeacherNotFoundException("Teacher not found");
         }

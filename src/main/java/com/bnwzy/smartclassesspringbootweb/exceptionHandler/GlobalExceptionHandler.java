@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(StudentClassesNotFoundException.class)
     public ResponseMessage StudentClassesNotFoundException(Exception e, HttpServletRequest request) {
         logger.error(e.getMessage());
-        return new ResponseMessage(507, "<Teacher not found>", null);
+        return new ResponseMessage(507, "<StudentClasses not found>", null);
     }
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseMessage wrongPasswordException(Exception e) {

@@ -115,12 +115,7 @@ public class StudentClassesService implements IStudentClassesService {
                 sc.add(studentClasses);
             }
         }
-        if(!sc.isEmpty()){
-            return sc;
-        }
-        else{
-            throw new StudentClassesNotFoundException("Student classes not found");
-        }
+        return sc;
     }
 
     @Override

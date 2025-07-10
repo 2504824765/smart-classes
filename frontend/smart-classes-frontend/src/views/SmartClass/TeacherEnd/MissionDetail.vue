@@ -78,11 +78,12 @@ const studentMissions = ref<(StudentMission & { isDone: boolean })[]>([])
 onMounted(async () => {
   const missionId = Number(route.query.id)
   const res = await getClassMissionByIdApi(missionId)
+  console.log(res.data)
   mission.value = res.data
 
   // 获取资源文件（TODO: 请替换为实际资源接口）
   if (mission.value?.resource) {
-    const resourceRes = await getResourceByIdApi(mission.value.resource)
+    const resourceRes = await getResourceByIdApi(mission.value.resource.id)
     fileCards.value = [
       {
         name: resourceRes.data.name,
@@ -103,7 +104,7 @@ onMounted(async () => {
 })
 
 const viewStudentDetail = (studentMission: StudentMission) => {
-  router.push({ name: 'StudentMissionDetail', query: { studentId: studentMission.id } })
+  router.push({ path: 'StudentMissionDetail', query: { studentId: studentMission.id } })
 }
 </script>
 

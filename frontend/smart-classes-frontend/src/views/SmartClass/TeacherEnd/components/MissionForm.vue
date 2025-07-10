@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus'
 import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { addClassMissionApi } from '@/api/classMission/index'
+import { PREFIX } from '@/constants'
 import type { ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource/index'
 import { uploadResourcesApi } from '@/api/oss/index'
@@ -18,7 +19,7 @@ import { StudentMissionCreateDTO } from '@/api/studentMission/types'
 const route = useRoute()
 
 // 从路由中获取课程 ID
-const classId = Number(route.query.cid)
+const classId = Number(route.query.classId)
 // 定义上传等待列表
 const pendingResources = ref<PendingUploadResource[]>([])
 interface PendingUploadResource {
@@ -121,6 +122,11 @@ const { getFormData, getElFormExpose } = formMethods
 const handleSubmit = async () => {
   const elForm = await getElFormExpose()
   if (!elForm) return
+  console.log('classId',classId)
+  if(!classId) {
+    ElMessage.warning('课程ID不存在')
+    return
+  }
 
   await elForm.validate(async (valid) => {
     if (!valid) {
@@ -136,45 +142,54 @@ const handleSubmit = async () => {
       if (pendingResources.value.length > 0) {
         const resFile = pendingResources.value[0]
         const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
+        console.log('uploadRes',uploadRes)
         const filePath = uploadRes.data
 
         const newRes = {
           name: resFile.name,
-          path: filePath,
+          path: filePath.replace(PREFIX, ''),
           type: resFile.type,
           description: resFile.description,
-          classId: formData.classes.id
+          classId: classId
         }
 
         const savedRes = await addResourceApi(newRes)
+        console.log('savedRes',savedRes)
         resourceId = savedRes.data.id
       }
 
       // 提交任务数据，合并 resourceId
       const missionToSubmit = {
         ...formData,
-        resource: resourceId ?? 0
+        cid: classId,
+        resource: resourceId ?? 0 
       }
+      console.log('missionToSubmit',missionToSubmit)
 
       const classMissionRes = await addClassMissionApi(missionToSubmit)
       ElMessage.success('任务创建成功')
+      console.log('classMissionRes',classMissionRes)
       const studentClassRes = await getAssociatedByCidApi(classId)
+      console.log('studentClassRes',studentClassRes)
       if (!studentClassRes.data || studentClassRes.data.length === 0) {
         ElMessage.warning('当前课程没有学生选课记录，学生任务无法创建')
         return
       }
       try {
         // 2. 遍历学生，构造每个 StudentMissionCreateDTO 并创建
-        const createPromises = studentClassRes.data.map((record: any) => {
+        const createPromises = studentClassRes.data.map(async (record: any) => {
           const dto: StudentMissionCreateDTO = {
-            student: record.student.id, // 👈 只传 student id
-            classMission: classMissionRes.data.id, // 👈 只传 classMission id
+            studentId: record.student.id,
+            classMissionId: classMissionRes.data.id, 
             score: 0,
             done: false,
             active: true,
             reportUrl: ''
           }
-          return addStudentMission(dto)
+          console.log('dto',dto)
+          const res = await addStudentMission(dto)
+          console.log('res',res)
+          return res
         })
 
         await Promise.all(createPromises)

@@ -109,18 +109,20 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
     },
     //教师-学生管理
     {
-      path: '/teacher/studentManage',
+      path: '/studentManage',
       component: Layout,
-      name: 'TeacherStudentManage',
+      name: 'StudentManage',
       meta: {
         title: t('teacher.studentManage'),
+        icon: 'vi-ant-design:user-outlined',
         userType: 'teacher',
-        noCache: true
+        noCache: true,
+        alwaysShow: true,
       },
       children: [
         {
-          path: '',
-          name: 'StudentManage',
+          path: 'list',
+          name: 'StudentManageList',
           component: () => import('@/views/SmartClass/TeacherEnd/StudentCourse.vue'),
           meta: {
             title: t('teacher.studentManage'),
@@ -128,20 +130,18 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             userType: 'teacher',
             noCache: true
           },
-          children:[
-            {
-              path: 'detail',
-              name: 'StudentManage',
-              component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
-              meta: {
-                title: t('teacher.studentManage'),
-                icon: 'vi-ant-design:user-outlined',
-                userType: 'teacher',
-                noCache: true
-              }
-            }
-          ]
         },
+        {
+          path: 'detail',
+          name: 'StudentManageCourseDetail',
+          component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
+          meta: {
+            title: t('teacher.studentManage'),
+            icon: 'vi-ant-design:user-outlined',
+            userType: 'teacher',
+            noCache: true
+          }
+        }
       ]
     },
 

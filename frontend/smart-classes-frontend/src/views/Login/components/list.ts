@@ -17,8 +17,9 @@ const studentList: string[] = [
 const teacherList: string[] = [
   '/teacher',
   '/teacher/dashboard',
-  '/teacher/studentManage',
-  '/teacher/studentManage/detail',
+  '/studentManage',
+  '/studentManage/list',
+  '/studentManage/list/detail',
   '/course',
   '/course/content',
   '/course/detail',

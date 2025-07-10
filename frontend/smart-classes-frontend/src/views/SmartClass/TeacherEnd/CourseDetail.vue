@@ -3,7 +3,7 @@
     <ElButton
       type="primary"
       style="margin-bottom: 10px"
-      @click="push({ path: '/course/detail/form' })"
+      @click="push({ path: '/course/detail/form' , query: { classId: classId } })"
       >添加任务</ElButton
     >
     <draggable v-model="missions" item-key="id" animation="200">

@@ -12,6 +12,6 @@ export type StudentMission = {
 }
 
 export type StudentMissionCreateDTO = Omit<StudentMission, 'id' | 'student' | 'classMission'> & {
-  student: number
-  classMission: number
+  studentId: number
+  classMissionId: number
 }

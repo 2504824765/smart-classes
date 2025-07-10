@@ -18,6 +18,12 @@ import { useRouter } from 'vue-router'
 import EditStudent from './EditStudent.vue'
 import AddStudent from './AddStudent.vue'
 import { Student } from '@/api/student/types'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// 从路由中获取课程 ID
+const classId = Number(route.query.classId)
 
 interface Params {
   pageIndex?: number
@@ -83,12 +89,19 @@ const getTableList = async (params?: Params) => {
       pageSize: pageSize.value
     }
   )
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  .catch(() => {})
+  .finally(() => {
+    loading.value = false
+  })
+
+  if (!classId) {
+    ElMessage.warning('请提供课程ID')
+    return
+  }
+
+  const studentRes = await get
+
   if (res) {
-    console.log('API响应数据:', res.data)
     let studentData: Student[] = []
     if (Array.isArray(res.data)) {
       studentData = res.data

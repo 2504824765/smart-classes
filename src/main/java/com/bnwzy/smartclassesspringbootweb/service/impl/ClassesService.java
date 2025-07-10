@@ -35,7 +35,7 @@ public class ClassesService implements IClassesService {
         classes.setClassHours(classesCreateDTO.getClassHours());
         classes.setGraph(classesCreateDTO.getGraph());
         classes.setDescription(classesCreateDTO.getDescription());
-        classes.setActive(classesCreateDTO.getActive());
+        classes.setIsActive(classesCreateDTO.getActive());
         classes.setImageUrl(classesCreateDTO.getImageUrl());
         return  classesRepository.save(classes);
     }
@@ -81,7 +81,7 @@ public class ClassesService implements IClassesService {
                 classes.setDescription(classesUpdateDTO.getDescription());
             }
             if (classesUpdateDTO.getActive() != null) {
-                classes.setActive(classesUpdateDTO.getActive());
+                classes.setIsActive(classesUpdateDTO.getActive());
             }
             if (classesUpdateDTO.getImageUrl() != null) {
                 classes.setImageUrl(classesUpdateDTO.getImageUrl());

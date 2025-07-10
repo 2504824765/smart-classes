@@ -3,7 +3,12 @@
     <el-card class="col-span-3 overflow-auto">
       <el-tree :data="treeData" :props="defaultProps" />
     </el-card>
-    <el-card v-loading="loading" class="col-span-9 flex flex-col">
+
+    <el-card
+      v-loading="loading"
+      :element-loading-text="`图谱正在生成，请耐心等待... ${progressData}%`"
+      class="col-span-9 flex flex-col"
+    >
       <el-tabs v-model="activeTab" class="flex-1" tab-position="top">
         <!-- 图谱 tab -->
         <el-tab-pane label="图谱" name="graph">
@@ -43,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import G6 from '@antv/g6'
 import FileDisplay from './FileDisplay.vue'
 import { getResourceByClassIdApi } from '@/api/resource/index'
@@ -52,7 +57,7 @@ import { getClassesByIdApi, updateClassApi } from '@/api/classes'
 import { PREFIX } from '@/constants/index'
 import { createGraphApi } from '@/api/dify/index'
 import { createDifyGraphRequestMulti } from '@/api/dify/types'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ClassesUpdateDTO } from '@/api/classes/types'
 
 const props = defineProps<{ classId: number | undefined }>()
@@ -79,6 +84,29 @@ const fileCards = ref([
     url: 'https://smart-class-northeast.oss-cn-beijing.aliyuncs.com/class/web开发技术/json/web开发技术知识图谱.json'
   }
 ])
+
+const loading = ref(false)
+const progressData = ref(0) // 进度百分比
+
+let timer: number | null = null
+
+// 监听loading变化，开始或停止进度计时
+watch(loading, (val) => {
+  if (val) {
+    progressData.value = 0
+    timer = window.setInterval(() => {
+      if (progressData.value < 99) {
+        progressData.value += 1
+      }
+    }, 2000) // 每2秒加1%
+  } else {
+    progressData.value = 100
+    if (timer) {
+      clearInterval(timer)
+      timer = null
+    }
+  }
+})
 
 const registerCustomNode = () => {
   G6.registerNode(
@@ -197,6 +225,7 @@ const initGraph = async () => {
 
   const nodes: any[] = []
   const edges: any[] = []
+  const rootNode = ref<any>()
 
   const walkTreeList = (treeList: any[], parentId: string | null = null) => {
     for (const node of treeList) {
@@ -204,12 +233,16 @@ const initGraph = async () => {
         id: node.id,
         label: node.label,
         type: 'progress-node',
-        progress: node.progress ?? Math.random(), // 示例随机进度，可自定义
+        progress: node.progress ?? Math.random(),
         style: {
           fill: parentId ? '#4BABF4' : '#5B8FF9',
           stroke: '#5B8FF9'
         }
       })
+
+      if (parentId) {
+        rootNode.value = node
+      }
 
       if (parentId) {
         edges.push({
@@ -230,15 +263,16 @@ const initGraph = async () => {
     width: graphContainer.value!.offsetWidth,
     height: graphContainer.value!.offsetHeight,
     layout: {
-      type: 'radial',
-      center: [containerWidth / 2, containerHeight / 2], // 设置中心点
-      linkDistance: 100, // 连线长度
-      maxIteration: 1000, // 最大迭代次数
-      focusNode: '1', // 以根节点为中心
-      unitRadius: 120, // 每一层的半径间距
-      preventOverlap: true, // 防止节点重叠
-      nodeSize: 90, // 节点大小（用于防重叠计算）
-      strictRadial: false // 不严格按径向排列，允许微调
+      type: 'force',
+      center: [containerWidth / 2, containerHeight / 2],
+      linkDistance: 10,
+      maxIteration: 1000,
+      focusNode: rootNode.value?.id,
+      unitRadius: 120,
+      preventOverlap: true,
+      nodeSize: 80,
+      nodeSpacing: 10, // 与 size 一起配合，给每个节点外留空间
+      strictRadial: false
     },
     modes: {
       default: ['drag-canvas', 'drag-node']
@@ -327,13 +361,23 @@ const initGraph = async () => {
   })
 }
 
-const loading = ref(false)
-
 async function createKnowledgeGraph() {
   if (!props.classId) {
     console.warn('classId 不存在，跳过图谱加载')
     return
   }
+
+  const confirmed = await ElMessageBox.confirm(
+    '请确认资源文件存在，否则无法生成图谱，是否继续？',
+    '确认生成图谱',
+    {
+      confirmButtonText: '继续',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).catch(() => false)
+
+  ElMessage.info('知识图谱生成时间较长，请耐心等待...')
 
   try {
     loading.value = true
@@ -345,7 +389,9 @@ async function createKnowledgeGraph() {
       return
     }
 
-    const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
+    const limitedResources = resources.slice(0, 8)
+
+    const urls = limitedResources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
     console.log('urls', urls)
     const requestBody = createDifyGraphRequestMulti(urls)
 
@@ -424,7 +470,7 @@ const deleteKnowledgeGraph = async () => {
 
     await updateClassApi(updateClass)
     ElMessage.success('知识图谱删除成功')
-    await initGraph()
+    initGraph()
   } catch (err) {
     console.error('图谱删除失败', err)
     ElMessage.error('图谱删除失败')
@@ -468,6 +514,7 @@ const fetchGraphData = async () => {
 
 const fetchFiles = async () => {
   const res = await getResourceByClassIdApi(props.classId!)
+  console.log(res)
   fileCards.value = res.data.map((resource: Resource) => ({
     name: resource.name,
     type: resource.type,
@@ -476,6 +523,7 @@ const fetchFiles = async () => {
 }
 
 onMounted(() => {
+  if (timer) clearInterval(timer)
   fetchFiles()
   fetchGraphData()
 })

@@ -177,7 +177,6 @@ const signIn = async () => {
       try {
         const res = await loginApi(formData)
         if (res.data === true) {
-
           ElMessage.success('登录成功')
           const user = await getUserInfoApi(formData.username)
           formData.roleId = user.data.id

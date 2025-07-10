@@ -226,6 +226,16 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
           }
         },
         {
+          path: 'select',
+          component: () => import('@/views/SmartClass/StudentEnd/CourseSelect.vue'),
+          name: 'CourseSelect',
+          meta: {
+            title: t('student.courseSelect'),
+            userType: 'student',
+            noCache: true
+          }
+        },
+        {
           path: 'detail',
           component: () => import('@/views/SmartClass/StudentEnd/CourseDetail.vue'),
           name: 'CourseDetail',
@@ -429,7 +439,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
           meta: {
             title: t('admin.mission'),
             userType: 'admin',
-            noCache: true,
+            noCache: true
           },
           children: [
             {

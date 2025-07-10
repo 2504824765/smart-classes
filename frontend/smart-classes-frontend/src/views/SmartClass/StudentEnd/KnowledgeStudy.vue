@@ -11,9 +11,21 @@
           :name="res.id"
           :key="res.id"
         >
-          <VideoPlay v-if="res.type === 'video'" :url="res.url" />
-          <div v-else-if="res.type === 'text'" class="p-4 bg-white rounded shadow"> </div>
+          <div v-if="res.type === 'text'" class="p-4 bg-white rounded shadow"> 
+            <el-card class="mb-4 p-4 bg-white rounded shadow">
+              <div v-html="compiledMarkdown" class="prose prose-sm max-w-none" />
+            </el-card>
+
+            <!-- 下：笔记编辑卡片 -->
+            <el-card class="p-4 bg-white rounded shadow">
+              <div class="mb-2 font-bold text-lg">我的笔记</div>
+              <RichTextEditor v-model="noteContent" />
+              <el-button type="primary" class="mt-2" @click="saveNote">保存笔记</el-button>
+            </el-card>
+          </div>
           <div v-else-if="res.type === 'question'" class="text-gray-400">
+            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)" >生成题目</ElButton>
+            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)">刷新题目</ElButton>
             <QuestionCard
               v-for="(q, index) in questions"
               :key="index"
@@ -23,7 +35,7 @@
               :answer="q.answer"
               :showResult="submitted"
             />
-            <el-button type="primary" @click="handleSubmit">提交</el-button>
+            <el-button type="primary" :disabled="questions.length === 0" @click="handleSubmit">提交</el-button>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -50,9 +62,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import VideoPlay from './components/VideoPlay.vue'
 import ChatGPT from './components/ChatGPT.vue'
 import { useRoute } from 'vue-router'
 import QuestionCard from './components/QuestionCard.vue'
@@ -62,6 +73,13 @@ import { PREFIX } from '@/constants/index'
 import { createDifyGenerateQuestionRequest } from '@/api/dify/types'
 import { generateQuestionApi } from '@/api/dify'
 import { ElMessageBox, ElLoading } from 'element-plus'
+import RichTextEditor from './components/RichTextEditor.vue'
+import { DifyChatRequest } from '@/api/dify/types'
+import { fetchDifyAnswerStream } from '@/api/dify/index'
+import html2pdf from 'html2pdf.js'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt()
 
 let controller: AbortController | null = null
 interface QuestionItem {
@@ -70,10 +88,17 @@ interface QuestionItem {
   answer: string
 }
 
+const questionToAsk = ref('')
+
+function sendToChatGPT() {
+  questionToAsk.value = '请介绍神经网络的基本结构'
+}
+
 const route = useRoute()
 
 const classId = Number(route.query.classId)
 const knowledgeName = route.query.knowledgeName as string
+const noteContent = ref('<p></p>')
 
 const loading = ref(false)
 const currentResourceId = ref('')
@@ -81,17 +106,115 @@ const questions = ref<QuestionItem[]>([])
 const answers = ref<(string | null)[]>([])
 const submitted = ref(false)
 
-watch(currentResourceId, async (newId) => {
-  const questionTabId = 'r3'
-  if (newId === questionTabId && questions.value.length === 0) {
+const aiMarkdown = ref('')
+const currentNodeName = ref('')
+const generating = ref(false)
+
+const getLocalCacheKey = (nodeName: string) => `ai-intro-${nodeName}`
+
+const loadNodeIntroduction = async (nodeName: string) => {
+  if (currentNodeName.value === nodeName) return // 避免重复加载
+  currentNodeName.value = nodeName
+  aiMarkdown.value = ''
+  generating.value = true
+
+  // ✅ 若已有 controller，先中断前一次流
+  if (controller) {
+    controller.abort()
+  }
+
+  controller = new AbortController()
+
+  const cacheKey = getLocalCacheKey(nodeName)
+  const cached = localStorage.getItem(cacheKey)
+  if (cached) {
+    console.log('从缓存中获取AI内容')
+    aiMarkdown.value = cached
+    generating.value = false
+    return
+  }
+
+  const question = `请你详细介绍与这个节点有关的知识，并且给出参考文献链接：${nodeName}`
+  let aiContent = ''
+  console.log(question)
+  const request: DifyChatRequest = {
+    inputs: {},
+    query: question,
+    response_mode: 'streaming',
+    user: 'test-user',
+    auto_generate_name: false,
+    files: []
+  }
+
+  try {
+    await fetchDifyAnswerStream(
+      request,
+      (chunk) => {
+        if (chunk.event === 'message') {
+          aiContent += chunk.answer || ''
+          aiMarkdown.value = aiContent
+        }
+      },
+      controller.signal
+    )
+    localStorage.setItem(cacheKey, aiContent)
+  } catch (e) {
+    ElMessage.error('获取AI内容失败')
+  } finally {
+    generating.value = false
+  }
+}
+
+
+const createQuestions = async (method:number) => {
+  if (method === 1) {
+    if(questions.value.length > 0) {
+      ElMessage.warning('已生成题目，请刷新页面重新生成')
+      return
+    }else{
+      if (questions.value.length === 0) {
+        loading.value = true
+        try {
+          fetchQuestions()
+        } finally {
+          loading.value = false
+        }
+      }
+    }
+  }
+  else if (method === 2) {
+    if (questions.value.length > 0) {
+      questions.value = []
+    }
     loading.value = true
     try {
       fetchQuestions()
     } finally {
       loading.value = false
     }
+  }else {
+    ElMessage.error('生成题目失败')
   }
-})
+}
+
+const compiledMarkdown = computed(() => md.render(aiMarkdown.value)) // 渲染为 HTML
+
+const saveNote = () => {
+  const el = document.createElement('div')
+  el.innerHTML = noteContent.value
+
+  html2pdf()
+    .set({
+      margin: 0.5,
+      filename: '我的笔记.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {},
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    })
+    .from(el)
+    .save()
+}
+
 
 const handleSubmit = () => {
   submitted.value = true
@@ -117,18 +240,12 @@ async function fetchKnowledge() {
     knowledge.resources = [
       {
         id: 'r1',
-        type: 'video',
-        name: '教学视频',
-        url: ''
-      },
-      {
-        id: 'r2',
         type: 'text',
         name: '学习笔记',
         content: '神经网络是一种模仿人脑的算法结构...'
       },
       {
-        id: 'r3',
+        id: 'r2',
         type: 'question',
         name: '练习题'
       }
@@ -145,6 +262,18 @@ const fetchQuestions = async () => {
     return
   }
 
+  const confirmed = await ElMessageBox.confirm(
+    '请确认资源文件存在，否则无法生成题目，是否继续？',
+    '确认生成题目',
+    {
+      confirmButtonText: '继续',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).catch(() => false)
+
+  ElMessage.info('题目生成时间较长，请耐心等待...')
+
   loading.value = true
   controller = new AbortController()
 
@@ -157,7 +286,8 @@ const fetchQuestions = async () => {
   try {
     const resourcesRes = await getResourceByClassIdApi(classId)
     const resources = resourcesRes.data
-    const urls = resources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
+    const limitedResources = resources.slice(0, 8)
+    const urls = limitedResources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
 
     const requestBody = createDifyGenerateQuestionRequest(urls, knowledgeName, 5)
 
@@ -196,8 +326,9 @@ watch(currentResourceId, (newId) => {
   currentResource.value = knowledge.resources.find((r) => r.id === newId) || null
 })
 
-onMounted(() => {
-  fetchKnowledge()
+onMounted(async () => {
+  await fetchKnowledge()
+  await loadNodeIntroduction(knowledgeName) 
 })
 </script>
 

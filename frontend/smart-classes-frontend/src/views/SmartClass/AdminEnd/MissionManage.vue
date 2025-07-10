@@ -8,9 +8,18 @@ import { ref, h, reactive, computed } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
-import { addClassMissionApi, getallClassMissionApi, updateClassMissionApi, deleteClassMissionApi } from '@/api/classMission/index'
+import {
+  addClassMissionApi,
+  getallClassMissionApi,
+  updateClassMissionApi,
+  deleteClassMissionApi
+} from '@/api/classMission/index'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ClassMission, ClassMissionCreateDTO, ClassMissionUpdateDTO } from '@/api/classMission/types'
+import {
+  ClassMission,
+  ClassMissionCreateDTO,
+  ClassMissionUpdateDTO
+} from '@/api/classMission/types'
 import { getAllClassesApi } from '@/api/classes/index'
 import type { Classes } from '@/api/classes/types'
 
@@ -57,8 +66,12 @@ const columns: TableColumn[] = [
     slots: {
       default: (data) => (
         <>
-          <BaseButton type="primary" size="small" onClick={() => onEdit(data.row)}>编辑</BaseButton>
-          <BaseButton type="danger" size="small" onClick={() => onDelete(data.row)}>删除</BaseButton>
+          <BaseButton type="primary" size="small" onClick={() => onEdit(data.row)}>
+            编辑
+          </BaseButton>
+          <BaseButton type="danger" size="small" onClick={() => onDelete(data.row)}>
+            删除
+          </BaseButton>
         </>
       )
     }
@@ -103,7 +116,7 @@ const classOptions = ref<{ label: string; value: number }[]>([])
 const loadClasses = async () => {
   const res = await getAllClassesApi()
   allClasses.value = res.data || []
-  classOptions.value = allClasses.value.map(c => ({ label: c.name, value: c.id }))
+  classOptions.value = allClasses.value.map((c) => ({ label: c.name, value: c.id }))
 }
 
 loadClasses()
@@ -128,7 +141,9 @@ const onEdit = (row: ClassMission) => {
 }
 
 const onDelete = async (row: ClassMission) => {
-  await ElMessageBox.confirm(`确定要删除任务「${row.description}」吗？`, '提示', { type: 'warning' })
+  await ElMessageBox.confirm(`确定要删除任务「${row.description}」吗？`, '提示', {
+    type: 'warning'
+  })
   await deleteClassMissionApi(row.id)
   ElMessage.success('删除成功')
   getTableList()
@@ -170,7 +185,12 @@ const handleSubmit = async () => {
       <el-form :model="formData" label-width="100px">
         <el-form-item label="课程" prop="cid">
           <el-select v-model="formData.cid" placeholder="请选择课程">
-            <el-option v-for="item in classOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option
+              v-for="item in classOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="类型">

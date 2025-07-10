@@ -6,7 +6,7 @@
     :class="{ 'is-disabled': disabled }"
   >
     <el-image
-      :src="`/${course.imageUrl}`"
+      :src="course.imageUrl ? `/${course.imageUrl}` : 'default.png'"
       alt="课程封面"
       style="width: 100%; height: 160px; object-fit: cover"
     />

@@ -6,6 +6,9 @@ import FileDisplay from './components/FileDisplay.vue'
 import ChatGPT from './components/ChatGPT.vue'
 import { getClassesByIdApi } from '@/api/classes'
 import { PREFIX } from '@/constants/index'
+import { getResourceByClassIdApi } from '@/api/resource/index'
+import type { Resource } from '@/api/resource/types'
+import { ElMessage } from 'element-plus'
 
 const { push } = useRouter()
 const route = useRoute()
@@ -15,48 +18,7 @@ const courseTitle = ref('课程学习')
 const progress = ref(65)
 const activeTab = ref('graph')
 // 树结构数据
-const treeData = ref([
-  {
-    id: '1',
-    label: 'Python',
-    children: [
-      {
-        id: '1-1',
-        label: '深度学习',
-        children: [
-          {
-            id: '1-1-1',
-            label: '神经网络',
-            children: [
-              {
-                id: '1-1-1-1',
-                label: '卷积神经网络',
-                children: [
-                  { id: '1-1-1-1-1', label: '过滤器' },
-                  { id: '1-1-1-1-2', label: '池化算法' }
-                ]
-              },
-              { id: '1-1-1-2', label: '密集连接网络' },
-              { id: '1-1-1-3', label: '分层表示学习' }
-            ]
-          },
-          { id: '1-1-2', label: '反向传播算法' },
-          { id: '1-1-3', label: '正则化' }
-        ]
-      },
-      {
-        id: '1-2',
-        label: '机器学习',
-        children: [
-          { id: '1-2-1', label: '核方法' },
-          { id: '1-2-2', label: '梯度提升机' }
-        ]
-      },
-      { id: '1-3', label: '向量化实现' },
-      { id: '1-4', label: '距离函数' }
-    ]
-  }
-])
+const treeData = ref<any[]>([])
 
 const defaultProps = {
   children: 'children',
@@ -231,7 +193,7 @@ const initGraph = async () => {
     width: graphContainer.value!.offsetWidth,
     height: graphContainer.value!.offsetHeight,
     layout: {
-      type: 'radial',
+      type: 'force',
       center: [containerWidth / 2, containerHeight / 2], // 设置中心点
       linkDistance: 100, // 连线长度
       maxIteration: 1000, // 最大迭代次数
@@ -342,6 +304,15 @@ const initGraph = async () => {
 
 const fetchGraphData = async () => {
   const res = await getClassesByIdApi(classId!)
+  if (!res.data) {
+    ElMessage.warning('无法定位课程')
+    return
+  }
+  if (!res.data.graph) {
+    ElMessage.warning('该课程暂无图谱数据,请等待老师创建图谱')
+    return
+  }
+  courseTitle.value = res.data.name
   const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
 
   const graphJson = await fetch(fullUrl)
@@ -364,14 +335,23 @@ const fetchGraphData = async () => {
   }
 
   treeData.value = [normalizeNode(graphJson)]
+}
 
-  initGraph()
+const fetchFiles = async () => {
+  const res = await getResourceByClassIdApi(classId!)
+  fileCards.value = res.data.map((resource: Resource) => ({
+    name: resource.name,
+    type: resource.type,
+    url: resource.path
+  }))
 }
 
 // 页面挂载后初始化图谱
-onMounted(() => {
+onMounted(async () => {
   registerCustomNode()
-  fetchGraphData()
+  await fetchFiles()
+  await fetchGraphData()
+  await initGraph()
 })
 </script>
 
@@ -382,7 +362,6 @@ onMounted(() => {
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold">课程名称：{{ courseTitle }}</h2>
-          <p class="text-gray-500">已学习进度：{{ progress }}%</p>
         </div>
       </div>
     </el-card>
@@ -391,7 +370,17 @@ onMounted(() => {
     <div class="grid grid-cols-12 gap-4 h-[80vh]">
       <!-- 左：树结构 -->
       <el-card class="col-span-2 overflow-auto">
-        <el-tree :data="treeData" :props="defaultProps" @node-click="handleTreeClick" />
+        <el-tree
+          :data="treeData"
+          :props="defaultProps"
+          @node-click="handleTreeClick"
+        >
+          <template #default="{ node, data }">
+            <div class="node-text">
+              {{ node.label }}
+            </div>
+          </template>
+        </el-tree>
       </el-card>
 
       <!-- 中：图谱/资源 tabs -->
@@ -400,10 +389,12 @@ onMounted(() => {
           <!-- 图谱 tab -->
           <el-tab-pane label="图谱" name="graph">
             <div
+              v-if="treeData.length > 0"
               ref="graphContainer"
               class="w-full h-[calc(80vh-120px)]"
               style="min-height: 500px"
             ></div>
+            <el-empty v-else description="暂无图谱数据" />
           </el-tab-pane>
 
           <!-- 资源 tab -->
@@ -425,3 +416,13 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>  
+.node-text {
+  max-width: 160px; /* 根据需要设置最大宽度 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+</style>

@@ -2,12 +2,7 @@
   <div class="homework-list">
     <el-page-header content="作业列表" @back="router.back" />
 
-    <draggable
-      v-model="homeworks"
-      item-key="id"
-      class="grid"
-      animation="200"
-    >
+    <draggable v-model="homeworks" item-key="id" class="grid" animation="200">
       <template #item="{ element }">
         <el-col :span="6">
           <HomeworkCard :homework="element" @view-detail="goToDetail" />
@@ -21,8 +16,8 @@
 import HomeworkCard from './components/HomeworkCard.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import type { StudentMission } from '@/api/studentMission/types' 
-import { getStudentMissionByClass } from '@/api/studentMission/index' 
+import type { StudentMission } from '@/api/studentMission/types'
+import { getStudentMissionByClass } from '@/api/studentMission/index'
 import { useUserStore } from '@/store/modules/user'
 import { getStudentByUsernameApi } from '@/api/student/index'
 import draggable from 'vuedraggable'
@@ -61,7 +56,7 @@ onMounted(async () => {
 function goToDetail(hw: StudentMission) {
   router.push({
     name: 'HomeworkDetail',
-    query: { missionId: hw.classMission.id, studentMissionId: hw.id}
+    query: { missionId: hw.classMission.id, studentMissionId: hw.id }
   })
 }
 </script>

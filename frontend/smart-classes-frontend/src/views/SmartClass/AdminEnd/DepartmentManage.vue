@@ -4,7 +4,14 @@ import { ElTree, ElMessage, ElMessageBox } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Table, TableColumn } from '@/components/Table'
 import { useTable } from '@/hooks/web/useTable'
-import { getAllDeptApi, getDeptByIdApi, getMembersByDeptIdApi, addDepartmentApi, updateDepartmentApi, deleteDepartmentApi } from '@/api/department/index'
+import {
+  getAllDeptApi,
+  getDeptByIdApi,
+  getMembersByDeptIdApi,
+  addDepartmentApi,
+  updateDepartmentApi,
+  deleteDepartmentApi
+} from '@/api/department/index'
 
 import { Department } from '@/api/department/types'
 
@@ -174,7 +181,7 @@ onMounted(fetchDepartmentTree)
         width: 100%;
         min-height: 600px;
         background: #f8fafc;
-        box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
+        box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
         border-radius: 18px;
         padding: 32px 40px 24px 40px;
         box-sizing: border-box;
@@ -195,7 +202,7 @@ onMounted(fetchDepartmentTree)
         highlight-current
         node-key="id"
         @node-click="handleDepartmentClick"
-        style="width: 100%; font-size: 17px;"
+        style="width: 100%; font-size: 17px"
         class="dept-tree-custom"
         default-expand-all
       >

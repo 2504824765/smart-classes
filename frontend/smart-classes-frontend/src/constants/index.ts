@@ -11,7 +11,7 @@ export const CONTENT_TYPE: AxiosContentType = 'application/json'
 /**
  * 请求超时时间
  */
-export const REQUEST_TIMEOUT = 60000
+export const REQUEST_TIMEOUT = 600000
 
 /**
  * 不重定向白名单

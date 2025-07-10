@@ -1,14 +1,24 @@
 <template>
-  <div class="flex items-center mb-4 gap-4">
-    <el-input v-model="searchKeyword" placeholder="搜索课程名" clearable />
-    <el-switch v-model="onlyShowActive" active-text="仅显示启用课程" />
-  </div>
+  <div>
+    <div class="flex items-center mb-4 gap-4">
+      <el-input v-model="searchKeyword" placeholder="搜索课程名" clearable />
+      <el-switch v-model="onlyShowActive" active-text="仅显示启用课程" />
+    </div>
 
-  <draggable v-model="displayList" item-key="id" class="course-list" animation="200">
-    <template #item="{ element }">
-      <CourseCard :course="element" :key="element.id" :disabled="!element.active" />
-    </template>
-  </draggable>
+    <div v-if="displayList.length === 0" class="flex flex-col items-center justify-center mt-10">
+      <el-empty description="你还没有选择任何课程">
+        <router-link to="/course/select">
+          <el-button type="primary">去选课</el-button>
+        </router-link>
+      </el-empty>
+    </div>
+
+    <draggable v-else v-model="displayList" item-key="id" class="course-list" animation="200">
+      <template #item="{ element }">
+        <CourseCard :course="element" :key="element.id" :disabled="!element.active" />
+      </template>
+    </draggable>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -20,6 +30,7 @@ import draggable from 'vuedraggable'
 import { useUserStore } from '@/store/modules/user'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 import { getClassesByIdApi } from '@/api/classes/index'
+import { ElMessage } from 'element-plus'
 
 const studentId = ref<number>()
 const getStudentId = async (username: string) => {
@@ -46,16 +57,19 @@ const courseList = ref<Classes[]>([])
 const queryCourseList = async () => {
   try {
     // 获取所有选课关联记录
-    if(!studentId.value){ 
+    if (!studentId.value) {
       return
     }
-    console.log(studentId.value)
     const associatedRes = await getAssociatedBySidApi(studentId.value)
-    console.log('选课关联记录：', associatedRes)
-    const associatedList = associatedRes.data // 每项应包含 cid
+    if (!associatedRes.data || associatedRes.data.length === 0) {
+      courseList.value = []
+      return
+    }
+    // 获取所有课程信息
+    const courseRes = await getClassesByIdApi
+    const associatedList = associatedRes.data
 
     const cidList: number[] = associatedList.map((item) => item.classes.id)
-    console.log('选课课程ID列表：', cidList)
     // 并发获取所有课程信息
     const classPromises = cidList.map((cid) => getClassesByIdApi(cid))
     const classResults = await Promise.all(classPromises)
@@ -65,7 +79,7 @@ const queryCourseList = async () => {
 
     console.log('选课课程列表：', courseList.value)
   } catch (err) {
-    console.error('加载课程列表失败', err)
+    ElMessage.warning('获取课程列表失败，请先选课')
   }
 }
 

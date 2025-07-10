@@ -108,6 +108,7 @@ public class OssUploadService implements IOssUploadService {
             throw new ImageUploadException("<文件名无效>");
         }
 
+
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
         Set<String> allowedExtensions = new HashSet<>(Arrays.asList(
                 "txt", "md", "markdown", "mdx", "pdf", "html", "htm", "xlsx", "xls",

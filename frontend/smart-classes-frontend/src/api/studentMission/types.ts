@@ -8,6 +8,7 @@ export type StudentMission = {
   score: number
   done: boolean
   active: boolean
+  reportUrl: string
 }
 
 export type StudentMissionCreateDTO = Omit<StudentMission, 'id'>

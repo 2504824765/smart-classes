@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "tb_resource")
 public class Resource {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "resource_seq")
+    @SequenceGenerator(name = "resource_seq", sequenceName = "tb_resource_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "name")

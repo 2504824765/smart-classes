@@ -69,23 +69,35 @@ public class StudentMissionService implements IStudentMissionService {
             throw new StudentMissionNotFoundException("<Student mission not found>");
         } else {
             StudentMission studentMission = studentMissionRepository.findById(studentMissionUpdateDTO.getId()).get();
-            if (studentRepository.findById(studentMissionUpdateDTO.getStudentId()).isEmpty()) {
-                throw new StudentNotFoundException("<Student not found>");
-            } else {
-                Student student = studentRepository.findById(studentMissionUpdateDTO.getStudentId()).get();
+            if (studentMissionUpdateDTO.getStudentId() != null) {
+                if (studentRepository.findById(studentMissionUpdateDTO.getStudentId()).isEmpty()) {
+                    throw new StudentNotFoundException("<Student not found>");
+                } else {
+                    Student student = studentRepository.findById(studentMissionUpdateDTO.getStudentId()).get();
+                    studentMission.setStudent(student);
+                }
+            }
+            if (studentMissionUpdateDTO.getClassMissionId() != null) {
                 if (classMissionRepository.findById(studentMissionUpdateDTO.getClassMissionId()).isEmpty()) {
                     throw new ClassMissionNotFoundException("<Class mission not found>");
                 } else {
                     ClassMission classmission = classMissionRepository.findById(studentMissionUpdateDTO.getClassMissionId()).get();
-                    studentMission.setStudent(student);
                     studentMission.setClassMission(classmission);
-                    studentMission.setScore(studentMissionUpdateDTO.getScore());
-                    studentMission.setDone(studentMissionUpdateDTO.getDone());
-                    studentMission.setActive(studentMissionUpdateDTO.getActive());
-                    studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());
-                    return studentMissionRepository.save(studentMission);
                 }
             }
+            if (studentMissionUpdateDTO.getScore() != null) {
+                studentMission.setScore(studentMissionUpdateDTO.getScore());
+            }
+            if (studentMissionUpdateDTO.getDone() != null) {
+                studentMission.setDone(studentMissionUpdateDTO.getDone());
+            }
+            if (studentMissionUpdateDTO.getActive() != null) {
+                studentMission.setActive(studentMissionUpdateDTO.getActive());
+            }
+            if (studentMissionUpdateDTO.getReportUrl() != null) {
+                studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());
+            }
+            return studentMissionRepository.save(studentMission);
         }
     }
 
@@ -125,16 +137,11 @@ public class StudentMissionService implements IStudentMissionService {
     }
 
     @Override
-    public List<Student> getAllStudentsOfClassMission(Long id) {
+    public List<StudentMission> getAllStudentMissionsOfClassMission(Long id) {
         ClassMission classMission = classMissionRepository.findById(id)
                 .orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
-
         // 只返回领取了该任务的学生
-        List<StudentMission> studentMissions = studentMissionRepository.findByClassMission(classMission);
-        return studentMissions.stream()
-                .map(StudentMission::getStudent)
-                .distinct()
-                .collect(Collectors.toList());
+        return studentMissionRepository.findByClassMission(classMission);
     }
 
     @Override

@@ -7,7 +7,8 @@ import jakarta.persistence.*;
 @Table(name = "tb_class_mission")
 public class ClassMission {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mission_seq")
+    @SequenceGenerator(name = "mission_seq", sequenceName = "tb_class_mission_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Integer id;
     @ManyToOne

@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Table(name = "tb_student_mission")
 public class StudentMission {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_mission_seq")
+    @SequenceGenerator(name = "student_mission_seq", sequenceName = "tb_student_mission_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @ManyToOne

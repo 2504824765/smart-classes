@@ -28,11 +28,11 @@ const initChart = () => {
     tooltip: {},
     radar: {
       indicator: [
-        { name: '概念理解', max: 100 },
-        { name: '逻辑推理', max: 100 },
-        { name: '问题解决', max: 100 },
-        { name: '创新思维', max: 100 },
-        { name: '表达规范', max: 100 }
+        { name: '概念理解', min: 60, max: 100 },
+        { name: '逻辑推理', min: 60, max: 100 },
+        { name: '问题解决', min: 60, max: 100 },
+        { name: '创新思维', min: 60, max: 100 },
+        { name: '表达规范', min: 60, max: 100 }
       ],
       radius: '65%',
       splitNumber: 5,

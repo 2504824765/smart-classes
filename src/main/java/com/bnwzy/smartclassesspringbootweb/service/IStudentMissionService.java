@@ -24,7 +24,7 @@ public interface IStudentMissionService {
 
     List<StudentMission> getStudentMissionsByStudentId(Long id);
 
-    List<Student> getAllStudentsOfClassMission(Long id);
+    List<StudentMission> getAllStudentMissionsOfClassMission(Long id);
 
     StudentMission getStudentMissionByStudentIdAndClassMissionId(GetStudentMissionByStudentIdAndClassMissionIdDTO getStudentMissionByStudentIdAndClassMissionIdDTO);
 }

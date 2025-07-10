@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileIsNullException.class)
     public ResponseMessage FileIsNullException(FileIsNullException e) {
         logger.error(e.getMessage());
-        return new ResponseMessage(512, "<Fill is null>", null);
+        return new ResponseMessage(512, "<File is null>", null);
     }
     @ExceptionHandler(ClassMissionNotFoundException.class)
     public ResponseMessage classMissionNotFoundException(ClassMissionNotFoundException e) {

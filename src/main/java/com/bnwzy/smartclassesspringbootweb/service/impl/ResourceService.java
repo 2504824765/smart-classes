@@ -58,14 +58,22 @@ public class ResourceService implements IResourceService {
             throw new ResourceNotFoundException("<Resource not found>");
         } else {
             Resource resource = resourceRepository.findById(resourceUpdateDTO.getId()).get();
-            if (classesRepository.findById(resourceUpdateDTO.getClassId()).isEmpty()) {
-                throw new ClassesNotFoundException("<Resouce class not found>");
-            } else {
-                resource.setClasses(classesRepository.findById(resourceUpdateDTO.getClassId()).get());
+            if (resourceUpdateDTO.getClassId() != null) {
+                if (classesRepository.findById(resourceUpdateDTO.getClassId()).isEmpty()) {
+                    throw new ClassesNotFoundException("<Resouce class not found>");
+                } else {
+                    resource.setClasses(classesRepository.findById(resourceUpdateDTO.getClassId()).get());
+                }
             }
-            resource.setName(resourceUpdateDTO.getName());
-            resource.setPath(resourceUpdateDTO.getPath());
-            resource.setType(resourceUpdateDTO.getType());
+            if (resourceUpdateDTO.getName() != null) {
+                resource.setName(resourceUpdateDTO.getName());
+            }
+            if (resourceUpdateDTO.getPath() != null) {
+                resource.setPath(resourceUpdateDTO.getPath());
+            }
+            if (resourceUpdateDTO.getType() != null) {
+                resource.setType(resourceUpdateDTO.getType());
+            }
             return resourceRepository.save(resource);
         }
     }

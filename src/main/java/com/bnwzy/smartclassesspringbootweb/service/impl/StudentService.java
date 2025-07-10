@@ -43,22 +43,32 @@ public class StudentService implements IStudentService {
             throw new StudentNotFoundException("<Student Not Found>");
         } else {
             Student student = studentRepository.findById(studentUpdateDTO.getId()).get();
-            student.setName(studentUpdateDTO.getName());
-            student.setGender(studentUpdateDTO.getGender());
-            if (departmentRepository.findById(studentUpdateDTO.getDeptId()).isEmpty()) {
-                throw new DepartmentNotFoundException("<Department Not Found>");
-            } else {
-                Department department = departmentRepository.findById(studentUpdateDTO.getDeptId()).get();
-                student.setDepartment(department);
+            if (studentUpdateDTO.getName() != null) {
+                student.setName(studentUpdateDTO.getName());
             }
-            student.setGpa(studentUpdateDTO.getGpa());
-            if (studentDataRepository.findById(studentUpdateDTO.getStudentDataId()).isEmpty()) {
-                throw new StudentDataNotFoundException("<StudentData Not Found>");
-            } else {
-                StudentData studentData = studentDataRepository.findById(studentUpdateDTO.getStudentDataId()).get();
-                student.setStudentData(studentData);
-                return studentRepository.save(student);
+            if  (studentUpdateDTO.getGender() != null) {
+                student.setGender(studentUpdateDTO.getGender());
             }
+            if (studentUpdateDTO.getDeptId() != null) {
+                if (departmentRepository.findById(studentUpdateDTO.getDeptId()).isEmpty()) {
+                    throw new DepartmentNotFoundException("<Department Not Found>");
+                } else {
+                    Department department = departmentRepository.findById(studentUpdateDTO.getDeptId()).get();
+                    student.setDepartment(department);
+                }
+            }
+            if (studentUpdateDTO.getGender() != null) {
+                student.setGpa(studentUpdateDTO.getGpa());
+            }
+            if (studentUpdateDTO.getStudentDataId() != null) {
+                if (studentDataRepository.findById(studentUpdateDTO.getStudentDataId()).isEmpty()) {
+                    throw new StudentDataNotFoundException("<StudentData Not Found>");
+                } else {
+                    StudentData studentData = studentDataRepository.findById(studentUpdateDTO.getStudentDataId()).get();
+                    student.setStudentData(studentData);
+                }
+            }
+            return studentRepository.save(student);
         }
     }
 

@@ -40,7 +40,7 @@ public class DifyReportCommentService implements IDifyReportCommentService {
 
     public DifyReportCommentService() {
 //        String apiKey = "app-569FKczHOtQkaHwEFk0QdEcW"; // 本地
-        String apiKey = "app-72aF7vyTeccjC7y0ZMrgn8S4"; // 远程
+        String apiKey = "app-IyD6i2DIxGDteTT2JoMethKN"; // 远程
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(300))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100000);

@@ -121,14 +121,27 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
         {
           path: '',
           name: 'StudentManage',
-          component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
+          component: () => import('@/views/SmartClass/TeacherEnd/StudentCourse.vue'),
           meta: {
             title: t('teacher.studentManage'),
             icon: 'vi-ant-design:user-outlined',
             userType: 'teacher',
             noCache: true
-          }
-        }
+          },
+          children:[
+            {
+              path: 'detail',
+              name: 'StudentManage',
+              component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
+              meta: {
+                title: t('teacher.studentManage'),
+                icon: 'vi-ant-design:user-outlined',
+                userType: 'teacher',
+                noCache: true
+              }
+            }
+          ]
+        },
       ]
     },
 

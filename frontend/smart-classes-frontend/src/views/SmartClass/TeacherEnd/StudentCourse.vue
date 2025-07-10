@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import CourseCard from './components/CourseCard.vue'
+import CourseCard from './components/CourseSCard.vue'
 import { Classes } from '@/api/classes/types'
 import { getAllClassesApi } from '@/api/classes/index'
 import { onMounted, ref, watch } from 'vue'

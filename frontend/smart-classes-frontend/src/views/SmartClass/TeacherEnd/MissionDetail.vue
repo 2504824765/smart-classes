@@ -93,10 +93,13 @@ onMounted(async () => {
 
   // 获取所有学生完成情况（已适配接口）
   const studentRes = await getStudentMissionByMission(missionId)
+  console.log(studentRes.data)
   studentMissions.value = studentRes.data.map((s) => ({
     ...s,
     isDone: s.done
   }))
+  console.log(studentMissions.value)
+  console.log(missionId)
 })
 
 const viewStudentDetail = (studentMission: StudentMission) => {

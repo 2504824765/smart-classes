@@ -11,9 +11,11 @@ import type { ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource/index'
 import { uploadResourcesApi } from '@/api/oss/index'
 import type { ClassMissionCreateDTO } from '@/api/classMission/types'
+import { addStudentMission } from '@/api/studentMission'
+import { getAssociatedByCidApi } from '@/api/studentClasses'
+import { StudentMissionCreateDTO } from '@/api/studentMission/types'
 
 const route = useRoute()
-const { push } = useRouter()
 
 // 从路由中获取课程 ID
 const classId = Number(route.query.cid)
@@ -25,7 +27,6 @@ interface PendingUploadResource {
   description: string
   file: File
 }
-const uploadedResources: ResourceCreateDTO[] = []
 
 const missionFormSchema = reactive<FormSchema[]>([
   {
@@ -135,7 +136,7 @@ const handleSubmit = async () => {
       if (pendingResources.value.length > 0) {
         const resFile = pendingResources.value[0]
         const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
-        const filePath = uploadRes.data.url
+        const filePath = uploadRes.data
 
         const newRes = {
           name: resFile.name,
@@ -155,12 +156,36 @@ const handleSubmit = async () => {
         resource: resourceId ?? 0
       }
 
-      await addClassMissionApi(missionToSubmit)
+      const classMissionRes = await addClassMissionApi(missionToSubmit)
       ElMessage.success('任务创建成功')
+      const studentClassRes = await getAssociatedByCidApi(classId)
+      if (!studentClassRes.data || studentClassRes.data.length === 0) {
+        ElMessage.warning('当前课程没有学生选课记录，学生任务无法创建')
+        return
+      }
+      try {
+        // 2. 遍历学生，构造每个 StudentMissionCreateDTO 并创建
+        const createPromises = studentClassRes.data.map((record: any) => {
+          const dto: StudentMissionCreateDTO = {
+            student: record.student.id, // 👈 只传 student id
+            classMission: classMissionRes.data.id, // 👈 只传 classMission id
+            score: 0,
+            done: false,
+            active: true,
+            reportUrl: ''
+          }
+          return addStudentMission(dto)
+        })
 
-      // 可选重置
-      elForm.resetFields()
-      pendingResources.value = []
+        await Promise.all(createPromises)
+        ElMessage.success('学生任务创建成功')
+        // 可选重置
+        elForm.resetFields()
+        pendingResources.value = []
+      } catch (e) {
+        console.error('批量创建失败:', e)
+        ElMessage.error('学生任务创建失败，请重试')
+      }
     } catch (err) {
       ElMessage.error('提交失败，请重试')
       console.error('任务提交错误：', err)

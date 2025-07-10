@@ -18,8 +18,8 @@ const deptTreeOptions = ref<any[]>([])
 
 function listToTree(list: any[], parentId = 0) {
   return list
-    .filter(item => item.parentId === parentId)
-    .map(item => ({
+    .filter((item) => item.parentId === parentId)
+    .map((item) => ({
       label: item.name,
       value: item.id,
       children: listToTree(list, item.id)
@@ -140,7 +140,7 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写学生信息')
       return
     }
-    let formData = await getFormData<StudentCreateDTO & { deptId: number | number[] }>()
+    const formData = await getFormData<StudentCreateDTO & { deptId: number | number[] }>()
     // 取多级选择的最后一级id
     if (Array.isArray(formData.deptId)) {
       formData.deptId = formData.deptId[formData.deptId.length - 1]

@@ -48,23 +48,13 @@
 
         <!-- 文件列表展示 -->
         <div class="mt-2">
-          <el-card
-            v-for="file in fileList"
-            :key="file.name"
-            class="mb-2"
-            shadow="hover"
-          >
+          <el-card v-for="file in fileList" :key="file.name" class="mb-2" shadow="hover">
             <div class="flex justify-between items-center">
               <div>
                 <el-icon class="mr-2"><Document /></el-icon>
                 {{ file.name }}
               </div>
-              <el-button
-                type="primary"
-                size="small"
-                text
-                @click="handleDownload(file)"
-              >
+              <el-button type="primary" size="small" text @click="handleDownload(file)">
                 下载
               </el-button>
             </div>
@@ -106,8 +96,8 @@ const queryDate = async () => {
   const studentMissionRes = await getStudentMissionById(studentMissionId)
   if (studentMissionRes.code === 200) {
     studentMission.value = studentMissionRes.data
-    console.log('res:',studentMissionRes)
-    console.log('studentMission:',studentMission.value)
+    console.log('res:', studentMissionRes)
+    console.log('studentMission:', studentMission.value)
     loadHistoryFile()
   }
 }

@@ -19,8 +19,8 @@ const deptTreeOptions = ref<any[]>([])
 // 平铺转树
 function listToTree(list: any[], parentId = 0) {
   return list
-    .filter(item => item.parentId === parentId)
-    .map(item => ({
+    .filter((item) => item.parentId === parentId)
+    .map((item) => ({
       label: item.name,
       value: item.id,
       children: listToTree(list, item.id)
@@ -118,7 +118,7 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写教师信息')
       return
     }
-    let formData = await getFormData<TeacherCreateDTO & { departmentId: number | number[] }>()
+    const formData = await getFormData<TeacherCreateDTO & { departmentId: number | number[] }>()
     // 取多级选择的最后一级id
     if (Array.isArray(formData.departmentId)) {
       formData.departmentId = formData.departmentId[formData.departmentId.length - 1]
@@ -132,9 +132,9 @@ const handleSubmit = async () => {
         await updateTeacherApi({ ...formData, id: teacherId.value } as TeacherUpdateDTO)
         ElMessage.success('教师信息更新成功')
       } else {
-      await createTeacherApi(formData)
-      ElMessage.success('教师添加成功')
-      elForm.resetFields()
+        await createTeacherApi(formData)
+        ElMessage.success('教师添加成功')
+        elForm.resetFields()
       }
       router.push({ path: '/admin/teacherManage' })
     } catch (err) {
@@ -147,7 +147,13 @@ const handleSubmit = async () => {
 <template>
   <ContentWrap :title="isEdit ? '编辑教师' : '新增教师'">
     <Form :schema="teacherFormSchema" @register="formRegister" />
-    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">{{ isEdit ? '保存' : '提交' }}</BaseButton>
-    <BaseButton style="margin-top: 16px; margin-left: 8px" @click="() => router.push({ path: '/admin/teacherManage' })">返回</BaseButton>
+    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">{{
+      isEdit ? '保存' : '提交'
+    }}</BaseButton>
+    <BaseButton
+      style="margin-top: 16px; margin-left: 8px"
+      @click="() => router.push({ path: '/admin/teacherManage' })"
+      >返回</BaseButton
+    >
   </ContentWrap>
 </template>

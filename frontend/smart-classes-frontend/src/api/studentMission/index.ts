@@ -21,7 +21,7 @@ export const getStudentMissionByStudent = async (
 export const getStudentMissionByMission = async (
   missionId: number
 ): Promise<IResponse<StudentMission[]>> => {
-  return request.get({ url: `/api/allStudentsOfClassMission/${missionId}` })
+  return request.get({ url: `/api/studentMission/allStudentsOfClassMission/${missionId}` })
 }
 
 export const getStudentMissionById = async (id: number): Promise<IResponse<StudentMission>> => {

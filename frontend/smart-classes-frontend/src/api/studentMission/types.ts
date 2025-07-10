@@ -11,4 +11,7 @@ export type StudentMission = {
   reportUrl: string
 }
 
-export type StudentMissionCreateDTO = Omit<StudentMission, 'id'>
+export type StudentMissionCreateDTO = Omit<StudentMission, 'id' | 'student' | 'classMission'> & {
+  student: number
+  classMission: number
+}

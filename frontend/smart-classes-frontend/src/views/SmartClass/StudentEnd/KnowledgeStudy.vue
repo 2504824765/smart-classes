@@ -11,9 +11,9 @@
           :name="res.id"
           :key="res.id"
         >
-          <div v-if="res.type === 'text'" class="p-4 bg-white rounded shadow"> 
+          <div v-if="res.type === 'text'" class="p-4 bg-white rounded shadow">
             <el-card class="mb-4 p-4 bg-white rounded shadow">
-              <div v-html="compiledMarkdown" class="prose prose-sm max-w-none" />
+              <div v-html="compiledMarkdown" class="prose prose-sm max-w-none"></div>
             </el-card>
 
             <!-- 下：笔记编辑卡片 -->
@@ -24,8 +24,12 @@
             </el-card>
           </div>
           <div v-else-if="res.type === 'question'" class="text-gray-400">
-            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)" >生成题目</ElButton>
-            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)">刷新题目</ElButton>
+            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)"
+              >生成题目</ElButton
+            >
+            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)"
+              >刷新题目</ElButton
+            >
             <QuestionCard
               v-for="(q, index) in questions"
               :key="index"
@@ -35,7 +39,9 @@
               :answer="q.answer"
               :showResult="submitted"
             />
-            <el-button type="primary" :disabled="questions.length === 0" @click="handleSubmit">提交</el-button>
+            <el-button type="primary" :disabled="questions.length === 0" @click="handleSubmit"
+              >提交</el-button
+            >
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -165,13 +171,12 @@ const loadNodeIntroduction = async (nodeName: string) => {
   }
 }
 
-
-const createQuestions = async (method:number) => {
+const createQuestions = async (method: number) => {
   if (method === 1) {
-    if(questions.value.length > 0) {
+    if (questions.value.length > 0) {
       ElMessage.warning('已生成题目，请刷新页面重新生成')
       return
-    }else{
+    } else {
       if (questions.value.length === 0) {
         loading.value = true
         try {
@@ -181,8 +186,7 @@ const createQuestions = async (method:number) => {
         }
       }
     }
-  }
-  else if (method === 2) {
+  } else if (method === 2) {
     if (questions.value.length > 0) {
       questions.value = []
     }
@@ -192,7 +196,7 @@ const createQuestions = async (method:number) => {
     } finally {
       loading.value = false
     }
-  }else {
+  } else {
     ElMessage.error('生成题目失败')
   }
 }
@@ -214,7 +218,6 @@ const saveNote = () => {
     .from(el)
     .save()
 }
-
 
 const handleSubmit = () => {
   submitted.value = true
@@ -328,7 +331,7 @@ watch(currentResourceId, (newId) => {
 
 onMounted(async () => {
   await fetchKnowledge()
-  await loadNodeIntroduction(knowledgeName) 
+  await loadNodeIntroduction(knowledgeName)
 })
 </script>
 

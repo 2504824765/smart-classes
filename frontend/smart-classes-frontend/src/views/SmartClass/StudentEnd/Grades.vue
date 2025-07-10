@@ -2,16 +2,9 @@
   <ContentWrap>
     <el-card shadow="hover" class="grade-card">
       <h2 class="title">学生成绩查看</h2>
-      <p class="student-info">
-        学生姓名: {{ student.name }}（ID: {{ student.id }}）
-      </p>
+      <p class="student-info"> 学生姓名: {{ student.name }}（ID: {{ student.id }}） </p>
 
-      <el-table
-        :data="grades"
-        stripe
-        border
-        class="grade-table"
-      >
+      <el-table :data="grades" stripe border class="grade-table">
         <el-table-column prop="name" label="课程名称" min-width="240" align="center" />
         <el-table-column prop="credit" label="学分" width="100" align="center" />
         <el-table-column prop="class_hours" label="学时" width="100" align="center" />
@@ -25,14 +18,11 @@
   </ContentWrap>
 </template>
 
-
 <script setup lang="ts">
-
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store/modules/user'
 import { getStudentByUsernameApi, getStudentByIdApi } from '@/api/student/index'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
-
 
 interface GradeItem {
   name: string
@@ -89,14 +79,14 @@ const fetchStudentInfo = async () => {
 
 // 获取学生的选课记录
 const fetchStudentGrades = async () => {
-    if (!student.value.id) {
+  if (!student.value.id) {
     console.error('学生ID为空')
     return
   }
   try {
     const res = await getAssociatedBySidApi(student.value.id)
     // console.log('获取到的 res：', res)
-    const associatedList = Array.isArray(res.data) ? res.data: []
+    const associatedList = Array.isArray(res.data) ? res.data : []
     // console.log('提取到的 associatedList：', associatedList)
 
     if (associatedList.length === 0) {
@@ -106,7 +96,13 @@ const fetchStudentGrades = async () => {
     }
 
     grades.value = associatedList
-      .filter((item: any) => item.grade !== null && item.grade !== undefined && item.grade !== '' && !isNaN(Number(item.grade)))
+      .filter(
+        (item: any) =>
+          item.grade !== null &&
+          item.grade !== undefined &&
+          item.grade !== '' &&
+          !isNaN(Number(item.grade))
+      )
       .map((item: any) => {
         const classData = item.classes
         return {
@@ -118,12 +114,10 @@ const fetchStudentGrades = async () => {
       })
 
     console.log('成绩数据：', grades.value)
-
   } catch (error) {
     console.error('获取选课或课程信息失败:', error)
   }
 }
-
 
 // GPA
 const gpa = computed(() => {
@@ -142,14 +136,11 @@ const gpa = computed(() => {
   return total.totalCredit > 0 ? total.totalGpa / total.totalCredit : 0
 })
 
-
 onMounted(async () => {
   await initialize()
-    console.log('成绩数据：', grades.value)
+  console.log('成绩数据：', grades.value)
 })
 </script>
-
-
 
 <style scoped>
 .grade-card {
@@ -189,6 +180,4 @@ onMounted(async () => {
   color: #409eff;
   margin-left: 8px;
 }
-
-
 </style>

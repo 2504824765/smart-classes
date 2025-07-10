@@ -38,10 +38,16 @@ const selectedCids = ref<number[]>([]) // 学生已选课程 id 列表
 // 获取学生已选课程 id
 const fetchSelectedCids = async () => {
   if (!studentId.value) return
+  console.log(studentId.value)
   const associatedRes = await getAssociatedBySidApi(studentId.value)
-  if (associatedRes.data) {
-    selectedCids.value = associatedRes.data.map((item) => item.classes.id)
+  console.log(associatedRes)
+  if (associatedRes.code === 200) {
+    console.log('fine1')
+    if (associatedRes.data) {
+      selectedCids.value = associatedRes.data.map((item) => item.classes.id)
+    }
   }
+  console.log('fine')
 }
 
 // 获取所有课程，并排除已选课程
@@ -49,7 +55,9 @@ const getClassList = async () => {
   loading.value = true
   try {
     await fetchSelectedCids() // 先获取已选课程 id
+    console.log('1s')
     const res = await getAllClassesApi()
+
     const allClasses: Classes[] = res.data || []
     // 排除已选课程
     classList.value = allClasses.filter((cls) => !selectedCids.value.includes(cls.id))

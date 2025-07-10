@@ -3,7 +3,7 @@
     <h2 style="text-align: center; margin-bottom: 20px">学生能力评估</h2>
     <template v-if="loaded">
       <AbilityRadarChart v-if="hasAbilityData" :abilities="studentAbilities" />
-      <div v-else style="text-align: center; color: gray;">暂无能力评估数据</div>
+      <div v-else style="text-align: center; color: gray">暂无能力评估数据</div>
     </template>
     <div v-else>正在加载能力数据...</div>
   </el-card>
@@ -67,7 +67,11 @@ const getStudentInfo = async (username: string) => {
   }
 }
 
-const updateStudentWithStudentDataId = async (studentId: number, deptId: number, studentDataId: number) => {
+const updateStudentWithStudentDataId = async (
+  studentId: number,
+  deptId: number,
+  studentDataId: number
+) => {
   try {
     await updateStudentApi({
       id: studentId,
@@ -80,7 +84,6 @@ const updateStudentWithStudentDataId = async (studentId: number, deptId: number,
   }
 }
 
-
 const initialize = async () => {
   if (loginInfo && loginInfo.username) {
     await getStudentInfo(loginInfo.username)
@@ -90,5 +93,4 @@ const initialize = async () => {
 onMounted(() => {
   initialize()
 })
-
 </script>

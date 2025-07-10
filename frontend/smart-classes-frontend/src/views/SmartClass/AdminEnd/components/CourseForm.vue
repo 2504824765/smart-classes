@@ -8,7 +8,12 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi, getClassesByIdApi } from '@/api/classes'
 import { PendingUploadResource, ResourceCreateDTO, Resource } from '@/api/resource/types'
-import { addResourceApi, getResourceByClassIdApi, getResourceByIdApi, deleteResourceApi } from '@/api/resource'
+import {
+  addResourceApi,
+  getResourceByClassIdApi,
+  getResourceByIdApi,
+  deleteResourceApi
+} from '@/api/resource'
 import { uploadResourcesApi } from '@/api/oss'
 import { Teacher } from '@/api/teacher/types'
 import { getAllTeacherApi } from '@/api/teacher'
@@ -34,7 +39,7 @@ const missionResources = ref<Resource[]>([])
 const isAddMode = computed(() => !isEdit.value)
 const isEditMode = computed(() => isEdit.value)
 
-const isFile = (f: any): f is File => typeof File !== 'undefined' && f instanceof File;
+const isFile = (f: any): f is File => typeof File !== 'undefined' && f instanceof File
 
 const courseFormSchema = reactive<FormSchema[]>([
   {
@@ -168,7 +173,7 @@ onMounted(async () => {
           credit: course.credit,
           classHours: course.classHours,
           description: course.description,
-          active: course.active,
+          active: course.active
         })
         // 直接拉取课程所有资源
         const resourceRes = await getResourceByClassIdApi(courseId.value)
@@ -317,24 +322,55 @@ const handleDeleteResource = async (id: number) => {
   <ContentWrap :title="isEdit ? '编辑课程' : '新增课程'">
     <Form :schema="courseFormSchema" @register="formRegister" />
     <div v-if="isEdit">
-      <div style="margin: 24px 0 0 0;">
-        <div style="font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 16px;">
+      <div style="margin: 24px 0 0 0">
+        <div
+          style="
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+          "
+        >
           <span>课程所有资源：</span>
           <el-upload
             :show-file-list="false"
             :before-upload="() => false"
-            :on-change="(file) => { if (isFile(file.raw)) handleResourceUpload(file.raw) }"
+            :on-change="
+              (file) => {
+                if (isFile(file.raw)) handleResourceUpload(file.raw)
+              }
+            "
             accept="*"
           >
             <BaseButton type="primary" size="small">上传资源</BaseButton>
           </el-upload>
         </div>
-        <div v-if="missionResources.length" style="display: flex; flex-wrap: wrap; gap: 16px;">
-          <div v-for="file in missionResources" :key="file.id" style="border: 1px solid #eee; border-radius: 6px; padding: 12px 18px; min-width: 180px; background: #fafbfc; position: relative;">
+        <div v-if="missionResources.length" style="display: flex; flex-wrap: wrap; gap: 16px">
+          <div
+            v-for="file in missionResources"
+            :key="file.id"
+            style="
+              border: 1px solid #eee;
+              border-radius: 6px;
+              padding: 12px 18px;
+              min-width: 180px;
+              background: #fafbfc;
+              position: relative;
+            "
+          >
             <div><b>文件名：</b>{{ file.name }}</div>
             <div><b>类型：</b>{{ file.type }}</div>
-            <div v-if="file.path"><a :href="file.path" target="_blank" style="color: #409EFF;">下载/查看</a></div>
-            <el-button type="danger" size="small" style="position: absolute; top: 8px; right: 8px;" @click="handleDeleteResource(file.id)">删除</el-button>
+            <div v-if="file.path"
+              ><a :href="file.path" target="_blank" style="color: #409eff">下载/查看</a></div
+            >
+            <el-button
+              type="danger"
+              size="small"
+              style="position: absolute; top: 8px; right: 8px"
+              @click="handleDeleteResource(file.id)"
+              >删除</el-button
+            >
           </div>
         </div>
       </div>

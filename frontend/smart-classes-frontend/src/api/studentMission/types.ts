@@ -1,6 +1,5 @@
 import { Student } from '@/api/student/types'
 import { ClassMission } from '@/api/classMission/types'
-import { Resource } from '@/api/resource/types'
 
 export type StudentMission = {
   id: number
@@ -9,7 +8,7 @@ export type StudentMission = {
   score: number
   done: boolean
   active: boolean
-  resource: Resource
+  reportUrl: string
 }
 
 export type StudentMissionCreateDTO = Omit<StudentMission, 'id'>

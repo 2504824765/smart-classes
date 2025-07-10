@@ -4,6 +4,8 @@
     <el-switch v-model="onlyShowActive" active-text="仅显示启用课程" />
   </div>
 
+  <el-empty v-if="displayList.length === 0">暂无课程</el-empty>
+  
   <draggable v-model="displayList" item-key="id" class="course-list" animation="200">
     <template #item="{ element }">
       <CourseCard :course="element" :key="element.id" :disabled="!element.active" />
@@ -15,14 +17,31 @@
 import CourseCard from './components/CourseCard.vue'
 import { Classes } from '@/api/classes/types'
 import { getAllClassesApi } from '@/api/classes/index'
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { getTeacherByUsernameApi } from '@/api/teacher'
+import { useUserStore } from '@/store/modules/user' 
 import draggable from 'vuedraggable'
+
+const teacherId = ref<number>()
+const getId = async (username: string) => {
+  const res = await getTeacherByUsernameApi(username)
+  teacherId.value = res.data.id
+}
+
+const userStore = useUserStore()
+const loginInfo = userStore.getLoginInfo
+const initialize = async () => {
+  if (loginInfo) {
+    const username = loginInfo.username
+    await getId(username)
+  }
+}
 
 const courseList = ref<Classes[]>([])
 
 const queryCourseList = async () => {
   const res = await getAllClassesApi()
-  courseList.value = res.data
+  courseList.value = res.data.filter((course: Classes) => course.teacher.id === teacherId.value)
 }
 
 const searchKeyword = ref('')
@@ -39,6 +58,7 @@ watch([courseList, searchKeyword, onlyShowActive], () => {
 })
 
 onMounted(() => {
+  initialize()
   queryCourseList()
 })
 </script>

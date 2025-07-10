@@ -47,8 +47,29 @@
         </el-upload>
 
         <!-- 文件列表展示 -->
-        <div v-if="fileList.length > 0" class="mt-2">
-          <el-upload-list :file-list="fileList" />
+        <div class="mt-2">
+          <el-card
+            v-for="file in fileList"
+            :key="file.name"
+            class="mb-2"
+            shadow="hover"
+          >
+            <div class="flex justify-between items-center">
+              <div>
+                <el-icon class="mr-2"><Document /></el-icon>
+                {{ file.name }}
+              </div>
+              <el-button
+                type="primary"
+                size="small"
+                text
+                @click="handleDownload(file)"
+              >
+                下载
+              </el-button>
+            </div>
+          </el-card>
+          <el-empty v-if="!fileList.length" description="暂无文件" />
         </div>
 
         <!-- 提交按钮 -->
@@ -66,7 +87,7 @@ import { getClassMissionByIdApi } from '@/api/classMission/index'
 import { getStudentMissionById } from '@/api/studentMission/index'
 import { StudentMission } from '@/api/studentMission/types'
 import { uploadResourcesApi } from '@/api/oss/index'
-import { addResourceApi, updateResourceApi } from '@/api/resource/index'
+import { updateStudentMission } from '@/api/studentMission/index'
 import { UploadFile, ElMessage } from 'element-plus'
 import { PREFIX } from '@/constants'
 const route = useRoute()
@@ -81,12 +102,45 @@ const queryDate = async () => {
   const classMissionRes = await getClassMissionByIdApi(missionId)
   if (classMissionRes.code === 200) {
     classMission.value = classMissionRes.data
-    console.log(classMission.value)
   }
   const studentMissionRes = await getStudentMissionById(studentMissionId)
   if (studentMissionRes.code === 200) {
     studentMission.value = studentMissionRes.data
-    console.log(studentMission.value)
+    console.log('res:',studentMissionRes)
+    console.log('studentMission:',studentMission.value)
+    loadHistoryFile()
+  }
+}
+
+const handleDownload = (file: File | { url: string; name: string } | any) => {
+  let url: string
+  let name: string
+
+  // 已上传的 OSS 文件（带 url）
+  if (file.url && file.name) {
+    url = file.url
+    name = file.name
+  }
+  // 上传前的本地文件（raw File 对象）
+  else if (file.raw instanceof File) {
+    url = URL.createObjectURL(file.raw)
+    name = file.name || file.raw.name
+  } else {
+    ElMessage.warning('无法识别的文件对象')
+    return
+  }
+
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.style.display = 'none'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+
+  // 清理 blob URL
+  if (file.raw instanceof File) {
+    URL.revokeObjectURL(url)
   }
 }
 
@@ -94,7 +148,16 @@ const fileList = ref<UploadFile[]>([])
 
 // 页面初始化时加载历史文件
 const loadHistoryFile = () => {
-  const resource = studentMission.value?.resource
+  const path = studentMission.value?.reportUrl
+  if (path) {
+    fileList.value = [
+      {
+        name: path.split('/').pop() || '已提交文件',
+        url: PREFIX + path, // 拼接完整URL
+        status: 'success'
+      } as UploadFile
+    ]
+  }
 }
 
 // 选择新文件（覆盖旧的 fileList）
@@ -119,15 +182,14 @@ const handleSubmit = async () => {
     const uploadRes = await uploadResourcesApi(fileRaw, '学生任务')
     const fullPath = uploadRes.data
     const relativePath = fullPath.replace(PREFIX, '')
-
-    if (!studentMission.value?.resource) {
-      // 3. 首次提交
-
+    if (!studentMission.value?.reportUrl) {
       ElMessage.success('文件上传并资源创建成功')
     } else {
-      studentMission.value.resource.path = relativePath
+      studentMission.value.reportUrl = relativePath
       ElMessage.success('文件上传并资源更新成功')
     }
+    console.log(studentMission.value)
+    await updateStudentMission(studentMission.value)
   } catch (err) {
     ElMessage.error('上传失败，请稍后重试')
   }

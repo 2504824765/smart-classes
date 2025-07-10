@@ -61,7 +61,12 @@ const renderMarkdown = (text: string) => {
   return md.render(text)
 }
 const userInput = ref('')
-const messages = ref<{ role: 'user' | 'ai'; content: string }[]>([])
+const messages = ref<{ role: 'user' | 'ai'; content: string }[]>([
+  {
+    role: 'ai',
+    content: '我是智能AI助手，你可以向我提问你想问的问题，我会尽可能的给你帮助 😊'
+  }
+])
 const generating = ref(false)
 const conversationId = ref<string | null>(null)
 
@@ -108,13 +113,14 @@ const fetchAnswer = async (question: string) => {
 }
 
 const quickActions = [
-  { label: '路径推荐', text: '推荐学习路径', iconName: 'vi-ant-design:project-outlined' },
-  { label: '知识简介', text: '知识点简介', iconName: 'vi-ant-design:info-circle-outlined' },
-  {
-    label: '资源清单',
-    text: '我有哪些资源可以学习？',
-    iconName: 'vi-ant-design:folder-open-outlined'
-  }
+  // { label: '路径推荐', text: '推荐学习路径', iconName: 'vi-ant-design:project-outlined' },
+  // { label: '知识简介', text: '知识点简介', iconName: 'vi-ant-design:info-circle-outlined' },
+  // {
+  //   label: '资源清单',
+  //   text: '我有哪些资源可以学习？',
+  //   iconName: 'vi-ant-design:folder-open-outlined'
+  // }
+  { label: '你好', text: '你好', iconName: 'vi-ant-design:info-circle-outlined' },
 ]
 
 const quickActionsWithIcon = quickActions.map((item) => ({

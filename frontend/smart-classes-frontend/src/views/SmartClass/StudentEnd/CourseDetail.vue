@@ -304,10 +304,15 @@ const initGraph = async () => {
 
 const fetchGraphData = async () => {
   const res = await getClassesByIdApi(classId!)
+  if (!res.data) {
+    ElMessage.warning('无法定位课程')
+    return
+  }
   if (!res.data.graph) {
     ElMessage.warning('该课程暂无图谱数据,请等待老师创建图谱')
     return
   }
+  courseTitle.value = res.data.name
   const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
 
   const graphJson = await fetch(fullUrl)
@@ -357,7 +362,6 @@ onMounted(async () => {
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold">课程名称：{{ courseTitle }}</h2>
-          <p class="text-gray-500">已学习进度：{{ progress }}%</p>
         </div>
       </div>
     </el-card>

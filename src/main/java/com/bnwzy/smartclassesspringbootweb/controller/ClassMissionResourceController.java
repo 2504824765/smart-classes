@@ -20,4 +20,9 @@ public class ClassMissionResourceController {
     public ResponseMessage createClassMissionResource(@Validated @RequestBody ClassMissionResourceCreateDTO classMissionResourceCreateDTO){
         return ResponseMessage.success("<Create class mission resource>", classMissionResourceService.createClassMissionResource(classMissionResourceCreateDTO));
     }
+
+    @GetMapping("/getAllClassMissionResourceByClassMissionId/{id}")
+    public ResponseMessage getAllClassMissionResourcesByClassMissionId(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Get all classMissionResource>", classMissionResourceService.getAllClassMissionResourcesByClassMissionId(id));
+    }
 }

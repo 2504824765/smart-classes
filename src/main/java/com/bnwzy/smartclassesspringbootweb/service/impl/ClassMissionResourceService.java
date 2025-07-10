@@ -7,9 +7,10 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionResourceCreateDT
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionResourceRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionResourceService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ClassMissionResourceService implements IClassMissionResourceService {
@@ -25,5 +26,11 @@ public class ClassMissionResourceService implements IClassMissionResourceService
         classMissionResource.setClassMission(classMission);
         classMissionResource.setPath(classMissionResourceCreateDTO.getPath());
         return classMissionResourceRepository.save(classMissionResource);
+    }
+
+    @Override
+    public List<ClassMissionResource> getAllClassMissionResourcesByClassMissionId(Long id) {
+        ClassMission classMission = classMissionRepository.findById(id).orElseThrow(() -> new ClassMissionNotFoundException("<ClassMission not found>"));
+        return classMissionResourceRepository.findByClassMission(classMission);
     }
 }

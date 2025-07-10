@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 @Table(name = "tb_user")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @SequenceGenerator(name = "user_seq", sequenceName = "tb_user_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "username")

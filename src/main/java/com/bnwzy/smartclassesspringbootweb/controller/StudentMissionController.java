@@ -49,7 +49,7 @@ public class StudentMissionController {
 
     @GetMapping("/allStudentsOfClassMission/{id}")
     public ResponseMessage getAllStudentsOfClassMission(@PathVariable("id") Long id) {
-        return ResponseMessage.success("<Get all students of class mission>", studentMissionService.getAllStudentsOfClassMission(id));
+        return ResponseMessage.success("<Get all students of class mission>", studentMissionService.getAllStudentMissionsOfClassMission(id));
     }
 
     @PostMapping("/getStudentMissionByStudentIdAndClassMissionId")

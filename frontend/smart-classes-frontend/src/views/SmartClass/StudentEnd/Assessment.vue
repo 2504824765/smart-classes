@@ -13,7 +13,7 @@
 import { ref, onMounted } from 'vue'
 import AbilityRadarChart from './components/AbilityRadarChart.vue'
 import { useUserStore } from '@/store/modules/user'
-import { getStudentByUsernameApi } from '@/api/student/index'
+import { getStudentByUsernameApi, updateStudentApi } from '@/api/student/index'
 
 const studentId = ref<number | null>(null)
 
@@ -53,11 +53,33 @@ const getStudentInfo = async (username: string) => {
     }
 
     loaded.value = true
+
+    // 更新学生数据
+    if (studentData.studentData && studentData.studentData.id) {
+      const deptId = studentData.department?.id
+      if (deptId) {
+        await updateStudentWithStudentDataId(studentData.id, deptId, studentData.studentData.id)
+      }
+    }
   } catch (error) {
     console.error('获取学生信息失败:', error)
     loaded.value = true
   }
 }
+
+const updateStudentWithStudentDataId = async (studentId: number, deptId: number, studentDataId: number) => {
+  try {
+    await updateStudentApi({
+      id: studentId,
+      deptId: deptId,
+      studentDataId: studentDataId
+    })
+    console.log('学生信息已成功更新，studentDataId:', studentDataId)
+  } catch (error) {
+    console.error('更新学生信息失败:', error)
+  }
+}
+
 
 const initialize = async () => {
   if (loginInfo && loginInfo.username) {

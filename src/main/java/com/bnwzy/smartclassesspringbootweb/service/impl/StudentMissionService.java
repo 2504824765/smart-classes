@@ -137,16 +137,11 @@ public class StudentMissionService implements IStudentMissionService {
     }
 
     @Override
-    public List<Student> getAllStudentsOfClassMission(Long id) {
+    public List<StudentMission> getAllStudentMissionsOfClassMission(Long id) {
         ClassMission classMission = classMissionRepository.findById(id)
                 .orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
-
         // 只返回领取了该任务的学生
-        List<StudentMission> studentMissions = studentMissionRepository.findByClassMission(classMission);
-        return studentMissions.stream()
-                .map(StudentMission::getStudent)
-                .distinct()
-                .collect(Collectors.toList());
+        return studentMissionRepository.findByClassMission(classMission);
     }
 
     @Override

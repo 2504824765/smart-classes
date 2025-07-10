@@ -19,6 +19,8 @@ import EditStudent from './EditStudent.vue'
 import AddStudent from './AddStudent.vue'
 import { Student } from '@/api/student/types'
 import { useRoute } from 'vue-router'
+import { getAssociatedByCidApi } from '@/api/studentClasses'
+import { StudentClasses } from '@/api/studentClasses/types'
 
 const route = useRoute()
 
@@ -82,47 +84,38 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const getTableList = async (params?: Params) => {
-  const res = await getStudentListApi(
-    params || {
-      pageIndex: currentPage.value,
-      pageSize: pageSize.value
-    }
-  )
-  .catch(() => {})
-  .finally(() => {
-    loading.value = false
-  })
-
+const getTableList = async () => {
   if (!classId) {
     ElMessage.warning('请提供课程ID')
     return
   }
 
-  const studentRes = await get
+  loading.value = true
 
-  if (res) {
-    let studentData: Student[] = []
-    if (Array.isArray(res.data)) {
-      studentData = res.data
-      total.value = res.data.length // 如果后端没有返回total，暂时用数组长度
+  try {
+    const res = await getAssociatedByCidApi(classId)
+
+    if (res.code === 200 && Array.isArray(res.data)) {
+      const associations: StudentClasses[] = res.data
+
+      // 提取每个学生
+      const studentData: Student[] = associations.map(item => item.student)
+
+      // 按学号升序排序
+      studentData.sort((a, b) => (a.id || 0) - (b.id || 0))
+
+      tableDataList.value = studentData
+      total.value = studentData.length
+
+      console.log('选课学生列表：', studentData)
     } else {
-      // 如果后端返回的是 { list: [], total: number } 这种结构
-      studentData = res.data.list || res.data
-      total.value = res.data.total || res.data.length || 0
+      ElMessage.error('获取学生列表失败')
     }
-
-    // 按学号（id）升序排序
-    studentData.sort((a, b) => {
-      const idA = a.id || 0
-      const idB = b.id || 0
-      return idA - idB
-    })
-
-    tableDataList.value = studentData
-    console.log(
-      `分页信息: 当前页=${currentPage.value}, 每页=${pageSize.value}, 总数=${total.value}`
-    )
+  } catch (error) {
+    console.error('获取学生列表异常', error)
+    ElMessage.error('获取学生列表出错')
+  } finally {
+    loading.value = false
   }
 }
 

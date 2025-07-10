@@ -43,7 +43,7 @@
           :span="4"
           v-for="studentMission in studentMissions"
           :key="studentMission.id"
-          @click="viewStudentDetail(studentMission)"
+          @click="viewStudentDetail(studentMission.id)"
         >
           <div
             class="student-card"
@@ -66,10 +66,13 @@ import { getClassMissionByIdApi } from '@/api/classMission/index'
 import { getResourceByIdApi } from '@/api/resource/index'
 import type { ClassMission } from '@/api/classMission/types'
 import FileDisplay from './components/FileDisplay.vue'
+import { PREFIX } from '@/constants'
 import { StudentMission } from '@/api/studentMission/types'
+import { getAllClassMissionResourcesByClassMissionId } from '@/api/classMissionResource'
 
 const route = useRoute()
 const router = useRouter()
+const { push } = useRouter()
 
 const mission = ref<ClassMission>()
 const fileCards = ref<{ name: string; url: string }[]>([])
@@ -82,14 +85,18 @@ onMounted(async () => {
   mission.value = res.data
 
   // 获取资源文件（TODO: 请替换为实际资源接口）
-  if (mission.value?.resource) {
-    const resourceRes = await getResourceByIdApi(mission.value.resource.id)
-    fileCards.value = [
-      {
-        name: resourceRes.data.name,
-        url: resourceRes.data.path
-      }
-    ]
+  if (mission.value) {
+    const resourceRes = await getAllClassMissionResourcesByClassMissionId(mission.value.id)
+    console.log('res', resourceRes)
+
+    if (Array.isArray(resourceRes.data)) {
+      fileCards.value = resourceRes.data.map((item: any) => ({
+        url: PREFIX + item.path,  // 如果你有 OSS 前缀
+        name: item.name || '未命名资源'
+      }))
+    } else {
+      fileCards.value = []
+    }
   }
 
   // 获取所有学生完成情况（已适配接口）
@@ -103,12 +110,16 @@ onMounted(async () => {
   console.log(missionId)
 })
 
-const viewStudentDetail = (studentMission: StudentMission) => {
-  router.push({ path: 'StudentMissionDetail', query: { studentId: studentMission.id } })
+const viewStudentDetail = (studentMissionId: number) => {
+  console.log(studentMissionId)
+  if(!studentMissionId){
+    return
+  } 
+  push({ path: '/course/detail/studentDetail', query: { studentMissionId: studentMissionId} })
 }
 </script>
 
-<style scoped>
+<style scoped>  
 .mission-detail {
   padding: 20px;
 }

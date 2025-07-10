@@ -35,7 +35,7 @@ export const addStudentMission = async (
 }
 
 export const updateStudentMission = async (data: StudentMission) => {
-  return request.put({ url: `/api/studentMission/update`, data })
+  return request.post({ url: `/api/studentMission/update`, data })
 }
 
 export const deleteStudentMission = async (id: number): Promise<IResponse<boolean>> => {

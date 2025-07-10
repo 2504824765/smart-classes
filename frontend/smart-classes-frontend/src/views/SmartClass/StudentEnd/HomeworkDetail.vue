@@ -51,7 +51,7 @@
           <el-card v-for="file in fileList" :key="file.name" class="mb-2" shadow="hover">
             <div class="flex justify-between items-center">
               <div>
-                <el-icon class="mr-2"><Document /></el-icon>
+                <Icon icon="ep:document" class="mr-2" />
                 {{ file.name }}
               </div>
               <el-button type="primary" size="small" text @click="handleDownload(file)">
@@ -78,6 +78,7 @@ import { getStudentMissionById } from '@/api/studentMission/index'
 import { StudentMission } from '@/api/studentMission/types'
 import { uploadResourcesApi } from '@/api/oss/index'
 import { updateStudentMission } from '@/api/studentMission/index'
+
 import { UploadFile, ElMessage } from 'element-plus'
 import { PREFIX } from '@/constants'
 const route = useRoute()
@@ -142,7 +143,7 @@ const loadHistoryFile = () => {
   if (path) {
     fileList.value = [
       {
-        name: path.split('/').pop() || '已提交文件',
+        name: path ? path.split('/').pop() || '已提交文件' : '已提交文件',
         url: PREFIX + path, // 拼接完整URL
         status: 'success'
       } as UploadFile

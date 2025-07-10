@@ -19,12 +19,13 @@ const teacherList: string[] = [
   '/teacher/dashboard',
   '/studentManage',
   '/studentManage/list',
-  '/studentManage/list/detail',
+  '/studentManage/detail',
   '/course',
   '/course/content',
   '/course/detail',
   '/course/detail/form',
-  '/course/detail/mission'
+  '/course/detail/mission',
+  '/course/detail/studentDetail'
 ]
 
 const adminList: string[] = [

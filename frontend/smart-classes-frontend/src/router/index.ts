@@ -126,25 +126,24 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
           component: () => import('@/views/SmartClass/TeacherEnd/StudentCourse.vue'),
           meta: {
             title: t('teacher.studentManage'),
-            icon: 'vi-ant-design:user-outlined',
             userType: 'teacher',
             noCache: true
           },
         },
         {
           path: 'detail',
-          name: 'StudentManageCourseDetail',
+          name: 'StudentManageDetail',
           component: () => import('@/views/SmartClass/TeacherEnd/StudentManage.vue'),
           meta: {
             title: t('teacher.studentManage'),
-            icon: 'vi-ant-design:user-outlined',
             userType: 'teacher',
-            noCache: true
+            noCache: true,
+            hidden: true,
+            canTo: true
           }
         }
       ]
     },
-
     {
       path: '/course',
       component: Layout,
@@ -164,7 +163,6 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
           name: 'CourseContent',
           meta: {
             title: t('teacher.courseList'),
-            icon: 'ep:collection-tag',
             userType: 'teacher',
             noCache: true
           }
@@ -199,6 +197,18 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
               name: 'CourseDetailMission',
               meta: {
                 title: t('teacher.missionDetail'),
+                userType: 'teacher',
+                noCache: true,
+                hidden: true,
+                canTo: true
+              }
+            },
+            {
+              path: 'studentDetail',
+              component: () => import('@/views/SmartClass/TeacherEnd/StudentMissionDetail.vue'),
+              name: 'CourseDetailStudentMissionDetail',
+              meta: {
+                title: t('teacher.studentMissionDetail'),
                 userType: 'teacher',
                 noCache: true,
                 hidden: true,

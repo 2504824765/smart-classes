@@ -15,6 +15,7 @@ import type { ClassMissionCreateDTO } from '@/api/classMission/types'
 import { addStudentMission } from '@/api/studentMission'
 import { getAssociatedByCidApi } from '@/api/studentClasses'
 import { StudentMissionCreateDTO } from '@/api/studentMission/types'
+import { createClassMissionResource } from '@/api/classMissionResource'
 
 const route = useRoute()
 
@@ -93,7 +94,7 @@ const missionFormSchema = reactive<FormSchema[]>([
     component: 'Upload',
     componentProps: {
       multiple: false,
-      limit: 1,
+      limit: 5,
       httpRequest: async (options) => {
         const rawFile = options.file as File
         const fileName = rawFile.name
@@ -136,38 +137,35 @@ const handleSubmit = async () => {
 
     try {
       const formData = await getFormData<ClassMissionCreateDTO>()
-      let resourceId: number | null = null
-
-      // 上传文件（仅一个）
-      if (pendingResources.value.length > 0) {
-        const resFile = pendingResources.value[0]
-        const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
-        console.log('uploadRes',uploadRes)
-        const filePath = uploadRes.data
-
-        const newRes = {
-          name: resFile.name,
-          path: filePath.replace(PREFIX, ''),
-          type: resFile.type,
-          description: resFile.description,
-          classId: classId
-        }
-
-        const savedRes = await addResourceApi(newRes)
-        console.log('savedRes',savedRes)
-        resourceId = savedRes.data.id
-      }
 
       // 提交任务数据，合并 resourceId
       const missionToSubmit = {
         ...formData,
         cid: classId,
-        resource: resourceId ?? 0 
       }
       console.log('missionToSubmit',missionToSubmit)
 
       const classMissionRes = await addClassMissionApi(missionToSubmit)
       ElMessage.success('任务创建成功')
+
+      if (pendingResources.value.length > 0) {
+        for (const resFile of pendingResources.value) {
+          const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
+          console.log('uploadRes', uploadRes)
+
+          const filePath = uploadRes.data
+          const newRes = {
+            path: filePath.replace(PREFIX, ''),
+            classMissionId: classMissionRes.data.id
+          }
+
+          const savedRes = await createClassMissionResource(newRes)
+          console.log('savedRes', savedRes)
+        }
+
+        ElMessage.success('所有资源上传成功')
+      }
+
       console.log('classMissionRes',classMissionRes)
       const studentClassRes = await getAssociatedByCidApi(classId)
       console.log('studentClassRes',studentClassRes)

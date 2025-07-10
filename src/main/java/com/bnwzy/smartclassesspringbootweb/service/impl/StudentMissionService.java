@@ -48,8 +48,8 @@ public class StudentMissionService implements IStudentMissionService {
             studentMission.setClassMission(classMissionRepository.findById(studentMissionCreateDTO.getClassMissionId()).get());
         }
         studentMission.setScore(0);
-        studentMission.setDone(false);
-        studentMission.setActive(true);
+        studentMission.setIsDone(false);
+        studentMission.setIsActive(true);
         return studentMissionRepository.save(studentMission);
     }
 
@@ -89,10 +89,10 @@ public class StudentMissionService implements IStudentMissionService {
                 studentMission.setScore(studentMissionUpdateDTO.getScore());
             }
             if (studentMissionUpdateDTO.getDone() != null) {
-                studentMission.setDone(studentMissionUpdateDTO.getDone());
+                studentMission.setIsDone(studentMissionUpdateDTO.getDone());
             }
             if (studentMissionUpdateDTO.getActive() != null) {
-                studentMission.setActive(studentMissionUpdateDTO.getActive());
+                studentMission.setIsActive(studentMissionUpdateDTO.getActive());
             }
             if (studentMissionUpdateDTO.getReportUrl() != null) {
                 studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());

@@ -1,8 +1,10 @@
 package com.bnwzy.smartclassesspringbootweb.pojo;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Data
 @Entity
 @Table(name = "tb_student_mission")
 public class StudentMission {
@@ -25,60 +27,4 @@ public class StudentMission {
     private Boolean isActive;
     @Column(name = "report_url")
     private String reportUrl;
-
-    public String getReportUrl() {
-        return reportUrl;
-    }
-
-    public void setReportUrl(String reportUrl) {
-        this.reportUrl = reportUrl;
-    }
-
-    public ClassMission getClassMission() {
-        return classMission;
-    }
-
-    public void setClassMission(ClassMission classMission) {
-        this.classMission = classMission;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public Boolean getDone() {
-        return isDone;
-    }
-
-    public void setDone(Boolean done) {
-        isDone = done;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
 }

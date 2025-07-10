@@ -12,7 +12,8 @@
       </el-table>
 
       <div class="gpa-info">
-        综合绩点 GPA: <span class="gpa-value">{{ gpa.toFixed(2) }}</span>
+        综合绩点 GPA: 
+        <span class="gpa-value">{{ displayGpa }}</span>
       </div>
     </el-card>
   </ContentWrap>
@@ -21,7 +22,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store/modules/user'
-import { getStudentByUsernameApi, getStudentByIdApi } from '@/api/student/index'
+import { Student } from '@/api/student/types'
+import { getStudentByUsernameApi, getStudentByIdApi, updateStudentApi } from '@/api/student/index'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 
 interface GradeItem {
@@ -31,10 +33,12 @@ interface GradeItem {
   grade: number
 }
 
-const student = ref({
-  id: null as number | null,
-  name: ''
-})
+// const student = ref({
+//   id: null as number | null,
+//   name: ''
+// })
+
+const student = ref<Partial<Student>>({})
 
 const studentId = ref<number | null>(null)
 const grades = ref<GradeItem[]>([])
@@ -47,6 +51,13 @@ const getStudentId = async (username: string) => {
 
 const userStore = useUserStore()
 const loginInfo = userStore.getLoginInfo
+
+const displayGpa = computed(() => {
+  return typeof student.value.gpa === 'number'
+    ? student.value.gpa.toFixed(2)
+    : '暂无'
+})
+
 const initialize = async () => {
   if (loginInfo && loginInfo.username) {
     await getStudentId(loginInfo.username)
@@ -62,7 +73,7 @@ const initialize = async () => {
   }
 }
 
-// 获取学生姓名
+// 获取学生信息
 const fetchStudentInfo = async () => {
   if (!student.value.id) {
     console.error('学生ID为空')
@@ -71,12 +82,16 @@ const fetchStudentInfo = async () => {
   try {
     const res = await getStudentByIdApi(student.value.id)
     student.value.name = res.data.name
+    student.value.gpa = res.data.gpa
+    student.value.department = res.data.department
+    student.value.studentData = res.data.studentData 
+
   } catch (error) {
     console.error('获取学生信息失败:', error)
   }
 }
 
-// 获取学生的选课记录
+// 获取学生的选课记录与成绩
 const fetchStudentGrades = async () => {
     if (!student.value.id) {
       console.error('学生ID为空')
@@ -111,20 +126,22 @@ const fetchStudentGrades = async () => {
           grade: Number(item.grade)
         }
       })
+    
+    // 更新绩点
+    const newGpa = calculateGpa(grades.value)
+    await updateStudentGpaIfNeeded(newGpa)
 
-    console.log('成绩数据：', grades.value)
   } catch (error) {
     console.error('获取选课或课程信息失败:', error)
   }
 }
 
-// GPA
-const gpa = computed(() => {
-  if (grades.value.length === 0) return 0
+const calculateGpa = (grades: GradeItem[]): number => {
+  if (grades.length === 0) return 0
 
-  const total = grades.value.reduce(
+  const total = grades.reduce(
     (acc, cur) => {
-      const gradePoint = Math.max((cur.grade - 50) / 10, 0)
+      const gradePoint = Math.max((cur.grade - 50) / 10, 0)  // 绩点公式
       acc.totalGpa += gradePoint * cur.credit
       acc.totalCredit += cur.credit
       return acc
@@ -133,7 +150,38 @@ const gpa = computed(() => {
   )
 
   return total.totalCredit > 0 ? total.totalGpa / total.totalCredit : 0
+}
+
+const updateStudentGpaIfNeeded = async (newGpa: number) => {
+  if (!student.value.id || !student.value.department || !student.value.studentData) return
+
+  const currentGpa = typeof student.value.gpa === 'number' ? student.value.gpa : -1
+  const calculatedGpa = parseFloat(newGpa.toFixed(2))
+
+  if (currentGpa !== calculatedGpa) {
+    try {
+      console.log('更新学生数据：', {
+  id: student.value.id,
+  deptId: student.value.department?.id,
+  studentDataId: student.value.studentData?.id,
+  gpa: calculatedGpa
 })
+      await updateStudentApi({
+        id: student.value.id,
+        deptId: student.value.department.id,
+        studentDataId: student.value.studentData.id,
+        gpa: calculatedGpa
+      })
+      student.value.gpa = calculatedGpa  // 本地更新以保持同步
+      console.log('GPA 更新成功:', calculatedGpa)
+    } catch (err) {
+      console.error('GPA 更新失败:', err)
+    }
+  } else {
+    console.log('GPA 无变化，无需更新')
+  }
+}
+
 
 onMounted(async () => {
   await initialize()

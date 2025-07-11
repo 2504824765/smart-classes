@@ -9,6 +9,7 @@ import com.bnwzy.smartclassesspringbootweb.service.IDifyStudentAbilityAnalyzeSer
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -37,11 +38,14 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
+    @Setter
     @Autowired
     private StudentRepository studentRepository;
 
+    @Setter
     @Autowired
     private OssUploadService ossUploadService;
+    @Setter
     @Autowired
     private StudentDataRepository studentDataRepository;
 
@@ -235,7 +239,7 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
         }
     }
 
-    private File createTextFile(String content, String filename) throws IOException {
+    File createTextFile(String content, String filename) throws IOException {
         File file = File.createTempFile(filename, ".txt");
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);

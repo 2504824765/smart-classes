@@ -5,6 +5,7 @@ import com.bnwzy.smartclassesspringbootweb.service.IDifyGenerateQuestionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Setter
 @Slf4j
 @Service
 public class DifyGenerateQuestionService implements IDifyGenerateQuestionService {
@@ -264,7 +266,7 @@ public class DifyGenerateQuestionService implements IDifyGenerateQuestionService
         }
     }
 
-    private File createTextFile(String content, String filename) throws IOException {
+    File createTextFile(String content, String filename) throws IOException {
         File file = File.createTempFile(filename, ".txt");
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);

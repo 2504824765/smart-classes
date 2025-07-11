@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(ClassMissionResourceNotFoundException.class)
+    public ResponseMessage classMissionResourceNotFoundException(ClassMissionResourceNotFoundException e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(514, "<ClassMissionNotFound>", null);
+    }
+
     @ExceptionHandler(DepartmentHasChildrenException.class)
     public ResponseMessage DepartmentHasChildren(DepartmentHasChildrenException e) {
         logger.error(e.getMessage());

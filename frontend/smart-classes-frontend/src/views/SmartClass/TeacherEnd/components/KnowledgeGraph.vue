@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-12 gap-3 h-[100vh]">
+  <div class="grid grid-cols-12 gap-3">
     <el-card class="col-span-3 overflow-auto">
       <el-tree :data="treeData" :props="defaultProps" />
     </el-card>
@@ -14,23 +14,25 @@
         <el-tab-pane label="图谱" name="graph">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center">
-              <ElButton type="primary" @click="createKnowledgeGraph" :disabled="hasGraph"
-                >生成图谱</ElButton
-              >
-              <ElButton
-                type="primary"
-                class="ml-2"
-                @click="deleteKnowledgeGraph"
-                :disabled="!hasGraph"
-                >删除图谱</ElButton
-              >
+              <ElButton type="primary" @click="createKnowledgeGraph" :disabled="hasGraph">
+                生成图谱
+              </ElButton>
+              <ElButton type="primary" class="ml-2" @click="deleteKnowledgeGraph" :disabled="!hasGraph">
+                删除图谱
+              </ElButton>
             </div>
           </div>
-          <div
-            ref="graphContainer"
-            class="w-full h-[calc(80vh-120px)]"
-            style="min-height: 500px"
-          ></div>
+
+          <template v-if="hasGraph">
+            <div
+              ref="graphContainer"
+              class="w-full h-[calc(80vh-100px)]"
+              style="min-height: 500px"
+            ></div>
+          </template>
+          <template v-else>
+            <el-empty description="暂无图谱，请点击生成图谱按钮" class="h-[300px]" />
+          </template>
         </el-tab-pane>
 
         <!-- 资源 tab -->
@@ -38,7 +40,7 @@
           <div class="overflow-auto h-[calc(80vh-120px)] px-2 pt-2">
             <el-empty v-if="fileCards.length === 0" description="暂无资源" />
             <div v-for="file in fileCards" :key="file.name" class="mb-2">
-              <FileDisplay :url="file.url" />
+              <FileDisplay :url="PREFIX + file.url" />
             </div>
           </div>
         </el-tab-pane>
@@ -429,7 +431,7 @@ async function createKnowledgeGraph() {
       credit: classRes.data.credit,
       classHours: classRes.data.classHours,
       graph: classRes.data.graph,
-      active: classRes.data.active,
+      isActive: classRes.data.isActive,
       description: classRes.data.description,
       imageUrl: classRes.data.imageUrl
     }
@@ -461,7 +463,7 @@ const deleteKnowledgeGraph = async () => {
       credit: classRes.data.credit,
       classHours: classRes.data.classHours,
       graph: '',
-      active: classRes.data.active,
+      isActive: classRes.data.isActive,
       description: classRes.data.description,
       imageUrl: classRes.data.imageUrl
     }

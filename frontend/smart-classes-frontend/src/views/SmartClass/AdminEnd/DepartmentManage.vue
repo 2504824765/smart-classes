@@ -88,14 +88,13 @@ const formData = reactive({
 const parentTreeOptions = ref<any[]>([])
 function listToTree(list: any[], parentId = 0) {
   return list
-    .filter(item => item.parentId === parentId)
-    .map(item => ({
+    .filter((item) => item.parentId === parentId)
+    .map((item) => ({
       label: item.name,
       value: item.id,
       children: listToTree(list, item.id)
     }))
 }
-
 
 const openDialog = (type: 'add' | 'edit', node?: Department) => {
   isEdit.value = type === 'edit'
@@ -191,7 +190,14 @@ onMounted(fetchDepartmentTree)
     >
       <el-button
         type="primary"
-        style="margin: 18px 0 18px 0; width: 200px; font-weight: bold; letter-spacing: 2px; border-radius: 8px; box-shadow: 0 2px 8px 0 rgba(64,158,255,0.08);"
+        style="
+          margin: 18px 0 18px 0;
+          width: 200px;
+          font-weight: bold;
+          letter-spacing: 2px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px 0 rgba(64, 158, 255, 0.08);
+        "
         @click="openDialog('add')"
       >
         新增部门
@@ -207,21 +213,43 @@ onMounted(fetchDepartmentTree)
         default-expand-all
       >
         <template #default="{ node, data }">
-          <span style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 6px 0;">
-            <span style="font-weight: 600; color: #222;">{{ data.name }}</span>
-            <span style="display: flex; gap: 4px;">
-              <el-button size="small" type="success" text style="padding: 0 6px;" @click.stop="openDialog('edit', data)">编辑</el-button>
-              <el-button size="small" type="danger" text style="padding: 0 6px;" @click.stop="handleDelete(data)">删除</el-button>
+          <span
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              width: 100%;
+              padding: 6px 0;
+            "
+          >
+            <span style="font-weight: 600; color: #222">{{ data.name }}</span>
+            <span style="display: flex; gap: 4px">
+              <el-button
+                size="small"
+                type="success"
+                text
+                style="padding: 0 6px"
+                @click.stop="openDialog('edit', data)"
+                >编辑</el-button
+              >
+              <el-button
+                size="small"
+                type="danger"
+                text
+                style="padding: 0 6px"
+                @click.stop="handleDelete(data)"
+                >删除</el-button
+              >
             </span>
           </span>
         </template>
       </el-tree>
     </el-card>
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑部门' : '新增部门'" width="400px">
-      <div v-if="isEdit && formData.name" style="margin-bottom: 10px; color: #888;">
+      <div v-if="isEdit && formData.name" style="margin-bottom: 10px; color: #888">
         当前部门：{{ formData.name }}
       </div>
-      <div v-else-if="formData.parentId > 0" style="margin-bottom: 10px; color: #888;">
+      <div v-else-if="formData.parentId > 0" style="margin-bottom: 10px; color: #888">
         当前父级部门：{{ getDeptNameById(formData.parentId) }}
       </div>
       <el-form :model="formData" label-width="100px">
@@ -247,16 +275,18 @@ onMounted(fetchDepartmentTree)
       <el-descriptions :column="1" border>
         <el-descriptions-item label="ID">{{ detailData?.department?.id }}</el-descriptions-item>
         <el-descriptions-item label="名称">{{ detailData?.department?.name }}</el-descriptions-item>
-        <el-descriptions-item label="父级ID">{{ detailData?.department?.parentId }}</el-descriptions-item>
+        <el-descriptions-item label="父级ID">{{
+          detailData?.department?.parentId
+        }}</el-descriptions-item>
       </el-descriptions>
-      <div style="margin: 16px 0 8px 0; font-weight: bold;">老师列表</div>
-      <el-table :data="detailData?.teachers || []" size="small" border style="margin-bottom: 16px;">
+      <div style="margin: 16px 0 8px 0; font-weight: bold">老师列表</div>
+      <el-table :data="detailData?.teachers || []" size="small" border style="margin-bottom: 16px">
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="username" label="工号" width="120" />
         <el-table-column prop="name" label="姓名" width="100" />
         <el-table-column prop="gender" label="性别" width="80" />
       </el-table>
-      <div style="margin: 8px 0; font-weight: bold;">学生列表</div>
+      <div style="margin: 8px 0; font-weight: bold">学生列表</div>
       <el-table :data="detailData?.students || []" size="small" border>
         <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="username" label="学号" width="120" />

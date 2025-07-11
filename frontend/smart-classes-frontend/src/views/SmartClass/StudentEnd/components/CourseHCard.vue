@@ -2,18 +2,18 @@
   <el-card
     class="course-card"
     shadow="hover"
-    :class="{ 'disabled-card': !course.active }"
+    :class="{ 'disabled-card': !course.isActive }"
     @click="handleClick"
   >
-    <el-image :src="course.imageUrl" alt="课程封面" class="course-image" />
+    <el-image :src="course.imageUrl ? course.imageUrl : '/default.png'" alt="课程封面" class="course-image" />
     <div class="course-info">
       <h3 class="course-title">{{ course.name }}</h3>
       <p class="course-description">{{ course.description }}</p>
       <el-tag
         size="small"
-        :type="!course.active ? 'info' : course.unfinished === course.total ? 'success' : 'warning'"
+        :type="!course.isActive || course.total === 0 ? 'info' : course.unfinished === course.total ? 'success' : 'warning'"
       >
-        {{ !course.active ? '课程已结束' : `已完成 ${course.unfinished}/${course.total} ` }}
+        {{ !course.isActive ? '课程已结束' : course.total === 0 ? '课程无任务' : `已完成 ${course.unfinished}/${course.total} ` }}
       </el-tag>
     </div>
   </el-card>
@@ -29,7 +29,7 @@ const props = defineProps<{
 }>()
 
 const handleClick = () => {
-  if (props.course.active) {
+  if (props.course.isActive) {
     emit('view-homework', props.course)
   } else {
     ElMessage.warning('该课程已截止')

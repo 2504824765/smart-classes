@@ -60,7 +60,6 @@ export const usePermissionStore = defineStore('permission', {
             cloneDeep(getAsyncRouterMap(this.userType)),
             routers as string[]
           )
-          console.log('routerMap', routerMap)
         } else {
           // 根据用户类型获取对应的路由
           routerMap = cloneDeep(getAsyncRouterMap(this.userType))

@@ -634,7 +634,8 @@ export default {
     createMission: '创建任务',
     courseDetail: '课程详情',
     missionDetail: '任务详情',
-    missionCreate: '创建任务'
+    missionCreate: '创建任务',
+    studentMissionDetail: '学生详情',
   },
   admin: {
     admin: '管理员',

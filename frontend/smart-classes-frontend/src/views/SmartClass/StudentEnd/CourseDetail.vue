@@ -308,10 +308,6 @@ const fetchGraphData = async () => {
     ElMessage.warning('无法定位课程')
     return
   }
-  if (!res.data.graph) {
-    ElMessage.warning('该课程暂无图谱数据,请等待老师创建图谱')
-    return
-  }
   courseTitle.value = res.data.name
   const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
 
@@ -370,11 +366,7 @@ onMounted(async () => {
     <div class="grid grid-cols-12 gap-4 h-[80vh]">
       <!-- 左：树结构 -->
       <el-card class="col-span-2 overflow-auto">
-        <el-tree
-          :data="treeData"
-          :props="defaultProps"
-          @node-click="handleTreeClick"
-        >
+        <el-tree :data="treeData" :props="defaultProps" @node-click="handleTreeClick">
           <template #default="{ node, data }">
             <div class="node-text">
               {{ node.label }}
@@ -417,12 +409,11 @@ onMounted(async () => {
   </div>
 </template>
 
-<style scoped>  
+<style scoped>
 .node-text {
   max-width: 160px; /* 根据需要设置最大宽度 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 </style>

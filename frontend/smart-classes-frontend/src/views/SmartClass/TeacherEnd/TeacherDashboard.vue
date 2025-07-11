@@ -6,7 +6,6 @@ import { getTableListApi } from '@/api/table'
 import { TableData } from '@/api/table/types'
 import { ref, h, reactive, onMounted } from 'vue'
 import { ElTag, ElCard, ElStatistic, ElProgress } from 'element-plus'
-// import { Calendar, Document, Trophy, Message, Clock } from '@element-plus/icons-vue'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
 import { UserType } from '@/api/login/types'
@@ -21,23 +20,30 @@ import {
   getStudentCountApi
 } from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
-import { getUserByIdApi } from '@/api/login'
-import { useUserStore } from '@/store/modules/user'
-import { getClassCountApi } from '@/api/classes'
-// import { getMissionListApi } from '@/api/mission'
-import { Icon } from '@/components/Icon'
 
-interface Params {
-  pageIndex?: number
-  pageSize?: number
+import { Icon } from '@/components/Icon'
+import { useUserStore } from '@/store/modules/user'
+import { Teacher } from '@/api/teacher/types'
+import { getAllClassesApi } from '@/api/classes'
+import { Classes } from '@/api/classes/types'
+import { getClassMissionByCidApi } from '@/api/classMission'
+
+
+// 教师信息
+const teacherInfo = ref<Teacher>()
+
+const getId = async (username: string) => {
+  const res = await getTeacherByUsernameApi(username)
+  teacherInfo.value = res.data
 }
 
-interface Course {
-  id: number
-  name: string
-  time: string
-  classroom: string
-  class: string
+const userStore = useUserStore()
+const loginInfo = userStore.getLoginInfo
+const initialize = async () => {
+  if (loginInfo) {
+    const username = loginInfo.username
+    await getId(username)
+  }
 }
 
 interface Statistics {
@@ -51,15 +57,8 @@ const router = useRouter()
 const { t } = useI18n()
 const userStore = useUserStore()
 
-// 教师信息
-const teacherInfo = ref({
-  name: '',
-  username: '',
-  avatar: ''
-})
-
 // 近期课程
-const recentCourses = ref<Course[]>([])
+const recentCourses = ref<Classes[]>([])
 const loading = ref(false)
 const statistics = ref<Statistics>({
   studentCount: 0,
@@ -71,67 +70,9 @@ const statistics = ref<Statistics>({
 // 获取当前登录教师信息
 const getCurrentTeacher = async () => {
   try {
-    const currentUser = userStore.getUserInfo
-    console.log('当前用户信息:', currentUser)
-
-    if (currentUser?.roleId) {
-      console.log('准备调用API获取用户详情, ID:', currentUser.roleId)
-      // 调用后端API获取用户信息
-      const userRes = await getUserByIdApi(currentUser.roleId)
-      console.log('API响应:', userRes)
-
-      if (userRes?.data) {
-        console.log('成功获取用户数据:', userRes.data)
-        teacherInfo.value = {
-          name: userRes.data.username, // 使用用户名作为显示名称
-          username: userRes.data.username,
-          avatar: userRes.data.imageURL || ''
-        }
-      } else {
-        console.log('API调用失败，使用当前用户信息')
-        // 如果API调用失败，使用当前用户信息
-        teacherInfo.value = {
-          name: currentUser.username || '老师',
-          username: currentUser.username || 'teacher001',
-          avatar: ''
-        }
-      }
-    } else {
-      console.log('没有找到用户信息或roleId，使用默认数据')
-      // 如果没有用户信息，使用默认数据
-      teacherInfo.value = {
-        name: '张老师',
-        username: 'teacher001',
-        avatar: ''
-      }
-    }
 
     console.log('最终教师信息:', teacherInfo.value)
 
-    // 设置课程数据
-    recentCourses.value = [
-      {
-        id: 1,
-        name: '软件质量保证与测试',
-        time: '2025-08-15 09:00',
-        classroom: '1号A402',
-        class: '软件2301-05'
-      },
-      {
-        id: 2,
-        name: 'Python编程与数据分析基础',
-        time: '2025-08-22 14:00',
-        classroom: '信息A101',
-        class: '软件2301-09'
-      },
-      {
-        id: 3,
-        name: '软件系统开发实训',
-        time: '2025-08-17 10:00',
-        classroom: '信息B418',
-        class: '软件2301-09'
-      }
-    ]
   } catch (error) {
     console.error('初始化失败:', error)
   }
@@ -139,6 +80,11 @@ const getCurrentTeacher = async () => {
 
 // 获取教师统计数据
 const getTeacherStatistics = async () => {
+  if(!teacherInfo.value) {
+    ElMessage.error('教师信息为空')
+    return
+  }
+
   try {
     loading.value = true
 
@@ -158,25 +104,11 @@ const getTeacherStatistics = async () => {
       statistics.value.studentCount = 0
     }
 
-    // 获取课程数量
-    try {
-      const courseCountRes = await getClassCountApi()
-      console.log('课程数量API响应:', courseCountRes)
-      if (courseCountRes && courseCountRes.data !== undefined) {
-        statistics.value.courseCount = Number(courseCountRes.data)
-        console.log('成功获取课程数量:', courseCountRes.data)
-      } else {
-        statistics.value.courseCount = 0
-        console.warn('课程数量API响应格式异常，设为0')
-      }
     } catch (error) {
       console.error('获取课程数量失败:', error)
       statistics.value.courseCount = 0
     }
 
-    // 可以继续添加获取任务数量和完成率的逻辑
-    // TODO: 添加获取任务数量的API调用
-    // TODO: 添加计算完成率的逻辑
   } catch (error) {
     console.error('获取统计数据失败:', error)
     statistics.value = {
@@ -191,22 +123,23 @@ const getTeacherStatistics = async () => {
 }
 // 快捷跳转
 const gotoCourseManagement = () => {
-  router.push('/teacher/ClassManage')
+  router.push('/course/content')
 }
 
 const gotoStudentManagement = () => {
-  router.push('/teacher/studentManage')
+  router.push('/course/content')
 }
 
 const gotoAssignmentManagement = () => {
-  router.push('/teacher/gradeManage')
+  router.push('/course/content')
 }
 
 const gotoMissionManagement = () => {
-  router.push('/teacher/Mission')
+  router.push('/course/content')
 }
 
 onMounted(() => {
+  initialize()
   setTimeout(() => {
     getCurrentTeacher().catch((error) => {
       console.error('初始化失败:', error)
@@ -224,7 +157,7 @@ onMounted(() => {
     <div class="welcome-section">
       <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px">
         <span style="font-size: 18px; font-weight: bold">{{ t('teacher.dashboard') }}</span>
-        <el-text class="mx-1" size="large">欢迎，{{ teacherInfo.name || '老师' }}</el-text>
+        <el-text class="mx-1" size="large">欢迎，{{ teacherInfo?.name || '老师' }}</el-text>
       </div>
       <el-divider />
     </div>
@@ -288,29 +221,35 @@ onMounted(() => {
       <div style="margin: 20px 0"></div>
       <el-table :data="recentCourses" v-loading="loading" style="width: 100%">
         <el-table-column prop="name" label="课程名称" min-width="280" align="center" />
-        <el-table-column label="上课时间" width="180" align="center">
+        <el-table-column label="课时" width="180" align="center">
           <template #default="{ row }">
             <div style="display: flex; align-items: center; justify-content: center">
               <Icon icon="ep:clock" />
-              <span style="margin-left: 8px">{{ row.time }}</span>
+              <span style="margin-left: 8px">{{ row.classHours }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="classroom" label="教室" width="150" align="center" />
-        <el-table-column prop="class" label="授课班级" width="160" align="center" />
+        <el-table-column prop="description" label="描述" width="150" align="center" />
+        <el-table-column label="状态" width="160" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.isActive ? 'success' : 'danger'">
+              {{ row.isActive ? '正常' : '禁用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 
     <!-- 快捷操作 -->
     <div class="quick-actions">
-      <h3>快捷操作（这几个对应的路径不完全对）</h3>
+      <h3>快捷操作</h3>
       <div style="margin: 20px 0"></div>
       <el-row :gutter="20">
         <el-col :span="6">
           <el-card
             shadow="hover"
             class="quick-card quick-card-1"
-            @click="router.push('/teacher/studentManage')"
+            @click="router.push('/studentManage/list')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:connection" :size="24" />
@@ -325,7 +264,6 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-2"
-            @click="router.push('/course/form')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:edit-pen" :size="24" />
@@ -340,7 +278,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-3"
-            @click="router.push('/teacher/ClassManage')"
+            @click="router.push('/course/content')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:upload" :size="24" />
@@ -355,7 +293,7 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-4"
-            @click="router.push('/teacher/gradeManage')"
+            @click="router.push('/course/content')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:trophy" :size="24" />

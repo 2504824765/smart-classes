@@ -9,11 +9,13 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Setter
 @Service
 public class ClassMissionService implements IClassMissionService {
     @Autowired

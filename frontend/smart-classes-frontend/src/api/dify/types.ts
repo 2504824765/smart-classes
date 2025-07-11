@@ -19,7 +19,7 @@ export type DifyGenerateQuestionRequest = DifyGraphRequest & {
 /**
  * 构建 DifyGraphRequest 请求体
  * @param url 文件的远程 URL
- * @param user 用户标识（可选，默认值 "test-user"）
+ * @param user 用户标识（可选，默认值 'test-user'）
  */
 export function createDifyGraphRequest(url: string, user = 'test-user'): DifyGraphRequest {
   return {
@@ -130,4 +130,52 @@ export function isDifyChatStreamResponse(obj: any): obj is DifyChatStreamRespons
     typeof obj.answer === 'string' &&
     typeof obj.conversation_id === 'string'
   )
+}
+
+
+/**
+ * 批改报告 Dify 请求体
+ */
+export type DifyReportCommentRequest = {
+inputs: {
+    studentReport: 
+    {
+      type: 'document'
+      transfer_method: 'remote_url'
+      url: string
+    },
+    moBan: 
+    {
+      type: 'document'
+      transfer_method: 'remote_url'
+      url: string
+    }
+  },
+  response_mode: 'streaming'
+  user: 'test-user'
+}
+
+/**
+ * 构建 DifyReportCommentRequest 请求体
+ * @param urlReport 
+ * @param urlMoban 
+ * @returns 
+ */
+export function createDifyReportCommentRequest(urlReport: string, urlMoban: string): DifyReportCommentRequest {
+  return {
+    inputs: {
+      studentReport: {
+        type: 'document',
+        transfer_method: 'remote_url',
+        url: urlReport 
+      },
+      moBan: {
+        type: 'document',
+        transfer_method: 'remote_url',
+        url: urlMoban 
+      }
+    },
+    response_mode: 'streaming',
+    user: 'test-user'
+  }
 }

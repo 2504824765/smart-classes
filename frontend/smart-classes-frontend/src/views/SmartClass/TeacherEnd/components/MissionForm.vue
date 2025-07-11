@@ -7,16 +7,22 @@ import { ElMessage } from 'element-plus'
 import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { addClassMissionApi } from '@/api/classMission/index'
+import { PREFIX } from '@/constants'
 import type { ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource/index'
 import { uploadResourcesApi } from '@/api/oss/index'
 import type { ClassMissionCreateDTO } from '@/api/classMission/types'
+import { addStudentMission } from '@/api/studentMission'
+import { getAssociatedByCidApi } from '@/api/studentClasses'
+import { StudentMissionCreateDTO } from '@/api/studentMission/types'
+import { createClassMissionResource } from '@/api/classMissionResource'
 
 const route = useRoute()
 const { push } = useRouter()
-
+const router = useRouter()
+const redirectPath = route.query.redirect as string || '/course/list' // fallback 默认返回某页
 // 从路由中获取课程 ID
-const classId = Number(route.query.cid)
+const classId = Number(route.query.classId)
 // 定义上传等待列表
 const pendingResources = ref<PendingUploadResource[]>([])
 interface PendingUploadResource {
@@ -25,7 +31,6 @@ interface PendingUploadResource {
   description: string
   file: File
 }
-const uploadedResources: ResourceCreateDTO[] = []
 
 const missionFormSchema = reactive<FormSchema[]>([
   {
@@ -65,7 +70,11 @@ const missionFormSchema = reactive<FormSchema[]>([
     componentProps: {
       type: 'datetime',
       format: 'YYYY-MM-DD HH:mm:ss',
-      valueFormat: 'YYYY-MM-DD HH:mm:ss'
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      // 禁用今天以前的日期时间
+      disabledDate: (time: Date) => {
+        return time.getTime() < new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+      }
     },
     formItemProps: {
       required: true
@@ -73,7 +82,7 @@ const missionFormSchema = reactive<FormSchema[]>([
   },
   {
     field: 'submit_method',
-    label: '提交方式',
+    label: '提交说明（可选）',
     component: 'Input'
   },
   {
@@ -91,7 +100,7 @@ const missionFormSchema = reactive<FormSchema[]>([
     component: 'Upload',
     componentProps: {
       multiple: false,
-      limit: 1,
+      limit: 5,
       httpRequest: async (options) => {
         const rawFile = options.file as File
         const fileName = rawFile.name
@@ -120,6 +129,11 @@ const { getFormData, getElFormExpose } = formMethods
 const handleSubmit = async () => {
   const elForm = await getElFormExpose()
   if (!elForm) return
+  console.log('classId',classId)
+  if(!classId) {
+    ElMessage.warning('课程ID不存在')
+    return
+  }
 
   await elForm.validate(async (valid) => {
     if (!valid) {
@@ -129,49 +143,94 @@ const handleSubmit = async () => {
 
     try {
       const formData = await getFormData<ClassMissionCreateDTO>()
-      let resourceId: number | null = null
-
-      // 上传文件（仅一个）
-      if (pendingResources.value.length > 0) {
-        const resFile = pendingResources.value[0]
-        const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
-        const filePath = uploadRes.data.url
-
-        const newRes = {
-          name: resFile.name,
-          path: filePath,
-          type: resFile.type,
-          description: resFile.description,
-          classId: formData.classes.id
-        }
-
-        const savedRes = await addResourceApi(newRes)
-        resourceId = savedRes.data.id
-      }
 
       // 提交任务数据，合并 resourceId
       const missionToSubmit = {
         ...formData,
-        resource: resourceId ?? 0
+        cid: classId,
       }
+      console.log('missionToSubmit',missionToSubmit)
 
-      await addClassMissionApi(missionToSubmit)
+      const classMissionRes = await addClassMissionApi(missionToSubmit)
       ElMessage.success('任务创建成功')
 
-      // 可选重置
-      elForm.resetFields()
-      pendingResources.value = []
+      if (pendingResources.value.length > 0) {
+        for (const resFile of pendingResources.value) {
+          const uploadRes = await uploadResourcesApi(resFile.file, '任务资源')
+          console.log('uploadRes', uploadRes)
+
+          const filePath = uploadRes.data
+          const newRes = {
+            path: filePath.replace(PREFIX, ''),
+            classMissionId: classMissionRes.data.id
+          }
+
+          const savedRes = await createClassMissionResource(newRes)
+          console.log('savedRes', savedRes)
+        }
+
+        ElMessage.success('所有资源上传成功')
+      }
+
+      console.log('classMissionRes',classMissionRes)
+      const studentClassRes = await getAssociatedByCidApi(classId)
+      console.log('studentClassRes',studentClassRes)
+      if (!studentClassRes.data || studentClassRes.data.length === 0) {
+        ElMessage.warning('当前课程没有学生选课记录，学生任务无法创建')
+        return
+      }
+      try {
+        // 2. 遍历学生，构造每个 StudentMissionCreateDTO 并创建
+        const createPromises = studentClassRes.data.map(async (record: any) => {
+          const dto: StudentMissionCreateDTO = {
+            studentId: record.student.id,
+            classMissionId: classMissionRes.data.id, 
+            score: 0,
+            isDone: false,
+            isActive: true,
+            reportUrl: '',
+            aiCommentUrl: '',
+          }
+          console.log('dto',dto)
+          const res = await addStudentMission(dto)
+          console.log('res',res)
+          return res
+        })
+
+        await Promise.all(createPromises)
+        ElMessage.success('学生任务创建成功')
+        router.push(redirectPath)
+        // 可选重置
+        elForm.resetFields()
+        pendingResources.value = []
+      } catch (e) {
+        console.error('批量创建失败:', e)
+        ElMessage.error('学生任务创建失败，请重试')
+      }
     } catch (err) {
       ElMessage.error('提交失败，请重试')
       console.error('任务提交错误：', err)
     }
   })
 }
+
+const handleBack = () => {
+  const redirect = router.currentRoute.value.query.redirect as string
+  if (redirect) {
+    router.push(redirect)
+  } else {
+    router.back()
+  }
+}
 </script>
 
 <template>
-  <ContentWrap title="新增任务">
+  <el-page-header content="新增任务" @back="handleBack" />
+  <ContentWrap>
     <Form :schema="missionFormSchema" @register="formRegister" />
-    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">提交</BaseButton>
+
+    <div style="margin-top: 16px; display: flex; gap: 12px">
+      <BaseButton type="primary" @click="handleSubmit">提交</BaseButton>
+    </div>
   </ContentWrap>
 </template>

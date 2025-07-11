@@ -120,7 +120,7 @@ const quickActions = [
   //   text: '我有哪些资源可以学习？',
   //   iconName: 'vi-ant-design:folder-open-outlined'
   // }
-  { label: '你好', text: '你好', iconName: 'vi-ant-design:info-circle-outlined' },
+  { label: '你好', text: '你好', iconName: 'vi-ant-design:info-circle-outlined' }
 ]
 
 const quickActionsWithIcon = quickActions.map((item) => ({

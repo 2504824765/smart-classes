@@ -1,6 +1,6 @@
 <template>
   <ContentWrap>
-    <el-card shadow="hover" class="grade-card">
+    <el-card v-if="loaded" shadow="hover" class="grade-card">
       <h2 class="title">学生成绩查看</h2>
       <p class="student-info"> 学生姓名: {{ student.name }}（ID: {{ student.id }}） </p>
 
@@ -12,7 +12,7 @@
       </el-table>
 
       <div class="gpa-info">
-        综合绩点 GPA: 
+        综合绩点 GPA:
         <span class="gpa-value">{{ displayGpa }}</span>
       </div>
     </el-card>
@@ -33,11 +33,6 @@ interface GradeItem {
   grade: number
 }
 
-// const student = ref({
-//   id: null as number | null,
-//   name: ''
-// })
-
 const student = ref<Partial<Student>>({})
 
 const studentId = ref<number | null>(null)
@@ -51,11 +46,10 @@ const getStudentId = async (username: string) => {
 
 const userStore = useUserStore()
 const loginInfo = userStore.getLoginInfo
+const loaded = ref(false)
 
 const displayGpa = computed(() => {
-  return typeof student.value.gpa === 'number'
-    ? student.value.gpa.toFixed(2)
-    : '暂无'
+  return typeof student.value.gpa === 'number' ? student.value.gpa.toFixed(2) : '暂无'
 })
 
 const initialize = async () => {
@@ -67,6 +61,7 @@ const initialize = async () => {
 
       await fetchStudentInfo()
       await fetchStudentGrades()
+      loaded.value = true
     } else {
       console.error('未能获取 studentId')
     }
@@ -84,8 +79,7 @@ const fetchStudentInfo = async () => {
     student.value.name = res.data.name
     student.value.gpa = res.data.gpa
     student.value.department = res.data.department
-    student.value.studentData = res.data.studentData 
-
+    student.value.studentData = res.data.studentData
   } catch (error) {
     console.error('获取学生信息失败:', error)
   }
@@ -93,9 +87,9 @@ const fetchStudentInfo = async () => {
 
 // 获取学生的选课记录与成绩
 const fetchStudentGrades = async () => {
-    if (!student.value.id) {
-      console.error('学生ID为空')
-      return
+  if (!student.value.id) {
+    console.error('学生ID为空')
+    return
   }
   try {
     const res = await getAssociatedBySidApi(student.value.id)
@@ -126,11 +120,10 @@ const fetchStudentGrades = async () => {
           grade: Number(item.grade)
         }
       })
-    
+
     // 更新绩点
     const newGpa = calculateGpa(grades.value)
     await updateStudentGpaIfNeeded(newGpa)
-
   } catch (error) {
     console.error('获取选课或课程信息失败:', error)
   }
@@ -141,7 +134,7 @@ const calculateGpa = (grades: GradeItem[]): number => {
 
   const total = grades.reduce(
     (acc, cur) => {
-      const gradePoint = Math.max((cur.grade - 50) / 10, 0)  // 绩点公式
+      const gradePoint = Math.max((cur.grade - 50) / 10, 0) // 绩点公式
       acc.totalGpa += gradePoint * cur.credit
       acc.totalCredit += cur.credit
       return acc
@@ -160,19 +153,14 @@ const updateStudentGpaIfNeeded = async (newGpa: number) => {
 
   if (currentGpa !== calculatedGpa) {
     try {
-      console.log('更新学生数据：', {
-  id: student.value.id,
-  deptId: student.value.department?.id,
-  studentDataId: student.value.studentData?.id,
-  gpa: calculatedGpa
-})
       await updateStudentApi({
         id: student.value.id,
         deptId: student.value.department.id,
         studentDataId: student.value.studentData.id,
         gpa: calculatedGpa
       })
-      student.value.gpa = calculatedGpa  // 本地更新以保持同步
+      await fetchStudentInfo()
+      // student.value.gpa = calculatedGpa
       console.log('GPA 更新成功:', calculatedGpa)
     } catch (err) {
       console.error('GPA 更新失败:', err)
@@ -181,7 +169,6 @@ const updateStudentGpaIfNeeded = async (newGpa: number) => {
     console.log('GPA 无变化，无需更新')
   }
 }
-
 
 onMounted(async () => {
   await initialize()

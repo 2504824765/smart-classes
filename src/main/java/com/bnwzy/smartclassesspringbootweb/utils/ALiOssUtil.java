@@ -9,6 +9,7 @@ import com.aliyun.oss.model.ObjectListing;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import com.bnwzy.smartclassesspringbootweb.config.OssProperties;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ALiOssUtil {
 
     @Qualifier("aliyun.oss-com.bnwzy.smartclassesspringbootweb.config.OssProperties")
+    @Setter
     @Autowired
     private OssProperties ossProperties;
 

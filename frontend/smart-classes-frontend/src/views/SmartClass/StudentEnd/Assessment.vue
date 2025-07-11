@@ -13,7 +13,7 @@
 import { ref, onMounted } from 'vue'
 import AbilityRadarChart from './components/AbilityRadarChart.vue'
 import { useUserStore } from '@/store/modules/user'
-import { getStudentByUsernameApi, updateStudentApi } from '@/api/student/index'
+import { getStudentByUsernameApi } from '@/api/student/index'
 
 const studentId = ref<number | null>(null)
 

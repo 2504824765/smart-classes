@@ -45,19 +45,6 @@ const initialize = async () => {
   }
 }
 
-interface Params {
-  pageIndex?: number
-  pageSize?: number
-}
-
-interface Course {
-  id: number
-  name: string
-  time: string
-  classroom: string
-  class: string
-}
-
 interface Statistics {
   studentCount: number
   courseCount: number
@@ -69,7 +56,7 @@ const router = useRouter()
 const { t } = useI18n()
 
 // 近期课程
-const recentCourses = ref<Course[]>([])
+const recentCourses = ref<Classes[]>([])
 const loading = ref(false)
 const statistics = ref<Statistics>({
   studentCount: 0,
@@ -90,30 +77,6 @@ const getCurrentTeacher = async () => {
       completionRate: 0
     }
 
-    // 设置课程数据
-    recentCourses.value = [
-      {
-        id: 1,
-        name: '软件质量保证与测试',
-        time: '2025-08-15 09:00',
-        classroom: '1号A402',
-        class: '软件2301-05'
-      },
-      {
-        id: 2,
-        name: 'Python编程与数据分析基础',
-        time: '2025-08-22 14:00',
-        classroom: '信息A101',
-        class: '软件2301-09'
-      },
-      {
-        id: 3,
-        name: '软件系统开发实训',
-        time: '2025-08-17 10:00',
-        classroom: '信息B418',
-        class: '软件2301-09'
-      }
-    ]
   } catch (error) {
     console.error('初始化失败:', error)
   }
@@ -148,9 +111,9 @@ const getTeacherStatistics = async () => {
     try {
       // 获取课程数量
       const res = await getAllClassesApi()
-
       const teacherId = teacherInfo.value.id
       const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
+      recentCourses.value = courseList
       console.log('课程数量API响应:', res)
       if (res && courseList) {
         statistics.value.courseCount = Number(courseList.length)
@@ -186,7 +149,7 @@ const getTeacherStatistics = async () => {
     try {
       // 获取完成率
       const res = await getAllClassesApi()
-      const classes = res.data  // 假设这里是课程数组
+      const classes = res.data 
 
       const startedMissionCounts: Record<number, number> = {}
 
@@ -336,16 +299,22 @@ onMounted(() => {
       <div style="margin: 20px 0"></div>
       <el-table :data="recentCourses" v-loading="loading" style="width: 100%">
         <el-table-column prop="name" label="课程名称" min-width="280" align="center" />
-        <el-table-column label="上课时间" width="180" align="center">
+        <el-table-column label="课时" width="180" align="center">
           <template #default="{ row }">
             <div style="display: flex; align-items: center; justify-content: center">
               <Icon icon="ep:clock" />
-              <span style="margin-left: 8px">{{ row.time }}</span>
+              <span style="margin-left: 8px">{{ row.classHours }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="classroom" label="教室" width="150" align="center" />
-        <el-table-column prop="class" label="授课班级" width="160" align="center" />
+        <el-table-column prop="description" label="描述" width="150" align="center" />
+        <el-table-column label="状态" width="160" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.isActive ? 'success' : 'danger'">
+              {{ row.isActive ? '正常' : '禁用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 

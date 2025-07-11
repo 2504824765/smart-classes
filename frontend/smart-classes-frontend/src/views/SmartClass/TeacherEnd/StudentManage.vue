@@ -299,12 +299,6 @@ const resetSearch = () => {
         <el-button type="primary" @click="searchFn" :loading="isSearching" plain> 搜索 </el-button>
         <el-button type="info" @click="resetSearch" plain>重置</el-button>
       </div>
-      <div style="display: flex; gap: 8px; margin-left: auto">
-        <el-button type="success" @click="addFn" round style="margin-right: 40px">
-          <Icon icon="ep:plus" class="mr-5px" />
-          添加学生
-        </el-button>
-      </div>
     </div>
     <Table
       :columns="columns"

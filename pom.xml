@@ -112,6 +112,20 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.7</version>
+                <configuration>
+                    <includes>
+                        <include>com/bnwzy/smartclassesspringbootweb/service/**/*</include>
+                        <include>com/bnwzy/smartclassesspringbootweb/utils/**/*</include>
+                        <include>com/bnwzy/smartclassesspringbootweb/exceptionHandler/**/*</include>
+                    </includes>
+                    <excludes>
+                        <exclude>com/bnwzy/smartclassesspringbootweb/config/**/*</exclude>
+                        <exclude>com/bnwzy/smartclassesspringbootweb/controller/**/*</exclude>
+                        <exclude>com/bnwzy/smartclassesspringbootweb/pojo/**/*</exclude>                        <exclude>com/bnwzy/smartclassesspringbootweb/config/**/*</exclude>
+                        <exclude>com/bnwzy/smartclassesspringbootweb/repository/**/*</exclude>
+                        <exclude>**/*Application.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

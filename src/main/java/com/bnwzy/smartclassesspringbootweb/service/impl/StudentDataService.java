@@ -6,10 +6,12 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentDataCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentDataUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentDataRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentDataService;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Setter
 @Service
 public class StudentDataService implements IStudentDataService {
     @Autowired

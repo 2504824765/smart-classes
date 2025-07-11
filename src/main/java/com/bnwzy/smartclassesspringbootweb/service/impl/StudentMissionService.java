@@ -11,12 +11,14 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentsAllClassMissionGetDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.*;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentMissionService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Setter
 @Service
 public class StudentMissionService implements IStudentMissionService {
     @Autowired

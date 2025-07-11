@@ -14,11 +14,13 @@ import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.TeacherRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IDepartmentService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Setter
 @Service
 public class DepartmentService implements IDepartmentService {
     @Autowired

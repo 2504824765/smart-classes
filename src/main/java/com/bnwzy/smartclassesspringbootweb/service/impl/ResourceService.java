@@ -24,6 +24,13 @@ public class ResourceService implements IResourceService {
     @Autowired
     private ClassesRepository classesRepository;
 
+    public void setResourceRepository(ResourceRepository resourceRepository) {
+        this.resourceRepository = resourceRepository;
+    }
+    public void setClassesRepository(ClassesRepository classesRepository) {
+        this.classesRepository = classesRepository;
+    }
+
 
     @Override
     public Resource createResource(ResourceCreateDTO resourceCreateDTO) {

@@ -5,6 +5,7 @@ import com.bnwzy.smartclassesspringbootweb.service.IDifyCreateGraphService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Setter
 @Slf4j
 @Service
 public class DifyCreateGraphService implements IDifyCreateGraphService {
@@ -317,7 +319,7 @@ public class DifyCreateGraphService implements IDifyCreateGraphService {
      * @param filename 文件名(不带扩展名)
      * @return 生成的File对象
      */
-    private File createTextFile(String content, String filename) throws IOException, IOException {
+    File createTextFile(String content, String filename) throws IOException, IOException {
         File file = File.createTempFile(filename, ".txt");
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);

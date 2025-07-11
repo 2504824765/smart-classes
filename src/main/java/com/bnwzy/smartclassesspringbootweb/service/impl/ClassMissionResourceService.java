@@ -7,11 +7,13 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionResourceCreateDT
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassMissionResourceRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IClassMissionResourceService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Setter
 @Service
 public class ClassMissionResourceService implements IClassMissionResourceService {
     @Autowired

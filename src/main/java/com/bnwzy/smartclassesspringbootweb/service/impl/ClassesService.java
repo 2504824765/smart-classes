@@ -8,12 +8,14 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassesUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.TeacherRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IClassesService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 @Service
 public class ClassesService implements IClassesService {
     @Autowired

@@ -10,6 +10,7 @@ import com.bnwzy.smartclassesspringbootweb.repository.ResourceRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.UserRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IOssUploadService;
 import com.bnwzy.smartclassesspringbootweb.utils.ALiOssUtil;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Setter
 @Service
 public class OssUploadService implements IOssUploadService {
     private static final Logger log = LoggerFactory.getLogger(OssUploadService.class);
@@ -32,9 +34,9 @@ public class OssUploadService implements IOssUploadService {
     ClassesRepository classesRepository;
 
     @Autowired
-    private ALiOssUtil aliOssUtil;
+    ALiOssUtil aliOssUtil;
     @Autowired
-    private OssProperties ossProperties;
+    OssProperties ossProperties;
 
     @Override
     public String uploadImage(MultipartFile file) {

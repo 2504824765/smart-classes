@@ -26,7 +26,7 @@ public class StudentService implements IStudentService {
     @Autowired
     StudentClassesRepository studentClassesRepository;
     @Autowired
-    private StudentDataRepository studentDataRepository;
+    StudentDataRepository studentDataRepository;
 
     @Override
     public Student getStudentById(Long id) {

@@ -123,7 +123,14 @@ loadClasses()
 
 const openCreate = () => {
   isEdit.value = false
-  Object.assign(formData, { type: '', description: '', deadline: '', score: 0, cid: undefined, id: undefined })
+  Object.assign(formData, {
+    type: '',
+    description: '',
+    deadline: '',
+    score: 0,
+    cid: undefined,
+    id: undefined
+  })
   dialogVisible.value = true
 }
 

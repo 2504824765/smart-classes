@@ -38,10 +38,16 @@ const selectedCids = ref<number[]>([]) // 学生已选课程 id 列表
 // 获取学生已选课程 id
 const fetchSelectedCids = async () => {
   if (!studentId.value) return
+  console.log(studentId.value)
   const associatedRes = await getAssociatedBySidApi(studentId.value)
-  if (associatedRes.data) {
-    selectedCids.value = associatedRes.data.map((item) => item.classes.id)
+  console.log(associatedRes)
+  if (associatedRes.code === 200) {
+    console.log('fine1')
+    if (associatedRes.data) {
+      selectedCids.value = associatedRes.data.map((item) => item.classes.id)
+    }
   }
+  console.log('fine')
 }
 
 // 获取所有课程，并排除已选课程
@@ -49,7 +55,9 @@ const getClassList = async () => {
   loading.value = true
   try {
     await fetchSelectedCids() // 先获取已选课程 id
+    console.log('1s')
     const res = await getAllClassesApi()
+
     const allClasses: Classes[] = res.data || []
     // 排除已选课程
     classList.value = allClasses.filter((cls) => !selectedCids.value.includes(cls.id))
@@ -63,17 +71,17 @@ const getClassList = async () => {
 // 最终展示的课程：未选过 + 搜索匹配 + 状态匹配
 const filteredList = computed(() => {
   return classList.value
-    .filter((cls): cls is Classes => !!cls && typeof cls.active !== 'undefined')
+    .filter((cls): cls is Classes => !!cls && typeof cls.isActive !== 'undefined')
     .filter((cls) => {
       const matchKeyword = cls.name.includes(searchKeyword.value)
-      const matchActive = onlyShowActive.value ? cls.active : true
+      const matchActive = onlyShowActive.value ? cls.isActive : true
       return matchKeyword && matchActive
     })
 })
 
 // 点击选课
 const handleSelect = async (cls: Classes) => {
-  if (!cls.active) {
+  if (!cls.isActive) {
     ElMessage.warning('该课程尚未开放')
     return
   }
@@ -120,7 +128,7 @@ onMounted(async () => {
       <template #content="cls">
         <div class="flex cursor-pointer gap-3">
           <img
-            :src="cls.imageUrl ? cls.imageUrl : 'default.png'"
+            :src="cls.imageUrl ? cls.imageUrl : '/default.png'"
             class="w-64px h-64px rounded object-cover"
             alt="课程封面"
           />
@@ -135,13 +143,13 @@ onMounted(async () => {
       <template #content-footer="cls">
         <div v-if="cls" class="flex justify-between items-center">
           <ElTag
-            :type="cls.active === true ? 'success' : cls.active === false ? 'warning' : 'danger'"
+            :type="cls.isActive === true ? 'success' : cls.isActive === false ? 'warning' : 'danger'"
           >
-            {{ cls.active === true ? '已开放' : cls.active === false ? '未开放' : '未知状态' }}
+            {{ cls.isActive === true ? '已开放' : cls.isActive === false ? '未开放' : '未知状态' }}
           </ElTag>
           <ElLink
             :underline="false"
-            :class="{ 'cursor-not-allowed text-gray-400': !cls.active }"
+            :class="{ 'cursor-not-allowed text-gray-400': !cls.isActive }"
             @click="() => handleSelect(cls)"
             >选课</ElLink
           >

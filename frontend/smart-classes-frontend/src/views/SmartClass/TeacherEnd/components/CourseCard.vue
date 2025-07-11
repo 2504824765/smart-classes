@@ -6,7 +6,7 @@
     :class="{ 'is-disabled': disabled }"
   >
     <el-image
-      :src=" course.imageUrl ? `/${course.imageUrl}`  : 'default.png' "
+      :src="course.imageUrl ? `/${course.imageUrl}` : '/default.png'"
       alt="课程封面"
       style="width: 100%; height: 160px; object-fit: cover"
     />
@@ -15,7 +15,7 @@
       <el-text type="info" class="course-desc">
         {{ course.description }}
       </el-text>
-      <el-text class="status" type="success" size="small" v-if="course.active"> 开放中 </el-text>
+      <el-text class="status" type="success" size="small" v-if="course.isActive"> 开放中 </el-text>
       <el-text class="status" type="danger" size="small" v-else> 未开放 </el-text>
     </div>
   </el-card>
@@ -65,7 +65,7 @@ const goToCourseDetail = () => {
 }
 .course-card.is-disabled {
   opacity: 0.6;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 /* 单独阻止点击行为（不影响拖动） */

@@ -17,12 +17,15 @@ const studentList: string[] = [
 const teacherList: string[] = [
   '/teacher',
   '/teacher/dashboard',
-  '/teacher/studentManage',
+  '/studentManage',
+  '/studentManage/list',
+  '/studentManage/detail',
   '/course',
   '/course/content',
   '/course/detail',
   '/course/detail/form',
-  '/course/detail/mission'
+  '/course/detail/mission',
+  '/course/detail/studentDetail'
 ]
 
 const adminList: string[] = [

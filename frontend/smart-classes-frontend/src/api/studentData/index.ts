@@ -12,7 +12,9 @@ export const deleteStudentDataApi = (id: number) => {
 }
 
 // 更新学生数据信息
-export const updateStudentDataApi = (data: StudentDataUpdateDTO): Promise<IResponse<StudentData>> => {
+export const updateStudentDataApi = (
+  data: StudentDataUpdateDTO
+): Promise<IResponse<StudentData>> => {
   return request.post({ url: '/api/studentData/update', data })
 }
 

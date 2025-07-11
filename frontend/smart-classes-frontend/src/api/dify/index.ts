@@ -1,5 +1,5 @@
 import request from '@/axios'
-import type { DifyGraphRequest, DifyGenerateQuestionRequest, DifyChatRequest } from './types'
+import type { DifyGraphRequest, DifyGenerateQuestionRequest, DifyChatRequest, DifyReportCommentRequest } from './types'
 
 const DIFY_CHAT_URL = 'https://api.dify.ai/v1/chat-messages'
 
@@ -70,4 +70,12 @@ export const generateQuestionApi = (
   data: DifyGenerateQuestionRequest
 ): Promise<IResponse<string>> => {
   return request.post({ url: '/api/dify/generateQuestion', data })
+}
+
+/**
+ * 调用 Dify 批改报告接口，返回 JSON 文件的 URL
+ * @param data DifyReportCommentRequest 请求体
+ */
+export const commentReportApi = (data: DifyReportCommentRequest): Promise<IResponse<string>> => {
+  return request.post({ url: '/api/dify/reportComment', data })
 }

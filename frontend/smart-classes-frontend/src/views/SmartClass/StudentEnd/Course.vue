@@ -15,7 +15,7 @@
 
     <draggable v-else v-model="displayList" item-key="id" class="course-list" animation="200">
       <template #item="{ element }">
-        <CourseCard :course="element" :key="element.id" :disabled="!element.active" />
+        <CourseCard :course="element" :key="element.id" :disabled="!element.isActive" />
       </template>
     </draggable>
   </div>
@@ -86,7 +86,7 @@ const queryCourseList = async () => {
 watch([courseList, searchKeyword, onlyShowActive], () => {
   displayList.value = courseList.value.filter((course) => {
     const matchKeyword = course.name?.includes(searchKeyword.value)
-    const matchActive = onlyShowActive.value ? course.active : true
+    const matchActive = onlyShowActive.value ? course.isActive : true
     return matchKeyword && matchActive
   })
 })

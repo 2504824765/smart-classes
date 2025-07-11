@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
 import { createTeacherApi, updateTeacherApi, getTeacherByIdApi } from '@/api/teacher/index'
 import { getAllDeptApi } from '@/api/department/index'
+import { getAllUserApi } from '@/api/user/index'
 import type { TeacherCreateDTO, TeacherUpdateDTO } from '@/api/teacher/types'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -15,12 +16,12 @@ const router = useRouter()
 const isEdit = ref(false)
 const teacherId = ref<number | null>(null)
 const deptTreeOptions = ref<any[]>([])
-
+const userOptions = ref<{ label: string; value: string }[]>([])
 // 平铺转树
 function listToTree(list: any[], parentId = 0) {
   return list
-    .filter(item => item.parentId === parentId)
-    .map(item => ({
+    .filter((item) => item.parentId === parentId)
+    .map((item) => ({
       label: item.name,
       value: item.id,
       children: listToTree(list, item.id)
@@ -31,12 +32,16 @@ const teacherFormSchema = reactive<FormSchema[]>([
   {
     field: 'username',
     label: '用户名',
-    component: 'Input',
+    component: 'Select',
     formItemProps: {
       required: true
     },
     componentProps: {
-      disabled: isEdit
+      disabled: isEdit,
+      options:userOptions,
+      filterable:true,
+      clearable:true,
+      placeholder:"请选择用户名"
     }
   },
   {
@@ -85,6 +90,20 @@ const loadDepartments = async () => {
   deptTreeOptions.value = listToTree(res.data)
 }
 
+const loadUsers = async () => {
+  try {
+    const res = await getAllUserApi()
+    // 过滤出学生角色的用户（不区分大小写）
+    const studentUsers = res.data.filter(user => user.role && user.role.toLowerCase() === 'teacher')
+    userOptions.value = studentUsers.map(user => ({
+      label: user.username,
+      value: user.username
+    }))
+    console.log('getAllUserApi返回:', res.data)
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+  }
+}
 const loadTeacher = async (id: number) => {
   const res = await getTeacherByIdApi(id)
   const teacher = res.data
@@ -98,6 +117,7 @@ const loadTeacher = async (id: number) => {
 
 onMounted(async () => {
   await loadDepartments()
+  await loadUsers()
   const id = route.query.id
   if (id) {
     isEdit.value = true
@@ -118,7 +138,7 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写教师信息')
       return
     }
-    let formData = await getFormData<TeacherCreateDTO & { departmentId: number | number[] }>()
+    const formData = await getFormData<TeacherCreateDTO & { departmentId: number | number[] }>()
     // 取多级选择的最后一级id
     if (Array.isArray(formData.departmentId)) {
       formData.departmentId = formData.departmentId[formData.departmentId.length - 1]
@@ -132,9 +152,9 @@ const handleSubmit = async () => {
         await updateTeacherApi({ ...formData, id: teacherId.value } as TeacherUpdateDTO)
         ElMessage.success('教师信息更新成功')
       } else {
-      await createTeacherApi(formData)
-      ElMessage.success('教师添加成功')
-      elForm.resetFields()
+        await createTeacherApi(formData)
+        ElMessage.success('教师添加成功')
+        elForm.resetFields()
       }
       router.push({ path: '/admin/teacherManage' })
     } catch (err) {
@@ -147,7 +167,13 @@ const handleSubmit = async () => {
 <template>
   <ContentWrap :title="isEdit ? '编辑教师' : '新增教师'">
     <Form :schema="teacherFormSchema" @register="formRegister" />
-    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">{{ isEdit ? '保存' : '提交' }}</BaseButton>
-    <BaseButton style="margin-top: 16px; margin-left: 8px" @click="() => router.push({ path: '/admin/teacherManage' })">返回</BaseButton>
+    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">{{
+      isEdit ? '保存' : '提交'
+    }}</BaseButton>
+    <BaseButton
+      style="margin-top: 16px; margin-left: 8px"
+      @click="() => router.push({ path: '/admin/teacherManage' })"
+      >返回</BaseButton
+    >
   </ContentWrap>
 </template>

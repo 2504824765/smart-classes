@@ -1,4 +1,5 @@
 import { Classes } from '../classes/types'
+import { Resource } from '../resource/types'
 
 export type ClassMission = {
   id: number
@@ -8,12 +9,13 @@ export type ClassMission = {
   deadline: string
   submitMethod: string
   score: number
-  resource: number
+  resource: Resource
 }
 
 export type ClassMissionCreateDTO = {
   cid: number
-} & Omit<ClassMission, 'id' | 'class'> // 排除id和class
+  resource: number
+} & Omit<ClassMission, 'id' | 'class' | 'resource'> // 排除id和class
 
 export type ClassMissionUpdateDTO = Partial<
   {

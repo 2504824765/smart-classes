@@ -91,11 +91,13 @@ const loadCourses = async () => {
   // 遍历课程，获取任务统计数据
   for (const cls of classes.value) {
     const missionRes = await getStudentMissionByClass(cls.id, studentId.value)
+    console.log(missionRes)
 
     const missions = missionRes.data || []
     const total = missions.length
-    const unfinished = missions.filter((m) => !m.active).length
-
+    const unfinished = missions.filter((m) => m.isDone).length
+    console.log(total)
+    console.log(unfinished)
     courseList.push({
       id: cls.id,
       name: cls.name,
@@ -103,7 +105,7 @@ const loadCourses = async () => {
       imageUrl: cls.imageUrl || '/default.png',
       total,
       unfinished,
-      active: cls.active
+      isActive: cls.isActive
     })
   }
 
@@ -113,7 +115,7 @@ const loadCourses = async () => {
 watch([classes, searchKeyword, onlyShowActive], () => {
   displayList.value = classes.value.filter((course) => {
     const matchKeyword = course.name?.includes(searchKeyword.value)
-    const matchActive = onlyShowActive.value ? course.active : true
+    const matchActive = onlyShowActive.value ? course.isActive : true
     return matchKeyword && matchActive
   })
 })

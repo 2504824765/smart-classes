@@ -18,6 +18,14 @@ import { useRouter } from 'vue-router'
 import EditStudent from './EditStudent.vue'
 import AddStudent from './AddStudent.vue'
 import { Student } from '@/api/student/types'
+import { useRoute } from 'vue-router'
+import { getAssociatedByCidApi, updateClassRecordApi } from '@/api/studentClasses'
+import { StudentClasses, StudentClassesUpdateDTO } from '@/api/studentClasses/types'
+
+const route = useRoute()
+
+// 从路由中获取课程 ID
+const classId = Number(route.query.classId)
 
 interface Params {
   pageIndex?: number
@@ -29,27 +37,27 @@ const router = useRouter()
 
 const columns: TableColumn[] = [
   {
-    field: 'id',
+    field: 'student.id',
     label: t('student.id')
   },
   {
-    field: 'name',
+    field: 'student.name',
     label: t('student.name')
   },
   {
-    field: 'gender',
+    field: 'student.gender',
     label: t('student.gender')
   },
   {
-    field: 'department',
+    field: 'student.department.name',
     label: t('student.dept'),
     slots: {
-      default: (row) => row.department?.name || ''
+      default: ({ row }) => row.student.department?.name || '未知'
     }
   },
   {
-    field: 'gpa',
-    label: t('student.gpa')
+    field: 'grade',
+    label: '成绩'
   },
   {
     field: 'action',
@@ -57,11 +65,9 @@ const columns: TableColumn[] = [
     slots: {
       default: (data) => {
         return (
-          <>
-            <BaseButton type="primary" onClick={() => editFn(data.row)}>
-              编辑
-            </BaseButton>
-          </>
+          <BaseButton type="primary" onClick={() => editFn(data.row)}>
+            编辑
+          </BaseButton>
         )
       }
     }
@@ -69,47 +75,36 @@ const columns: TableColumn[] = [
 ]
 
 const loading = ref(true)
-const tableDataList = ref<Student[]>([])
+const tableDataList = ref<StudentClasses[]>([])
 
-// 分页相关状态
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const getTableList = async (params?: Params) => {
-  const res = await getStudentListApi(
-    params || {
-      pageIndex: currentPage.value,
-      pageSize: pageSize.value
-    }
-  )
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
-  if (res) {
-    console.log('API响应数据:', res.data)
-    let studentData: Student[] = []
-    if (Array.isArray(res.data)) {
-      studentData = res.data
-      total.value = res.data.length // 如果后端没有返回total，暂时用数组长度
+const getTableList = async () => {
+  if (!classId) {
+    ElMessage.warning('请提供课程ID')
+    return
+  }
+
+  loading.value = true
+
+  try {
+    const res = await getAssociatedByCidApi(classId)
+
+    if (res.code === 200 && Array.isArray(res.data)) {
+      tableDataList.value = res.data
+      total.value = res.data.length
+
+      console.log('选课学生列表：', tableDataList.value)
     } else {
-      // 如果后端返回的是 { list: [], total: number } 这种结构
-      studentData = res.data.list || res.data
-      total.value = res.data.total || res.data.length || 0
+      ElMessage.error('获取学生列表失败')
     }
-
-    // 按学号（id）升序排序
-    studentData.sort((a, b) => {
-      const idA = a.id || 0
-      const idB = b.id || 0
-      return idA - idB
-    })
-
-    tableDataList.value = studentData
-    console.log(
-      `分页信息: 当前页=${currentPage.value}, 每页=${pageSize.value}, 总数=${total.value}`
-    )
+  } catch (error) {
+    console.error('获取学生列表异常', error)
+    ElMessage.error('获取学生列表出错')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -130,17 +125,23 @@ const editFn = (data) => {
 }
 
 const onEditSave = async (newData) => {
+  const updateDto: StudentClassesUpdateDTO = {
+    id: newData.id,
+    cid: newData.classes.id,
+    sid: newData.student.id,
+    grade: newData.grade
+  }
+
   try {
-    await updateStudentApi(newData)
+    await updateClassRecordApi(updateDto)
     ElMessage.success('保存成功')
-    getTableList() // 刷新表格
+    getTableList()
   } catch (e) {
     ElMessage.error('保存失败')
   }
 }
 
 const onDeleted = () => {
-  // 删除成功后刷新列表
   getTableList()
 }
 
@@ -152,7 +153,7 @@ const handleCurrentChange = (page: number) => {
 
 const handleSizeChange = (size: number) => {
   pageSize.value = size
-  currentPage.value = 1 // 重置到第一页
+  currentPage.value = 1
   getTableList()
 }
 
@@ -168,7 +169,7 @@ const onAddSave = async (newData) => {
   try {
     await createStudentApi(newData)
     ElMessage.success('添加成功')
-    getTableList() // 刷新表格
+    getTableList() 
   } catch (e) {
     ElMessage.error('添加失败')
   }
@@ -187,10 +188,9 @@ const searchFn = async () => {
 
     console.log('开始搜索，关键词:', searchKeyword.value.trim())
 
-    // 先获取所有学生数据，然后前端过滤
     const res = await getStudentListApi({
       pageIndex: 1,
-      pageSize: 1000 // 获取更多数据用于搜索
+      pageSize: 1000 
     })
 
     console.log('获取所有学生数据:', res)
@@ -198,7 +198,6 @@ const searchFn = async () => {
     if (res && res.data) {
       const allStudents = Array.isArray(res.data) ? res.data : res.data.list || []
       console.log('所有学生数据:', allStudents)
-      // 前端过滤：按姓名搜索
       const keyword = searchKeyword.value.trim().toLowerCase()
       const filteredStudents = allStudents.filter(
         (student) => student.name && student.name.toLowerCase().includes(keyword)
@@ -229,37 +228,6 @@ const searchFn = async () => {
   } finally {
     loading.value = false
     isSearching.value = false
-  }
-}
-
-// 搜索ID
-const searchByIdFn = async (studentId: string) => {
-  if (!studentId.trim()) {
-    ElMessage.warning('请输入学生ID')
-    return
-  }
-
-  try {
-    loading.value = true
-    const res = await getStudentByIdApi(studentId.trim())
-
-    if (res && res.data) {
-      tableDataList.value = [res.data]
-      total.value = 1
-      currentPage.value = 1
-      ElMessage.success('找到匹配的学生')
-    } else {
-      tableDataList.value = []
-      total.value = 0
-      ElMessage.info('未找到该ID的学生')
-    }
-  } catch (error) {
-    console.error('ID搜索失败:', error)
-    ElMessage.error('搜索失败，请稍后重试')
-    tableDataList.value = []
-    total.value = 0
-  } finally {
-    loading.value = false
   }
 }
 
@@ -294,12 +262,6 @@ const resetSearch = () => {
       <div style="display: flex; gap: 8px">
         <el-button type="primary" @click="searchFn" :loading="isSearching" plain> 搜索 </el-button>
         <el-button type="info" @click="resetSearch" plain>重置</el-button>
-      </div>
-      <div style="display: flex; gap: 8px; margin-left: auto">
-        <el-button type="success" @click="addFn" round style="margin-right: 40px">
-          <Icon icon="ep:plus" class="mr-5px" />
-          添加学生
-        </el-button>
       </div>
     </div>
     <Table

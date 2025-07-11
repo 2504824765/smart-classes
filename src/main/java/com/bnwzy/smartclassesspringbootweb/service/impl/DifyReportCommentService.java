@@ -5,6 +5,7 @@ import com.bnwzy.smartclassesspringbootweb.service.IDifyReportCommentService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,7 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Setter
 @Slf4j
 @Service
 public class DifyReportCommentService implements IDifyReportCommentService {
@@ -267,7 +269,7 @@ public class DifyReportCommentService implements IDifyReportCommentService {
         }
     }
 
-    private File createTextFile(String content, String filename) throws IOException {
+    File createTextFile(String content, String filename) throws IOException {
         File file = File.createTempFile(filename, ".txt");
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);

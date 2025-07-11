@@ -11,12 +11,13 @@ import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentMissionUpdateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.StudentsAllClassMissionGetDTO;
 import com.bnwzy.smartclassesspringbootweb.repository.*;
 import com.bnwzy.smartclassesspringbootweb.service.IStudentMissionService;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Setter
 @Service
 public class StudentMissionService implements IStudentMissionService {
     @Autowired
@@ -88,14 +89,17 @@ public class StudentMissionService implements IStudentMissionService {
             if (studentMissionUpdateDTO.getScore() != null) {
                 studentMission.setScore(studentMissionUpdateDTO.getScore());
             }
-            if (studentMissionUpdateDTO.getDone() != null) {
-                studentMission.setIsDone(studentMissionUpdateDTO.getDone());
+            if (studentMissionUpdateDTO.getIsDone() != null) {
+                studentMission.setIsDone(studentMissionUpdateDTO.getIsDone());
             }
-            if (studentMissionUpdateDTO.getActive() != null) {
-                studentMission.setIsActive(studentMissionUpdateDTO.getActive());
+            if (studentMissionUpdateDTO.getIsActive() != null) {
+                studentMission.setIsActive(studentMissionUpdateDTO.getIsActive());
             }
             if (studentMissionUpdateDTO.getReportUrl() != null) {
                 studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());
+            }
+            if (studentMissionUpdateDTO.getAiCommentUrl() != null) {
+                studentMission.setAiCommentUrl(studentMissionUpdateDTO.getAiCommentUrl());
             }
             return studentMissionRepository.save(studentMission);
         }

@@ -3,7 +3,7 @@
     <h2 style="text-align: center; margin-bottom: 20px">学生能力评估</h2>
     <template v-if="loaded">
       <AbilityRadarChart v-if="hasAbilityData" :abilities="studentAbilities" />
-      <div v-else style="text-align: center; color: gray;">暂无能力评估数据</div>
+      <div v-else style="text-align: center; color: gray">暂无能力评估数据</div>
     </template>
     <div v-else>正在加载能力数据...</div>
   </el-card>
@@ -13,7 +13,7 @@
 import { ref, onMounted } from 'vue'
 import AbilityRadarChart from './components/AbilityRadarChart.vue'
 import { useUserStore } from '@/store/modules/user'
-import { getStudentByUsernameApi, updateStudentApi } from '@/api/student/index'
+import { getStudentByUsernameApi } from '@/api/student/index'
 
 const studentId = ref<number | null>(null)
 
@@ -68,5 +68,4 @@ const initialize = async () => {
 onMounted(() => {
   initialize()
 })
-
 </script>

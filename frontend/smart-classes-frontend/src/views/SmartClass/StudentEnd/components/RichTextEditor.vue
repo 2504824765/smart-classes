@@ -1,13 +1,20 @@
 <template>
   <div>
-    <div ref="toolbarRef" style="border: 1px solid #ccc; margin-bottom: 10px;" />
-    <div ref="editorRef" style="border: 1px solid #ccc; min-height: 300px;" />
+    <div ref="toolbarRef" style="border: 1px solid #ccc; margin-bottom: 10px"></div>
+    <div ref="editorRef" style="border: 1px solid #ccc; min-height: 300px"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
-import { IDomEditor, IEditorConfig, IToolbarConfig, createEditor, createToolbar, Boot } from '@wangeditor/editor'
+import {
+  IDomEditor,
+  IEditorConfig,
+  IToolbarConfig,
+  createEditor,
+  createToolbar,
+  Boot
+} from '@wangeditor/editor'
 import '@wangeditor/editor/dist/css/style.css'
 
 const props = defineProps<{ modelValue: string }>()

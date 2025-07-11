@@ -8,10 +8,10 @@ import * as echarts from 'echarts'
 
 const props = defineProps<{
   abilities: {
-    conceptUnderstanding: number,
-    logicalReasoning: number,
-    problemSolving: number,
-    innovativeThinking: number,
+    conceptUnderstanding: number
+    logicalReasoning: number
+    problemSolving: number
+    innovativeThinking: number
     expressionNorms: number
   }
 }>()
@@ -76,14 +76,18 @@ const initChart = () => {
   })
 }
 
-watch(() => props.abilities, () => {
-  nextTick(() => {
-    if (chartInstance) {
-      chartInstance.dispose()
-    }
-    initChart()
-  })
-}, { immediate: true, deep: true })
+watch(
+  () => props.abilities,
+  () => {
+    nextTick(() => {
+      if (chartInstance) {
+        chartInstance.dispose()
+      }
+      initChart()
+    })
+  },
+  { immediate: true, deep: true }
+)
 
 onMounted(() => {
   initChart()

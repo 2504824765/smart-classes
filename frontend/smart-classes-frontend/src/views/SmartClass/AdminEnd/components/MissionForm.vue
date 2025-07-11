@@ -139,13 +139,25 @@ const goback = () => {
 <template>
   <ContentWrap>
     <Form ref="formRef" :schema="schema" v-model="formData" :rules="rules" />
-    <div v-if="classResources.length" style="margin: 24px 0 0 0;">
-      <div style="font-weight: bold; margin-bottom: 8px;">课程所有资源：</div>
-      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-        <div v-for="file in classResources" :key="file.id" style="border: 1px solid #eee; border-radius: 6px; padding: 12px 18px; min-width: 180px; background: #fafbfc;">
+    <div v-if="classResources.length" style="margin: 24px 0 0 0">
+      <div style="font-weight: bold; margin-bottom: 8px">课程所有资源：</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <div
+          v-for="file in classResources"
+          :key="file.id"
+          style="
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 12px 18px;
+            min-width: 180px;
+            background: #fafbfc;
+          "
+        >
           <div><b>文件名：</b>{{ file.name }}</div>
           <div><b>类型：</b>{{ file.type }}</div>
-          <div v-if="file.path"><a :href="file.path" target="_blank" style="color: #409EFF;">下载/查看</a></div>
+          <div v-if="file.path"
+            ><a :href="file.path" target="_blank" style="color: #409eff">下载/查看</a></div
+          >
         </div>
       </div>
     </div>

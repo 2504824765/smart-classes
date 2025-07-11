@@ -11,9 +11,13 @@
           :name="res.id"
           :key="res.id"
         >
-          <div v-if="res.type === 'text'" class="p-4 bg-white rounded shadow"> 
-            <el-card class="mb-4 p-4 bg-white rounded shadow">
-              <div v-html="compiledMarkdown" class="prose prose-sm max-w-none" />
+          <div v-if="res.type === 'text'" class="p-4 bg-white rounded shadow">
+            <el-card style="min-height: 200px;"
+              class="mb-4 p-4 bg-white rounded shadow"
+              v-loading="generating && !isMarkdownRendered"
+              element-loading-text="AI生成中，请稍候..."
+            >
+              <div v-html="compiledMarkdown" class="prose prose-sm max-w-none"></div>
             </el-card>
 
             <!-- 下：笔记编辑卡片 -->
@@ -24,8 +28,12 @@
             </el-card>
           </div>
           <div v-else-if="res.type === 'question'" class="text-gray-400">
-            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)" >生成题目</ElButton>
-            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)">刷新题目</ElButton>
+            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)"
+              >生成题目</ElButton
+            >
+            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)"
+              >刷新题目</ElButton
+            >
             <QuestionCard
               v-for="(q, index) in questions"
               :key="index"
@@ -35,7 +43,9 @@
               :answer="q.answer"
               :showResult="submitted"
             />
-            <el-button type="primary" :disabled="questions.length === 0" @click="handleSubmit">提交</el-button>
+            <el-button type="primary" :disabled="questions.length === 0" @click="handleSubmit"
+              >提交</el-button
+            >
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -62,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { ref, reactive, onMounted, watch, computed, watchEffect } from 'vue'
 import { ElMessage } from 'element-plus'
 import ChatGPT from './components/ChatGPT.vue'
 import { useRoute } from 'vue-router'
@@ -105,7 +115,7 @@ const currentResourceId = ref('')
 const questions = ref<QuestionItem[]>([])
 const answers = ref<(string | null)[]>([])
 const submitted = ref(false)
-
+const isMarkdownRendered = ref(false)
 const aiMarkdown = ref('')
 const currentNodeName = ref('')
 const generating = ref(false)
@@ -117,6 +127,7 @@ const loadNodeIntroduction = async (nodeName: string) => {
   currentNodeName.value = nodeName
   aiMarkdown.value = ''
   generating.value = true
+  isMarkdownRendered.value = false
 
   // ✅ 若已有 controller，先中断前一次流
   if (controller) {
@@ -165,24 +176,21 @@ const loadNodeIntroduction = async (nodeName: string) => {
   }
 }
 
-
-const createQuestions = async (method:number) => {
+const createQuestions = async (method: number) => {
   if (method === 1) {
-    if(questions.value.length > 0) {
+    if (questions.value.length > 0) {
       ElMessage.warning('已生成题目，请刷新页面重新生成')
       return
-    }else{
+    } else {
       if (questions.value.length === 0) {
-        loading.value = true
         try {
-          fetchQuestions()
+          await fetchQuestions()
         } finally {
           loading.value = false
         }
       }
     }
-  }
-  else if (method === 2) {
+  } else if (method === 2) {
     if (questions.value.length > 0) {
       questions.value = []
     }
@@ -192,12 +200,19 @@ const createQuestions = async (method:number) => {
     } finally {
       loading.value = false
     }
-  }else {
+  } else {
     ElMessage.error('生成题目失败')
   }
 }
 
 const compiledMarkdown = computed(() => md.render(aiMarkdown.value)) // 渲染为 HTML
+
+watchEffect(() => {
+  // 只有当内容不为空才标记为“已渲染”
+  if (compiledMarkdown.value.trim()) {
+    isMarkdownRendered.value = true
+  }
+})
 
 const saveNote = () => {
   const el = document.createElement('div')
@@ -214,7 +229,6 @@ const saveNote = () => {
     .from(el)
     .save()
 }
-
 
 const handleSubmit = () => {
   submitted.value = true
@@ -256,6 +270,8 @@ async function fetchKnowledge() {
   }
 }
 
+let loadingInstance: any = null
+
 const fetchQuestions = async () => {
   if (!classId) {
     console.warn('classId 不存在，跳过图谱加载')
@@ -272,12 +288,18 @@ const fetchQuestions = async () => {
     }
   ).catch(() => false)
 
+  if (!confirmed) {
+    ElMessage.info('已取消生成题目')
+    loading.value = false
+    return 
+  }
+
   ElMessage.info('题目生成时间较长，请耐心等待...')
 
   loading.value = true
   controller = new AbortController()
 
-  const loadingInstance = ElLoading.service({
+  loadingInstance = ElLoading.service({
     lock: true,
     text: '正在生成题目...',
     background: 'rgba(0, 0, 0, 0.3)'
@@ -304,14 +326,18 @@ const fetchQuestions = async () => {
 
     questions.value = res
     answers.value = Array(res.length).fill(null)
-  } catch (err: any) {
+  }catch (err: any) {
     if (err.name === 'AbortError') {
       console.warn('题目请求被用户中止')
+      loadingInstance.close()
+      loading.value = false
+      return
     } else {
       console.error('题目生成失败', err)
     }
   } finally {
-    loadingInstance.close()
+    loadingInstance?.close()
+    loadingInstance = null
     loading.value = false
   }
 }
@@ -319,7 +345,15 @@ const fetchQuestions = async () => {
 const cancelRequest = () => {
   if (controller) {
     controller.abort()
+    controller = null
   }
+
+  if (loadingInstance) {
+    loadingInstance.close()
+    loadingInstance = null
+  }
+
+  loading.value = false
 }
 
 watch(currentResourceId, (newId) => {
@@ -328,7 +362,7 @@ watch(currentResourceId, (newId) => {
 
 onMounted(async () => {
   await fetchKnowledge()
-  await loadNodeIntroduction(knowledgeName) 
+  await loadNodeIntroduction(knowledgeName)
 })
 </script>
 

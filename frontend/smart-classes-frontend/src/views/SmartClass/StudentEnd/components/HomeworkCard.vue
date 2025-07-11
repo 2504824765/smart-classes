@@ -5,10 +5,10 @@
         homework.classMission.id ? `任务 # ${homework.classMission.type} ` : '未知任务'
       }}</div>
       <el-tag
-        :type="homework.done ? 'success' : homework.active ? 'warning' : 'danger'"
+        :type="homework.isDone ? 'success' : homework.isActive ? 'warning' : 'danger'"
         size="small"
       >
-        {{ homework.done ? '已完成' : homework.active ? '未完成' : '已截止' }}
+        {{ homework.isDone ? '已完成' : homework.isActive ? '未完成' : '已截止' }}
       </el-tag>
     </div>
     <p class="brief">成绩：{{ homework.score ?? '未评分' }}</p>

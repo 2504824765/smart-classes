@@ -8,3 +8,7 @@ export const getAllClassMissionResourcesByClassMissionId = (classMissionId: numb
 export const createClassMissionResource = (classMissionResourceCreateDTO: ClassMissionResourceCreateDTO): Promise<IResponse<ClassMissionResource>> => {
   return request.post({ url: '/api/classMissionResource/create', data: classMissionResourceCreateDTO })
 }
+
+export const deleteClassMissionResource = (classMissionResourceId: number) => {
+  return request.delete({ url: `/api/classMissionResource/deleteById/${classMissionResourceId}` })
+}

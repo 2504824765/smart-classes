@@ -89,6 +89,7 @@ const fileList = ref<UploadFile[]>([])
 const selectedMissionIds = ref<number[]>([])
 
 const toggleSelection = (id: number, checked: boolean) => {
+  console.log('id, checked',id,checked)
   if (checked) {
     selectedMissionIds.value.push(id)
   } else {
@@ -103,6 +104,7 @@ const deleteSelectedMissions = async () => {
   }
 
   try {
+    console.log(selectedMissionIds.value)
     await Promise.all(selectedMissionIds.value.map((id) => deleteClassMissionApi(id)))
     ElMessage.success('删除成功')
     await fetchMissions()

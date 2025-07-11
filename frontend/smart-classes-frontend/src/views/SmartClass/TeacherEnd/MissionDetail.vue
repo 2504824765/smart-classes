@@ -44,14 +44,6 @@
       <template #header>
         <div class="flex justify-between items-center">
           <span>相关资源</span>
-          <el-upload
-            :show-file-list="false"
-            :auto-upload="true"
-            :http-request="handleUpload"
-            :multiple="true"
-          >
-            <el-button type="primary" size="small">上传资源</el-button>
-          </el-upload>
         </div>
       </template>
 
@@ -73,6 +65,23 @@
       <div v-else>
         <el-empty description="暂无资源" />
       </div>
+
+      <el-upload
+        class="upload-demo"
+        drag
+        :action="''"
+        :auto-upload="false"
+        :on-change="handleFileChange"
+        :file-list="[]"
+        :multiple="true"
+      >
+        <el-icon><upload-filled /></el-icon>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+
+      <el-button type="primary" class="mt-2" @click="handleUpload" :loading="uploading">
+        上传文件
+      </el-button>
     </el-card>
 
     <!-- 学生完成情况 -->
@@ -107,12 +116,12 @@ import { getStudentMissionByMission } from '@/api/studentMission/index'
 import { getClassMissionByIdApi, updateClassMissionApi } from '@/api/classMission/index'
 import type { ClassMission, ClassMissionUpdateDTO } from '@/api/classMission/types'
 import { uploadResourcesApi } from '@/api/oss/index'
-import { createClassMissionResource } from '@/api/classMissionResource/index'
+import { createClassMissionResource, deleteClassMissionResource } from '@/api/classMissionResource/index'
 import FileDisplay from './components/FileDisplay.vue'
 import { PREFIX } from '@/constants'
 import { StudentMission } from '@/api/studentMission/types'
 import { getAllClassMissionResourcesByClassMissionId } from '@/api/classMissionResource'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, UploadFile } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
@@ -170,6 +179,21 @@ const updateDeadline = async () => {
   }
 }
 
+const handleFileChange = (uploadFile: UploadFile) => {
+  const rawFile = uploadFile.raw!
+  const fileName = rawFile.name
+  const fileType = fileName.split('.').pop() || ''
+
+  pendingResources.value.push({
+    name: fileName,
+    type: fileType,
+    description: fileName,
+    file: rawFile
+  })
+
+  ElMessage.success(`已添加到待上传列表：${fileName}`)
+}
+
 const handleUpload = async () => {
   if (pendingResources.value.length === 0) {
     ElMessage.warning('没有待上传的文件')
@@ -215,7 +239,7 @@ const handleUpload = async () => {
 const deleteFile = async (file: { id: number; name: string }) => {
   try {
     await ElMessageBox.confirm(`确定删除资源 ${file.name}？`, '警告', { type: 'warning' })
-    await deleteResourceApi(file.id)
+    await deleteClassMissionResource(file.id)
     fileCards.value = fileCards.value.filter((f) => f.id !== file.id)
     ElMessage.success('删除成功')
   } catch {

@@ -6,7 +6,6 @@ import { getTableListApi } from '@/api/table'
 import { TableData } from '@/api/table/types'
 import { ref, h, reactive, onMounted } from 'vue'
 import { ElTag, ElCard, ElStatistic, ElProgress } from 'element-plus'
-// import { Calendar, Document, Trophy, Message, Clock } from '@element-plus/icons-vue'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
 import { UserType } from '@/api/login/types'
@@ -21,8 +20,30 @@ import {
   getStudentCountApi
 } from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
-// import { getMissionListApi } from '@/api/mission'
 import { Icon } from '@/components/Icon'
+import { useUserStore } from '@/store/modules/user'
+import { Teacher } from '@/api/teacher/types'
+import { getAllClassesApi } from '@/api/classes'
+import { Classes } from '@/api/classes/types'
+import { getClassMissionByCidApi } from '@/api/classMission'
+
+
+// 教师信息
+const teacherInfo = ref<Teacher>()
+
+const getId = async (username: string) => {
+  const res = await getTeacherByUsernameApi(username)
+  teacherInfo.value = res.data
+}
+
+const userStore = useUserStore()
+const loginInfo = userStore.getLoginInfo
+const initialize = async () => {
+  if (loginInfo) {
+    const username = loginInfo.username
+    await getId(username)
+  }
+}
 
 interface Params {
   pageIndex?: number
@@ -47,13 +68,6 @@ interface Statistics {
 const router = useRouter()
 const { t } = useI18n()
 
-// 教师信息
-const teacherInfo = ref({
-  name: '',
-  username: '',
-  avatar: ''
-})
-
 // 近期课程
 const recentCourses = ref<Course[]>([])
 const loading = ref(false)
@@ -67,12 +81,6 @@ const statistics = ref<Statistics>({
 // 获取当前登录教师信息
 const getCurrentTeacher = async () => {
   try {
-    // 暂时只设置默认数据，避免API调用导致的路由问题
-    teacherInfo.value = {
-      name: '张老师',
-      username: 'teacher001',
-      avatar: ''
-    }
 
     // 设置统计数据
     statistics.value = {
@@ -113,6 +121,11 @@ const getCurrentTeacher = async () => {
 
 // 获取教师统计数据
 const getTeacherStatistics = async () => {
+  if(!teacherInfo.value) {
+    ElMessage.error('教师信息为空')
+    return
+  }
+
   try {
     loading.value = true
 
@@ -131,6 +144,70 @@ const getTeacherStatistics = async () => {
       console.error('获取学生数量失败:', error)
       statistics.value.studentCount = 0
     }
+
+    try {
+      // 获取课程数量
+      const res = await getAllClassesApi()
+
+      const teacherId = teacherInfo.value.id
+      const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
+      console.log('课程数量API响应:', res)
+      if (res && courseList) {
+        statistics.value.courseCount = Number(courseList.length)
+        console.log('成功获取课程数量:', courseList.length)
+      }
+      
+    } catch (error) {
+      console.error('获取课程数量失败:', error)
+      statistics.value.courseCount = 0
+    }
+
+    try {
+      // 获取作业数量
+      const res = await getAllClassesApi()
+      const classes = res.data  // 假设这里是课程数组
+
+      let totalMissions = 0
+
+      await Promise.all(
+        classes.map(async (cls) => {
+          const missionRes = await getClassMissionByCidApi(cls.id)
+          totalMissions += missionRes.data.length
+        })
+      )
+
+      console.log('所有课程任务总数', totalMissions)
+      statistics.value.assignmentCount = totalMissions
+    } catch (error) {
+      console.error('获取作业数量失败:', error)
+      statistics.value.assignmentCount = 0
+    }
+
+    try {
+      // 获取完成率
+      const res = await getAllClassesApi()
+      const classes = res.data  // 假设这里是课程数组
+
+      const startedMissionCounts: Record<number, number> = {}
+
+      await Promise.all(
+        classes.map(async (cls) => {
+          const missionRes = await getClassMissionByCidApi(cls.id)
+          const missions = missionRes.data
+
+          const startedMissions = missions.filter(mission => mission.deadline && new Date(mission.deadline) < new Date)
+
+          startedMissionCounts[cls.id] = startedMissions.length
+        })
+      )
+
+      console.log('每个课程已开始任务数量', startedMissionCounts)
+      statistics.value.completionRate = Object.values(startedMissionCounts).reduce((acc, count) => acc + count, 0) / (classes.length * 2) * 100
+    } catch (error) {
+      console.error('获取完成率失败:', error)
+      statistics.value.completionRate = 0
+    }
+
   } catch (error) {
     console.error('获取统计数据失败:', error)
     statistics.value = {
@@ -142,10 +219,6 @@ const getTeacherStatistics = async () => {
   } finally {
     loading.value = false
   }
-
-  
-
-
 }
 // 快捷跳转
 const gotoCourseManagement = () => {
@@ -165,6 +238,7 @@ const gotoMissionManagement = () => {
 }
 
 onMounted(() => {
+  initialize()
   setTimeout(() => {
     getCurrentTeacher().catch((error) => {
       console.error('初始化失败:', error)
@@ -182,7 +256,7 @@ onMounted(() => {
     <div class="welcome-section">
       <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px">
         <span style="font-size: 18px; font-weight: bold">{{ t('teacher.dashboard') }}</span>
-        <el-text class="mx-1" size="large">欢迎，{{ teacherInfo.name || '老师' }}</el-text>
+        <el-text class="mx-1" size="large">欢迎，{{ teacherInfo?.name || '老师' }}</el-text>
       </div>
       <el-divider />
     </div>
@@ -239,14 +313,15 @@ onMounted(() => {
         </el-col>
         <el-col :span="6">
           <el-card shadow="hover" class="stat-card stat-card-4">
-            <el-statistic
-              :value="statistics.completionRate"
-              :value-style="{ fontSize: '32px', fontWeight: 'bold', color: 'white' }"
-            >
-              <template #title>
-                <span style="font-size: 16px; font-weight: 600; color: white">作业完成率</span>
-              </template>
-            </el-statistic>
+          <el-statistic
+            :value="statistics.completionRate"
+            :value-style="{ fontSize: '32px', fontWeight: 'bold', color: 'white' }"
+            :formatter="value => Number(value).toFixed(2) + '%'"
+          >
+            <template #title>
+              <span style="font-size: 16px; font-weight: 600; color: white">作业完成率</span>
+            </template>
+          </el-statistic>
             <div class="card-footer">
               <el-button type="text" plain @click="gotoStudentManagement">查看详情</el-button>
             </div>
@@ -276,7 +351,7 @@ onMounted(() => {
 
     <!-- 快捷操作 -->
     <div class="quick-actions">
-      <h3>快捷操作（这几个对应的路径不完全对）</h3>
+      <h3>快捷操作</h3>
       <div style="margin: 20px 0"></div>
       <el-row :gutter="20">
         <el-col :span="6">

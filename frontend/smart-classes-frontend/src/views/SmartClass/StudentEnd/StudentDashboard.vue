@@ -5,7 +5,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElCard, ElStatistic, ElProgress, ElMessage } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
-import { getUserByIdApi } from '@/api/login'
+import { getUserByIdApi } from '@/api/login/index'
 import { useUserStore } from '@/store/modules/user'
 import { Icon } from '@/components/Icon'
 import { getStudentMissionByClass } from '@/api/studentMission/index'
@@ -140,7 +140,7 @@ const getStatisticsData = async () => {
       }
 
       const homeworkCount = allHomeworks.length
-      const completedHomework = allHomeworks.filter((hw) => hw.done === true).length
+      const completedHomework = allHomeworks.filter((hw) => hw.isDone === true).length
       const completionRate =
         homeworkCount > 0 ? Math.round((completedHomework / homeworkCount) * 100) : 0
 
@@ -317,15 +317,17 @@ onMounted(() => {
                 </span>
                 <el-tag
                   :type="
+                    homework.isDone === true
+                      ? 'success'
+                      : homework.isActive === true
                     homework.done === true
                       ? 'success'
                       : homework.active === true
-                        ? 'warning'
-                        : 'info'
-                  "
-                  size="small"
                 >
                   {{
+                    homework.isDone === true
+                      ? '已完成'
+                      : homework.isActive === true
                     homework.done === true
                       ? '已完成'
                       : homework.active === true

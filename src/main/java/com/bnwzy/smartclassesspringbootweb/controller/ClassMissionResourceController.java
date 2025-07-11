@@ -25,4 +25,9 @@ public class ClassMissionResourceController {
     public ResponseMessage getAllClassMissionResourcesByClassMissionId(@PathVariable("id") Long id) {
         return ResponseMessage.success("<Get all classMissionResource>", classMissionResourceService.getAllClassMissionResourcesByClassMissionId(id));
     }
+
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseMessage deleteClassMissionResourceById(@PathVariable("id") Long id) {
+        return ResponseMessage.success("<Delete classMissionResource>", classMissionResourceService.deleteClassMissionResourceById(id));
+    }
 }

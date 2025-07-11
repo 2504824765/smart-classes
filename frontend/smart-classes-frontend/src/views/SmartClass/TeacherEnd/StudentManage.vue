@@ -19,8 +19,8 @@ import EditStudent from './EditStudent.vue'
 import AddStudent from './AddStudent.vue'
 import { Student } from '@/api/student/types'
 import { useRoute } from 'vue-router'
-import { getAssociatedByCidApi } from '@/api/studentClasses'
-import { StudentClasses } from '@/api/studentClasses/types'
+import { getAssociatedByCidApi, updateClassRecordApi } from '@/api/studentClasses'
+import { StudentClasses, StudentClassesUpdateDTO } from '@/api/studentClasses/types'
 
 const route = useRoute()
 
@@ -37,30 +37,27 @@ const router = useRouter()
 
 const columns: TableColumn[] = [
   {
-    field: 'id',
+    field: 'student.id',
     label: t('student.id')
   },
   {
-    field: 'name',
+    field: 'student.name',
     label: t('student.name')
   },
   {
-    field: 'gender',
+    field: 'student.gender',
     label: t('student.gender')
   },
   {
-    field: 'department',
+    field: 'student.department.name',
     label: t('student.dept'),
     slots: {
-      default: ({ row }) => {
-        console.log('row结构为:', row)
-        return row.department?.name || '未知'
-      }
+      default: ({ row }) => row.student.department?.name || '未知'
     }
   },
   {
-    field: 'gpa',
-    label: t('student.gpa')
+    field: 'grade',
+    label: '成绩'
   },
   {
     field: 'action',
@@ -68,11 +65,9 @@ const columns: TableColumn[] = [
     slots: {
       default: (data) => {
         return (
-          <>
-            <BaseButton type="primary" onClick={() => editFn(data.row)}>
-              编辑
-            </BaseButton>
-          </>
+          <BaseButton type="primary" onClick={() => editFn(data.row)}>
+            编辑
+          </BaseButton>
         )
       }
     }
@@ -80,7 +75,7 @@ const columns: TableColumn[] = [
 ]
 
 const loading = ref(true)
-const tableDataList = ref<Student[]>([])
+const tableDataList = ref<StudentClasses[]>([])
 
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -98,16 +93,8 @@ const getTableList = async () => {
     const res = await getAssociatedByCidApi(classId)
 
     if (res.code === 200 && Array.isArray(res.data)) {
-      const associations: StudentClasses[] = res.data
-
-      // 提取每个学生
-      const studentData: Student[] = associations.map(item => item.student)
-
-      // 按学号升序排序
-      studentData.sort((a, b) => (a.id || 0) - (b.id || 0))
-
-      tableDataList.value = studentData
-      total.value = studentData.length
+      tableDataList.value = res.data
+      total.value = res.data.length
 
       console.log('选课学生列表：', tableDataList.value)
     } else {
@@ -138,10 +125,17 @@ const editFn = (data) => {
 }
 
 const onEditSave = async (newData) => {
+  const updateDto: StudentClassesUpdateDTO = {
+    id: newData.id,
+    cid: newData.classes.id,
+    sid: newData.student.id,
+    grade: newData.grade
+  }
+
   try {
-    await updateStudentApi(newData)
+    await updateClassRecordApi(updateDto)
     ElMessage.success('保存成功')
-    getTableList() 
+    getTableList()
   } catch (e) {
     ElMessage.error('保存失败')
   }
@@ -234,36 +228,6 @@ const searchFn = async () => {
   } finally {
     loading.value = false
     isSearching.value = false
-  }
-}
-
-const searchByIdFn = async (studentId: string) => {
-  if (!studentId.trim()) {
-    ElMessage.warning('请输入学生ID')
-    return
-  }
-
-  try {
-    loading.value = true
-    const res = await getStudentByIdApi(studentId.trim())
-
-    if (res && res.data) {
-      tableDataList.value = [res.data]
-      total.value = 1
-      currentPage.value = 1
-      ElMessage.success('找到匹配的学生')
-    } else {
-      tableDataList.value = []
-      total.value = 0
-      ElMessage.info('未找到该ID的学生')
-    }
-  } catch (error) {
-    console.error('ID搜索失败:', error)
-    ElMessage.error('搜索失败，请稍后重试')
-    tableDataList.value = []
-    total.value = 0
-  } finally {
-    loading.value = false
   }
 }
 

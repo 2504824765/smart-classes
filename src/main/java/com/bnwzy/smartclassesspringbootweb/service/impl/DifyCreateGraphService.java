@@ -138,12 +138,20 @@ public class DifyCreateGraphService implements IDifyCreateGraphService {
                                     
                                     // 去掉JSON格式字符串开头的```json和结尾的```
                                     String cleanedText = text;
+                                    
+                                    // 处理各种可能的JSON标记格式
                                     if (cleanedText.startsWith("```json")) {
                                         cleanedText = cleanedText.substring(7);
+                                    } else if (cleanedText.startsWith("```")) {
+                                        cleanedText = cleanedText.substring(3);
+                                    } else if (cleanedText.startsWith("json")) {
+                                        cleanedText = cleanedText.substring(4);
                                     }
+                                    
                                     if (cleanedText.endsWith("```")) {
                                         cleanedText = cleanedText.substring(0, cleanedText.length() - 3);
                                     }
+                                    
                                     // 去掉开头和结尾的空白字符
                                     cleanedText = cleanedText.trim();
                                     

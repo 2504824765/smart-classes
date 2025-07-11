@@ -53,4 +53,9 @@ public class TeacherController {
     public ResponseMessage getTeacherCount() {
         return ResponseMessage.success("<Get teacher count>", teacherService.getTeacherCount());
     }
+
+    @GetMapping("/getTeachersOfDepartment/{deptId}")
+    public ResponseMessage getTeachersOfDepartment(@PathVariable("deptId") Long deptId) {
+        return ResponseMessage.success("<Get teachers of department>", teacherService.getTeachersOfDept(deptId));
+    }
 }

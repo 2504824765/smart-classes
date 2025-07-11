@@ -7,5 +7,4 @@ public class DeptUpdateDTO {
     private Long id;
     private String name;
     private Long parentId;
-    private Integer departmentLevel;
 }

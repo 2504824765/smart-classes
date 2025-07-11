@@ -6,18 +6,18 @@ export type Teacher = {
   name: string
   gender: string
   // dept: string
-  dept: Department
+  department: Department
 }
 
-export type TeacherCreateDTO = Omit<Teacher, 'id' | 'dept'> & {
-  deptId: number
+export type TeacherCreateDTO = Omit<Teacher, 'id' | 'department'> & {
+  departmentId: number
 }
 
 export type TeacherUpdateDTO = Partial<
   {
     id: number
-  } & Omit<Teacher, 'id' | 'dept'>
+  } & Omit<Teacher, 'id' | 'department'>
 > & {
   id: number
-  deptId: number
+  departmentId: number
 }

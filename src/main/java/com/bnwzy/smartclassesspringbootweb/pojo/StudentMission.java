@@ -1,13 +1,16 @@
 package com.bnwzy.smartclassesspringbootweb.pojo;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Data
 @Entity
 @Table(name = "tb_student_mission")
 public class StudentMission {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_mission_seq")
+    @SequenceGenerator(name = "student_mission_seq", sequenceName = "tb_student_mission_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @ManyToOne
@@ -22,52 +25,6 @@ public class StudentMission {
     private Boolean isDone;
     @Column(name = "is_actice")
     private Boolean isActive;
-
-    public ClassMission getClassMission() {
-        return classMission;
-    }
-
-    public void setClassMission(ClassMission classMission) {
-        this.classMission = classMission;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public Boolean getDone() {
-        return isDone;
-    }
-
-    public void setDone(Boolean done) {
-        isDone = done;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
+    @Column(name = "report_url")
+    private String reportUrl;
 }

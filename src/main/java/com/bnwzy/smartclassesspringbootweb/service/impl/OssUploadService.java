@@ -108,6 +108,7 @@ public class OssUploadService implements IOssUploadService {
             throw new ImageUploadException("<文件名无效>");
         }
 
+
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
         Set<String> allowedExtensions = new HashSet<>(Arrays.asList(
                 "txt", "md", "markdown", "mdx", "pdf", "html", "htm", "xlsx", "xls",
@@ -118,8 +119,11 @@ public class OssUploadService implements IOssUploadService {
             throw new ImageUploadException("<仅支持上传:TXT, MD, MDX, MARKDOWN, PDF, HTML, XLSX, XLS, DOC, DOCX, CSV,EML, MSG, PPTX, PPT, XML, EPUB>");
         }
 
+        if(message.isEmpty()){
+            message="default";
+        }
 
-        String baseFilename = "class/" + "resource/"+message +"/"+ message;
+        String baseFilename = "class/" + "resource/"+message +"/"+file.getOriginalFilename();
         String filename = baseFilename + "." + extension;
 
         // 检查文件是否存在并生成不重复的文件名

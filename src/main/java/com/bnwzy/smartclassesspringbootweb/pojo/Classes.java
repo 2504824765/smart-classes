@@ -1,15 +1,17 @@
 package com.bnwzy.smartclassesspringbootweb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import javax.naming.Name;
 
+@Data
 @Entity
 @Table(name = "tb_class")
 public class Classes {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "class_seq")
+    @SequenceGenerator(name = "class_seq", sequenceName = "tb_class_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "name")
@@ -29,76 +31,4 @@ public class Classes {
     private String description;
     @Column(name = "imageUrl")
     private String imageUrl;
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Teacher getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
-    }
-
-    public Double getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Double credit) {
-        this.credit = credit;
-    }
-
-    public Double getClassHours() {
-        return classHours;
-    }
-
-    public void setClassHours(Double classHours) {
-        this.classHours = classHours;
-    }
-
-    public String getGraph() {
-        return graph;
-    }
-
-    public void setGraph(String graph) {
-        this.graph = graph;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

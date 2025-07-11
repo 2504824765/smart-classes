@@ -4,15 +4,18 @@ import { ContentWrap } from '@/components/ContentWrap'
 import { useForm } from '@/hooks/web/useForm'
 import { BaseButton } from '@/components/Button'
 import { ElMessage } from 'element-plus'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { Classes, ClassesCreateDTO } from '@/api/classes/types'
 import { addClassApi, updateClassApi, getClassesByIdApi } from '@/api/classes'
-import { PendingUploadResource, ResourceCreateDTO } from '@/api/resource/types'
-import { addResourceApi } from '@/api/resource/index'
-import { uploadResourcesApi } from '@/api/oss/index'
+import { PendingUploadResource, ResourceCreateDTO, Resource } from '@/api/resource/types'
+import { addResourceApi, getResourceByClassIdApi, getResourceByIdApi, deleteResourceApi } from '@/api/resource'
+import { uploadResourcesApi } from '@/api/oss'
 import { Teacher } from '@/api/teacher/types'
 import { getAllTeacherApi } from '@/api/teacher'
 import { useRoute, useRouter } from 'vue-router'
+import { ElUpload } from 'element-plus'
+import { getClassMissionByCidApi } from '@/api/classMission'
+import { ElMessageBox } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,10 +25,16 @@ const courseId = ref<number | null>(null)
 //待上传的资源
 const pendingResources = ref<PendingUploadResource[]>([])
 // 绑定上传的资源（uploadedResources 是前面上传时填充的）
-const uploadedResources: ResourceCreateDTO[] = []
+const uploadedResources = ref<ResourceCreateDTO[]>([])
 const allTeachers = ref<Teacher[]>([]) // 所有教师原始数据
 const teacherOptions = ref<{ label: string; value: number }[]>([]) // 绑定 Select
 const teacherLoading = ref(false)
+const missionResources = ref<Resource[]>([])
+
+const isAddMode = computed(() => !isEdit.value)
+const isEditMode = computed(() => isEdit.value)
+
+const isFile = (f: any): f is File => typeof File !== 'undefined' && f instanceof File;
 
 const courseFormSchema = reactive<FormSchema[]>([
   {
@@ -48,7 +57,7 @@ const courseFormSchema = reactive<FormSchema[]>([
       filterMethod: (query: string) => {
         if (!query) {
           teacherOptions.value = allTeachers.value.map((t) => ({
-            label: `${t.name}（${t.dept?.name || '未分配院系'}）`,
+            label: t.name,
             value: t.id
           }))
           return
@@ -57,11 +66,11 @@ const courseFormSchema = reactive<FormSchema[]>([
           .filter(
             (t) =>
               t.name.includes(query) ||
-              t.dept?.name?.includes(query) ||
+              t.department?.name?.includes(query) ||
               String(t.id).includes(query)
           )
           .map((t) => ({
-            label: `${t.name}（${t.dept?.name || '未分配院系'}）`,
+            label: t.name,
             value: t.id
           }))
       }
@@ -103,16 +112,6 @@ const courseFormSchema = reactive<FormSchema[]>([
     value: true
   },
   {
-    field: 'imageUrl',
-    label: '课程封面图（URL 或文件名）',
-    component: 'Input'
-  },
-  {
-    field: 'graph',
-    label: '课程知识图谱JSON（可选）',
-    component: 'Input'
-  },
-  {
     field: 'files',
     label: '上传课程资料',
     component: 'Upload',
@@ -137,7 +136,8 @@ const courseFormSchema = reactive<FormSchema[]>([
       slots: {
         default: () => <BaseButton type="primary">点击上传</BaseButton>
       }
-    }
+    },
+    remove: !isEditMode.value
   }
 ])
 
@@ -150,7 +150,7 @@ onMounted(async () => {
     const res = await getAllTeacherApi()
     allTeachers.value = res.data
     teacherOptions.value = res.data.map((t) => ({
-      label: `${t.name}（${t.dept?.name || '未分配院系'}）`,
+      label: t.name,
       value: t.id
     }))
 
@@ -169,9 +169,10 @@ onMounted(async () => {
           classHours: course.classHours,
           description: course.description,
           active: course.active,
-          imageUrl: course.imageUrl,
-          graph: course.graph
         })
+        // 直接拉取课程所有资源
+        const resourceRes = await getResourceByClassIdApi(courseId.value)
+        missionResources.value = resourceRes.data
       } catch (error) {
         ElMessage.error('获取课程信息失败')
         console.error('获取课程信息错误：', error)
@@ -198,7 +199,10 @@ const handleSubmit = async () => {
 
     try {
       const formData = await getFormData<ClassesCreateDTO>()
-
+      // 强制teacherId为number类型，防止为字符串
+      if (formData.teacherId) {
+        formData.teacherId = Number(formData.teacherId)
+      }
       if (isEdit.value) {
         if (!courseId.value) {
           ElMessage.error('课程ID缺失，无法编辑')
@@ -218,9 +222,9 @@ const handleSubmit = async () => {
 
         for (const resource of pendingResources.value) {
           const uploadRes = await uploadResourcesApi(resource.file, '课程资料')
-          const filePath = uploadRes.data.url
+          const filePath = uploadRes.data
 
-          uploadedResources.push({
+          uploadedResources.value.push({
             name: resource.name,
             path: filePath,
             type: resource.type,
@@ -230,7 +234,7 @@ const handleSubmit = async () => {
         }
 
         // 插入数据库资源记录
-        for (const resource of uploadedResources) {
+        for (const resource of uploadedResources.value) {
           await addResourceApi(resource)
         }
       }
@@ -242,15 +246,99 @@ const handleSubmit = async () => {
     }
   })
 }
+
+// 新增上传文件相关逻辑
+const handleFileUpload = async (file: File) => {
+  const fileName = file.name
+  const fileType = fileName.split('.').pop() || ''
+  // 1. 上传文件到后端，获取url
+  const uploadRes = await uploadResourcesApi(file, '课程资料')
+  const filePath = uploadRes.data
+  // 2. 保存资源信息到数据库
+  const resource = await addResourceApi({
+    name: fileName,
+    path: filePath,
+    type: fileType,
+    description: fileName,
+    classId: courseId.value || 0
+  })
+  // 3. 显示在底部文件列表
+  uploadedResources.value.push(resource.data)
+  ElMessage.success(`已上传：${fileName}`)
+}
+
+// 课程资源上传（编辑模式下）
+const handleResourceUpload = async (file: File) => {
+  if (!courseId.value) {
+    ElMessage.error('课程ID缺失，无法上传资源')
+    return
+  }
+  try {
+    const fileName = file.name
+    const fileType = fileName.split('.').pop() || ''
+    // 1. 上传文件到后端，获取url
+    const uploadRes = await uploadResourcesApi(file, '课程资料')
+    const filePath = uploadRes.data
+    console.log(uploadRes)
+    // 2. 保存资源信息到数据库
+    await addResourceApi({
+      name: fileName,
+      path: filePath,
+      type: fileType,
+      description: fileName,
+      classId: courseId.value
+    })
+    ElMessage.success(`已上传：${fileName}`)
+    await fetchResourceList()
+  } catch (err) {
+    ElMessage.error('上传失败')
+    console.error(err)
+  }
+}
+
+const fetchResourceList = async () => {
+  if (!courseId.value) return
+  const resourceRes = await getResourceByClassIdApi(courseId.value)
+  missionResources.value = resourceRes.data
+}
+
+const handleDeleteResource = async (id: number) => {
+  ElMessageBox.confirm('确定要删除该资源吗？', '提示', { type: 'warning' })
+    .then(async () => {
+      await deleteResourceApi(id)
+      ElMessage.success('删除成功')
+      await fetchResourceList()
+    })
+    .catch(() => {})
+}
 </script>
 
 <template>
   <ContentWrap :title="isEdit ? '编辑课程' : '新增课程'">
     <Form :schema="courseFormSchema" @register="formRegister" />
-    <el-table :data="uploadedResources" style="width: 100%">
-      <el-table-column prop="name" label="文件名" />
-      <el-table-column prop="type" label="类型" width="120" />
-    </el-table>
+    <div v-if="isEdit">
+      <div style="margin: 24px 0 0 0;">
+        <div style="font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 16px;">
+          <span>课程所有资源：</span>
+          <el-upload
+            :show-file-list="false"
+            :before-upload="() => false"
+            :on-change="(file) => { if (isFile(file.raw)) handleResourceUpload(file.raw) }"
+            accept="*"
+          >
+            <BaseButton type="primary" size="small">上传资源</BaseButton>
+          </el-upload>
+        </div>
+        <div v-if="missionResources.length" style="display: flex; flex-wrap: wrap; gap: 16px;">
+          <div v-for="file in missionResources" :key="file.id" style="border: 1px solid #eee; border-radius: 6px; padding: 12px 18px; min-width: 180px; background: #fafbfc; position: relative;">
+            <div><b>文件名：</b>{{ file.name }}</div>
+            <div><b>类型：</b>{{ file.type }}</div>
+            <div v-if="file.path"><a :href="file.path" target="_blank" style="color: #409EFF;">下载/查看</a></div>
+            <el-button type="danger" size="small" style="position: absolute; top: 8px; right: 8px;" @click="handleDeleteResource(file.id)">删除</el-button>
+          </div>
+        </div>
+      </div>
+    </div>
     <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">
       {{ isEdit ? '更新' : '提交' }}
     </BaseButton>

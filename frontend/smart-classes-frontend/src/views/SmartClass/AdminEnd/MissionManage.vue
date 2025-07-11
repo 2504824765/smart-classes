@@ -8,9 +8,18 @@ import { ref, h, reactive, computed } from 'vue'
 import { ElTag } from 'element-plus'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
-import { addClassMissionApi, getallClassMissionApi, updateClassMissionApi, deleteClassMissionApi } from '@/api/classMission/index'
+import {
+  addClassMissionApi,
+  getallClassMissionApi,
+  updateClassMissionApi,
+  deleteClassMissionApi
+} from '@/api/classMission/index'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ClassMission, ClassMissionCreateDTO, ClassMissionUpdateDTO } from '@/api/classMission/types'
+import {
+  ClassMission,
+  ClassMissionCreateDTO,
+  ClassMissionUpdateDTO
+} from '@/api/classMission/types'
 import { getAllClassesApi } from '@/api/classes/index'
 import type { Classes } from '@/api/classes/types'
 
@@ -47,11 +56,6 @@ const columns: TableColumn[] = [
     label: t('task.deadline')
   },
   {
-    field: 'submitMethod',
-    label: t('task.submit_method'),
-    formatter: (row: any) => row.submitMethod || row.submit_method || ''
-  },
-  {
     field: 'score',
     label: t('task.score')
   },
@@ -62,8 +66,12 @@ const columns: TableColumn[] = [
     slots: {
       default: (data) => (
         <>
-          <BaseButton type="primary" size="small" onClick={() => onEdit(data.row)}>编辑</BaseButton>
-          <BaseButton type="danger" size="small" onClick={() => onDelete(data.row)}>删除</BaseButton>
+          <BaseButton type="primary" size="small" onClick={() => onEdit(data.row)}>
+            编辑
+          </BaseButton>
+          <BaseButton type="danger" size="small" onClick={() => onDelete(data.row)}>
+            删除
+          </BaseButton>
         </>
       )
     }
@@ -98,7 +106,9 @@ getTableList()
 // 弹窗表单相关
 const dialogVisible = ref(false)
 const isEdit = ref(false)
-const formData = reactive<Partial<ClassMissionCreateDTO & { id?: number }>>({})
+const formData = reactive<Partial<ClassMissionCreateDTO & { id?: number }>>({
+  deadline: ''
+})
 
 const allClasses = ref<Classes[]>([])
 const classOptions = ref<{ label: string; value: number }[]>([])
@@ -106,26 +116,24 @@ const classOptions = ref<{ label: string; value: number }[]>([])
 const loadClasses = async () => {
   const res = await getAllClassesApi()
   allClasses.value = res.data || []
-  classOptions.value = allClasses.value.map(c => ({ label: c.name, value: c.id }))
+  classOptions.value = allClasses.value.map((c) => ({ label: c.name, value: c.id }))
 }
 
 loadClasses()
 
 const openCreate = () => {
   isEdit.value = false
-  Object.assign(formData, { type: '', description: '', deadline: '', submitMethod: '', score: 0, cid: undefined, id: undefined })
+  Object.assign(formData, { type: '', description: '', deadline: '', score: 0, cid: undefined, id: undefined })
   dialogVisible.value = true
 }
 
 const onEdit = (row: ClassMission) => {
   isEdit.value = true
-  // 兼容 classes 结构，确保 id/cid 都有
   Object.assign(formData, {
     id: row.id,
     type: row.type,
     description: row.description,
-    deadline: row.deadline,
-    submitMethod: (row as any).submitMethod || (row as any).submit_method,
+    deadline: typeof row.deadline === 'string' ? row.deadline : '',
     score: row.score,
     cid: (row.classes as any)?.id || (row as any).cid
   })
@@ -133,7 +141,9 @@ const onEdit = (row: ClassMission) => {
 }
 
 const onDelete = async (row: ClassMission) => {
-  await ElMessageBox.confirm(`确定要删除任务「${row.description}」吗？`, '提示', { type: 'warning' })
+  await ElMessageBox.confirm(`确定要删除任务「${row.description}」吗？`, '提示', {
+    type: 'warning'
+  })
   await deleteClassMissionApi(row.id)
   ElMessage.success('删除成功')
   getTableList()
@@ -156,7 +166,7 @@ const handleSubmit = async () => {
   <ContentWrap>
     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px">
       <span style="font-size: 18px; font-weight: bold">{{ t('teacher.mission') }}</span>
-      <el-button @click="getTableList" style="margin-left: 30px">刷新</el-button>
+      <!-- <el-button @click="getTableList" style="margin-left: 30px">刷新</el-button> -->
     </div>
     <BaseButton type="primary" @click="openCreate" style="margin-bottom: 16px" round>
       <Icon icon="ep:plus" class="mr-5px" />
@@ -175,7 +185,12 @@ const handleSubmit = async () => {
       <el-form :model="formData" label-width="100px">
         <el-form-item label="课程" prop="cid">
           <el-select v-model="formData.cid" placeholder="请选择课程">
-            <el-option v-for="item in classOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option
+              v-for="item in classOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="类型">
@@ -193,9 +208,6 @@ const handleSubmit = async () => {
             value-format="yyyy-MM-dd HH:mm:ss"
             style="width: 100%"
           />
-        </el-form-item>
-        <el-form-item label="提交方式">
-          <el-input v-model="formData.submitMethod" placeholder="请输入提交方式" />
         </el-form-item>
         <el-form-item label="得分">
           <el-input-number v-model="formData.score" :min="0" />

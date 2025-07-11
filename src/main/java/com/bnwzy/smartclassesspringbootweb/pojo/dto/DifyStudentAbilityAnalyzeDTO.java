@@ -1,9 +1,18 @@
 package com.bnwzy.smartclassesspringbootweb.pojo.dto;
 
 public class DifyStudentAbilityAnalyzeDTO {
+    private Long studentId;
     private DifyStudentAbilityAnalyzeDTO.Inputs inputs;
     private String response_mode;
     private String user;
+
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
 
     public DifyStudentAbilityAnalyzeDTO.Inputs getInputs() {
         return inputs;
@@ -27,6 +36,10 @@ public class DifyStudentAbilityAnalyzeDTO {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public Upload getUpload() {
+        return new Upload(inputs, response_mode, user);
     }
 
     public static class Inputs {
@@ -96,6 +109,30 @@ public class DifyStudentAbilityAnalyzeDTO {
                     ", url='" + url + '\'' +
                     ", upload_file_id='" + upload_file_id + '\'' +
                     '}';
+        }
+    }
+
+    public static class Upload {
+        private DifyStudentAbilityAnalyzeDTO.Inputs inputs;
+        private String response_mode;
+        private String user;
+
+        public Upload(DifyStudentAbilityAnalyzeDTO.Inputs inputs, String response_mode, String user) {
+            this.inputs = inputs;
+            this.response_mode = response_mode;
+            this.user = user;
+        }
+
+        public DifyStudentAbilityAnalyzeDTO.Inputs getInputs() {
+            return inputs;
+        }
+
+        public String getResponse_mode() {
+            return response_mode;
+        }
+
+        public String getUser() {
+            return user;
         }
     }
 

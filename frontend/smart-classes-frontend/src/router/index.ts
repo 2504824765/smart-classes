@@ -247,6 +247,16 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
           }
         },
         {
+          path: 'select',
+          component: () => import('@/views/SmartClass/StudentEnd/CourseSelect.vue'),
+          name: 'CourseSelect',
+          meta: {
+            title: t('student.courseSelect'),
+            userType: 'student',
+            noCache: true
+          }
+        },
+        {
           path: 'detail',
           component: () => import('@/views/SmartClass/StudentEnd/CourseDetail.vue'),
           name: 'CourseDetail',
@@ -268,6 +278,31 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
             hidden: true,
             canTo: true,
             noCache: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/personal',
+      component: Layout,
+      redirect: '/personal/personal-center',
+      name: 'Personal',
+      meta: {
+        title: t('router.personal'),
+        hidden: true,
+        canTo: true,
+        userType: 'student'
+      },
+      children: [
+        {
+          path: 'personal-center',
+          component: () => import('@/views/Personal/PersonalCenter/PersonalCenter.vue'),
+          name: 'PersonalCenter',
+          meta: {
+            title: t('router.personalCenter'),
+            hidden: true,
+            canTo: true,
+            userType: 'student'
           }
         }
       ]
@@ -320,21 +355,31 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
       ]
     },
     {
-      path: '/grades',
+      path: '/data',
       component: Layout,
-      name: 'Grades',
+      name: 'Data',
       meta: {
-        title: t('student.grades'),
+        title: t('student.data'),
         icon: 'vi-ant-design:bar-chart-outlined',
         userType: 'student'
       },
       children: [
         {
-          path: '',
+          path: 'grades',
           component: () => import('@/views/SmartClass/StudentEnd/Grades.vue'),
-          name: 'GradesContent',
+          name: 'DataGrades',
           meta: {
             title: t('student.grades'),
+            userType: 'student',
+            noCache: true
+          }
+        },
+        {
+          path: 'assessment',
+          component: () => import('@/views/SmartClass/StudentEnd/Assessment.vue'),
+          name: 'DataAssessment',
+          meta: {
+            title: t('student.assessment'),
             userType: 'student',
             noCache: true
           }

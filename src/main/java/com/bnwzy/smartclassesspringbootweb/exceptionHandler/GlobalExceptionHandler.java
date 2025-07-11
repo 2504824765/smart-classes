@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(DepartmentHasChildrenException.class)
+    public ResponseMessage DepartmentHasChildren(DepartmentHasChildrenException e) {
+        logger.error(e.getMessage());
+        return new ResponseMessage(513, "<该部门有子部门，不能直接删除！>", null);
+    }
     @ExceptionHandler(FileIsNullException.class)
     public ResponseMessage FileIsNullException(FileIsNullException e) {
         logger.error(e.getMessage());
-        return new ResponseMessage(512, "<Fill is null>", null);
+        return new ResponseMessage(512, "<File is null>", null);
     }
     @ExceptionHandler(ClassMissionNotFoundException.class)
     public ResponseMessage classMissionNotFoundException(ClassMissionNotFoundException e) {
@@ -44,7 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(StudentClassesNotFoundException.class)
     public ResponseMessage StudentClassesNotFoundException(Exception e, HttpServletRequest request) {
         logger.error(e.getMessage());
-        return new ResponseMessage(507, "<Teacher not found>", null);
+        return new ResponseMessage(507, "<StudentClasses not found>", null);
     }
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseMessage wrongPasswordException(Exception e) {

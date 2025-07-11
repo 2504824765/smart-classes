@@ -1,12 +1,16 @@
 package com.bnwzy.smartclassesspringbootweb.pojo;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "tb_student")
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 默认自增生成方式
+//    @GeneratedValue(strategy = GenerationType.IDENTITY) // 默认自增生成方式
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq")
+    @SequenceGenerator(name = "student_seq", sequenceName = "tb_student_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "name")
@@ -20,52 +24,7 @@ public class Student {
     private Department department;
     @Column(name = "gpa")
     private Double gpa;
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public Double getGpa() {
-        return gpa;
-    }
-
-    public void setGpa(Double gpa) {
-        this.gpa = gpa;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    @OneToOne
+    @JoinColumn(name = "student_data_id")
+    private StudentData studentData;
 }

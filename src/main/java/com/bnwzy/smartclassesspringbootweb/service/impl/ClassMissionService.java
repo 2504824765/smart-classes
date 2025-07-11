@@ -55,16 +55,28 @@ public class ClassMissionService implements IClassMissionService {
             throw new ClassMissionNotFoundException("<Class mission not found>");
         }
         ClassMission classMission = classMissionRepository.findById(classMissionUpdateDTO.getId()).get();
-        if (classesRepository.findById(classMissionUpdateDTO.getCid()).isEmpty()) {
-            throw new ClassesNotFoundException("<Class not found>");
-        } else {
-            classMission.setClasses(classesRepository.findById(classMissionUpdateDTO.getCid()).get());
+        if (classMissionUpdateDTO.getCid() != null) {
+            if (classesRepository.findById(classMissionUpdateDTO.getCid()).isEmpty()) {
+                throw new ClassesNotFoundException("<Class not found>");
+            } else {
+                classMission.setClasses(classesRepository.findById(classMissionUpdateDTO.getCid()).get());
+            }
         }
-        classMission.setType(classMissionUpdateDTO.getType());
-        classMission.setDescription(classMissionUpdateDTO.getDescription());
-        classMission.setDeadline(classMissionUpdateDTO.getDeadline());
-        classMission.setSubmit_method(classMissionUpdateDTO.getSubmitMethod());
-        classMission.setScore(classMissionUpdateDTO.getScore());
+        if (classMissionUpdateDTO.getType() != null) {
+            classMission.setType(classMissionUpdateDTO.getType());
+        }
+        if (classMissionUpdateDTO.getDescription() != null) {
+            classMission.setDescription(classMissionUpdateDTO.getDescription());
+        }
+        if (classMissionUpdateDTO.getDeadline() != null) {
+            classMission.setDeadline(classMissionUpdateDTO.getDeadline());
+        }
+        if (classMissionUpdateDTO.getSubmitMethod() != null) {
+            classMission.setSubmit_method(classMissionUpdateDTO.getSubmitMethod());
+        }
+        if (classMissionUpdateDTO.getScore() != null) {
+            classMission.setScore(classMissionUpdateDTO.getScore());
+        }
         return classMissionRepository.save(classMission);
     }
 

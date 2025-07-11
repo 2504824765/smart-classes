@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
 import { createStudentApi, updateStudentApi, getStudentByIdApi } from '@/api/student/index'
 import { getAllDeptApi } from '@/api/department/index'
+import { getAllUserApi } from '@/api/user/index'
 import type { Student, StudentCreateDTO, StudentUpdateDTO } from '@/api/student/types'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -14,15 +15,33 @@ const router = useRouter()
 const route = useRoute()
 const isEdit = ref(false)
 const studentId = ref<number | null>(null)
-const deptOptions = ref<{ label: string; value: number }[]>([])
+const deptTreeOptions = ref<any[]>([])
+const userOptions = ref<{ label: string; value: string }[]>([])
+
+function listToTree(list: any[], parentId = 0) {
+  return list
+    .filter(item => item.parentId === parentId)
+    .map(item => ({
+      label: item.name,
+      value: item.id,
+      children: listToTree(list, item.id)
+    }))
+}
 
 const studentFormSchema = reactive<FormSchema[]>([
   {
     field: 'username',
     label: '用户名',
-    component: 'Input',
+    component: 'Select',
     formItemProps: {
       required: true
+    },
+    componentProps: {
+      disabled: isEdit,
+      options: userOptions,
+      filterable: true,
+      clearable: true,
+      placeholder: '请选择用户名'
     }
   },
   {
@@ -50,9 +69,12 @@ const studentFormSchema = reactive<FormSchema[]>([
   {
     field: 'deptId',
     label: '所属院系',
-    component: 'Select',
+    component: 'Cascader',
     componentProps: {
-      options: deptOptions
+      options: deptTreeOptions,
+      props: { checkStrictly: true, emitPath: false },
+      clearable: true,
+      placeholder: '请选择院系'
     },
     formItemProps: {
       required: true
@@ -90,7 +112,22 @@ const { getElFormExpose, getFormData, setValues } = formMethods
 
 const loadDepartments = async () => {
   const res = await getAllDeptApi()
-  deptOptions.value = res.data.map((d: any) => ({ label: d.name, value: d.id }))
+  deptTreeOptions.value = listToTree(res.data)
+}
+
+const loadUsers = async () => {
+  try {
+    const res = await getAllUserApi()
+    // 过滤出学生角色的用户（不区分大小写）
+    const studentUsers = res.data.filter(user => user.role && user.role.toLowerCase() === 'student')
+    userOptions.value = studentUsers.map(user => ({
+      label: user.username,
+      value: user.username
+    }))
+    console.log('getAllUserApi返回:', res.data)
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+  }
 }
 
 const loadStudent = async (id: number) => {
@@ -100,13 +137,14 @@ const loadStudent = async (id: number) => {
     username: student.username,
     name: student.name,
     gender: student.gender,
-    deptId: student.dept?.id || student.department?.id,
+    deptId: student.department?.id,
     gpa: student.gpa
   })
 }
 
 onMounted(async () => {
   await loadDepartments()
+  await loadUsers()
   const id = route.query.id
   if (id) {
     isEdit.value = true
@@ -124,7 +162,11 @@ const handleSubmit = async () => {
       ElMessage.warning('请完整填写学生信息')
       return
     }
-    const formData = await getFormData<StudentCreateDTO & { deptId: number }>()
+    let formData = await getFormData<StudentCreateDTO & { deptId: number | number[] }>()
+    // 取多级选择的最后一级id
+    if (Array.isArray(formData.deptId)) {
+      formData.deptId = formData.deptId[formData.deptId.length - 1]
+    }
     try {
       if (isEdit.value && studentId.value) {
         await updateStudentApi({ ...formData, id: studentId.value })

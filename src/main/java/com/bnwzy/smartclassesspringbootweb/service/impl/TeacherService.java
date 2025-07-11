@@ -3,9 +3,13 @@ package com.bnwzy.smartclassesspringbootweb.service.impl;
 import com.bnwzy.smartclassesspringbootweb.exception.DepartmentNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.TeacherNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.exception.UserAlreadyExistException;
+import com.bnwzy.smartclassesspringbootweb.exception.UserNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.pojo.Classes;
+import com.bnwzy.smartclassesspringbootweb.pojo.Department;
 import com.bnwzy.smartclassesspringbootweb.pojo.Teacher;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.TeacherCreateDTO;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.TeacherUpdateDTO;
+import com.bnwzy.smartclassesspringbootweb.repository.ClassesRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.DepartmentRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.TeacherRepository;
 import com.bnwzy.smartclassesspringbootweb.repository.UserRepository;
@@ -28,9 +32,12 @@ public class TeacherService implements ITeacherService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ClassesRepository classesRepository;
+
     @Override
     public Teacher addTeacher(TeacherCreateDTO teacherCreateDTO) {
-        if(!teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()){
+        if(userRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()){
             Teacher teacher = new Teacher();
             teacher.setUsername(teacherCreateDTO.getUsername());
             teacher.setName(teacherCreateDTO.getName());
@@ -40,14 +47,14 @@ public class TeacherService implements ITeacherService {
             }else{
                 throw new DepartmentNotFoundException("Department not found");
             }
-            if (!userRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()) {
+            if (teacherRepository.findByUsername(teacherCreateDTO.getUsername()).isPresent()) {
                 throw new UserAlreadyExistException("Teacher already exist");
             } else {
                 teacher.setUsername(teacherCreateDTO.getUsername());
             }
             return teacherRepository.save(teacher);
         }else{
-            throw new UserAlreadyExistException("User already exist");
+            throw new UserNotFoundException("User not found");
         }
     }
 
@@ -58,15 +65,20 @@ public class TeacherService implements ITeacherService {
                 throw new TeacherNotFoundException("Teacher not found");
             }
             Teacher teacher=teacherRepository.findById(teacherUpdateDTO.getId()).get();
-            teacher.setName(teacherUpdateDTO.getName());
-            teacher.setGender(teacherUpdateDTO.getGender());
-            if(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).isPresent()){
-                teacher.setDepartment(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).get());
-                return teacherRepository.save(teacher);
+            if (teacherUpdateDTO.getName()!=null) {
+                teacher.setName(teacherUpdateDTO.getName());
             }
-            else{
-                throw new DepartmentNotFoundException("Department not found");
+            if (teacherUpdateDTO.getGender()!=null) {
+                teacher.setGender(teacherUpdateDTO.getGender());
             }
+            if (teacherUpdateDTO.getDepartmentId()!=null) {
+                if (departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).isPresent()) {
+                    teacher.setDepartment(departmentRepository.findById(teacherUpdateDTO.getDepartmentId()).get());
+                } else {
+                    throw new DepartmentNotFoundException("Department not found");
+                }
+            }
+            return teacherRepository.save(teacher);
         }else{
             throw new TeacherNotFoundException("Teacher not found");
         }
@@ -74,8 +86,15 @@ public class TeacherService implements ITeacherService {
 
     @Override
     public boolean deleteById(Long id) {
-        if(teacherRepository.existsById(id)){
-            teacherRepository.deleteById(id);
+        if(teacherRepository.findById(id).isPresent()){
+            Teacher teacher=teacherRepository.findById(id).get();
+            List<Classes> classes = classesRepository.findByTeacher(teacher);
+            if (!classes.isEmpty()) {
+                for (Classes aClass : classes) {
+                    aClass.setTeacher(null);
+                }
+            }
+            teacherRepository.delete(teacher);
             return true;
         }else{
             throw new TeacherNotFoundException("Teacher not found");
@@ -108,5 +127,14 @@ public class TeacherService implements ITeacherService {
     @Override
     public Long getTeacherCount() {
         return teacherRepository.count();
+    }
+
+    @Override
+    public List<Teacher> getTeachersOfDept(Long deptId) {
+        if (departmentRepository.findById(deptId).isPresent()) {
+            return teacherRepository.findByDepartment(departmentRepository.findById(deptId).get());
+        } else {
+            throw new DepartmentNotFoundException("Department not found");
+        }
     }
 }

@@ -56,14 +56,6 @@ setProps({
       }
     },
     {
-      field: 'department',
-      label: '所属院系',
-      width: 150,
-      formatter: (_: Recordable, __: TableColumn, cellValue: any, row: Classes) => {
-        return row.teacher?.dept?.name || '未分配'
-      }
-    },
-    {
       field: 'active',
       label: '是否开课',
       width: 100,
@@ -125,7 +117,6 @@ setProps({
       row-key="id"
       :data="dataList"
       :loading="loading"
-      :columns="[]"
       :pagination="{ total }"
       @register="tableRegister"
       @refresh="refresh"

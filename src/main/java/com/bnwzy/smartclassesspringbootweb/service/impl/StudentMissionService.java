@@ -48,8 +48,8 @@ public class StudentMissionService implements IStudentMissionService {
             studentMission.setClassMission(classMissionRepository.findById(studentMissionCreateDTO.getClassMissionId()).get());
         }
         studentMission.setScore(0);
-        studentMission.setDone(false);
-        studentMission.setActive(true);
+        studentMission.setIsDone(false);
+        studentMission.setIsActive(true);
         return studentMissionRepository.save(studentMission);
     }
 
@@ -69,22 +69,35 @@ public class StudentMissionService implements IStudentMissionService {
             throw new StudentMissionNotFoundException("<Student mission not found>");
         } else {
             StudentMission studentMission = studentMissionRepository.findById(studentMissionUpdateDTO.getId()).get();
-            if (studentRepository.findById(studentMissionUpdateDTO.getStudentId()).isEmpty()) {
-                throw new StudentNotFoundException("<Student not found>");
-            } else {
-                Student student = studentRepository.findById(studentMissionUpdateDTO.getStudentId()).get();
+            if (studentMissionUpdateDTO.getStudentId() != null) {
+                if (studentRepository.findById(studentMissionUpdateDTO.getStudentId()).isEmpty()) {
+                    throw new StudentNotFoundException("<Student not found>");
+                } else {
+                    Student student = studentRepository.findById(studentMissionUpdateDTO.getStudentId()).get();
+                    studentMission.setStudent(student);
+                }
+            }
+            if (studentMissionUpdateDTO.getClassMissionId() != null) {
                 if (classMissionRepository.findById(studentMissionUpdateDTO.getClassMissionId()).isEmpty()) {
                     throw new ClassMissionNotFoundException("<Class mission not found>");
                 } else {
                     ClassMission classmission = classMissionRepository.findById(studentMissionUpdateDTO.getClassMissionId()).get();
-                    studentMission.setStudent(student);
                     studentMission.setClassMission(classmission);
-                    studentMission.setScore(studentMissionUpdateDTO.getScore());
-                    studentMission.setDone(studentMissionUpdateDTO.getDone());
-                    studentMission.setActive(studentMissionUpdateDTO.getActive());
-                    return studentMissionRepository.save(studentMission);
                 }
             }
+            if (studentMissionUpdateDTO.getScore() != null) {
+                studentMission.setScore(studentMissionUpdateDTO.getScore());
+            }
+            if (studentMissionUpdateDTO.getDone() != null) {
+                studentMission.setIsDone(studentMissionUpdateDTO.getDone());
+            }
+            if (studentMissionUpdateDTO.getActive() != null) {
+                studentMission.setIsActive(studentMissionUpdateDTO.getActive());
+            }
+            if (studentMissionUpdateDTO.getReportUrl() != null) {
+                studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());
+            }
+            return studentMissionRepository.save(studentMission);
         }
     }
 
@@ -124,19 +137,11 @@ public class StudentMissionService implements IStudentMissionService {
     }
 
     @Override
-    public List<Student> getAllStudentsOfClassMission(Long id) {
+    public List<StudentMission> getAllStudentMissionsOfClassMission(Long id) {
         ClassMission classMission = classMissionRepository.findById(id)
                 .orElseThrow(() -> new ClassMissionNotFoundException("<Class mission not found>"));
-
-        // 添加null检查
-        Classes classes = classMission.getClasses();
-        if (classes == null) {
-            throw new ClassesNotFoundException("<Class not found>");
-        }
-
-        return studentClassesRepository.findByClasses(classes).stream()
-                .map(StudentClasses::getStudent)
-                .collect(Collectors.toList());
+        // 只返回领取了该任务的学生
+        return studentMissionRepository.findByClassMission(classMission);
     }
 
     @Override

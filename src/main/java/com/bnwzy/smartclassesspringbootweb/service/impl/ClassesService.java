@@ -35,7 +35,7 @@ public class ClassesService implements IClassesService {
         classes.setClassHours(classesCreateDTO.getClassHours());
         classes.setGraph(classesCreateDTO.getGraph());
         classes.setDescription(classesCreateDTO.getDescription());
-        classes.setActive(classesCreateDTO.getActive());
+        classes.setIsActive(classesCreateDTO.getActive());
         classes.setImageUrl(classesCreateDTO.getImageUrl());
         return  classesRepository.save(classes);
     }
@@ -57,20 +57,35 @@ public class ClassesService implements IClassesService {
             throw new ClassesNotFoundException("<Class Not Found>");
         } else {
             Classes classes = classesRepository.findById(classesUpdateDTO.getId()).get();
-            if (teacherRepository.findById(classesUpdateDTO.getTeacherId()).isEmpty()) {
-                throw new TeacherNotFoundException("Teacher not found");
-            } else {
-                Teacher teacher = teacherRepository.findById(classesUpdateDTO.getTeacherId()).get();
-                classes.setTeacher(teacher);
+            if (classesUpdateDTO.getTeacherId() != null) {
+                if (teacherRepository.findById(classesUpdateDTO.getTeacherId()).isEmpty()) {
+                    throw new TeacherNotFoundException("Teacher not found");
+                } else {
+                    Teacher teacher = teacherRepository.findById(classesUpdateDTO.getTeacherId()).get();
+                    classes.setTeacher(teacher);
+                }
             }
-            classes.setName(classesUpdateDTO.getName());
-            classes.setId(classes.getId());
-            classes.setCredit(classesUpdateDTO.getCredit());
-            classes.setClassHours(classesUpdateDTO.getClassHours());
-            classes.setGraph(classesUpdateDTO.getGraph());
-            classes.setDescription(classesUpdateDTO.getDescription());
-            classes.setActive(classesUpdateDTO.getActive());
-            classes.setImageUrl(classesUpdateDTO.getImageUrl());
+            if (classesUpdateDTO.getName() != null) {
+                classes.setName(classesUpdateDTO.getName());
+            }
+            if (classesUpdateDTO.getCredit() != null) {
+                classes.setCredit(classesUpdateDTO.getCredit());
+            }
+            if (classesUpdateDTO.getClassHours() != null) {
+                classes.setClassHours(classesUpdateDTO.getClassHours());
+            }
+            if (classesUpdateDTO.getGraph() != null) {
+                classes.setGraph(classesUpdateDTO.getGraph());
+            }
+            if (classesUpdateDTO.getDescription() != null) {
+                classes.setDescription(classesUpdateDTO.getDescription());
+            }
+            if (classesUpdateDTO.getActive() != null) {
+                classes.setIsActive(classesUpdateDTO.getActive());
+            }
+            if (classesUpdateDTO.getImageUrl() != null) {
+                classes.setImageUrl(classesUpdateDTO.getImageUrl());
+            }
             return classesRepository.save(classes);
         }
     }

@@ -39,7 +39,8 @@ public class DifyReportCommentService implements IDifyReportCommentService {
     private OssUploadService ossUploadService;
 
     public DifyReportCommentService() {
-        String apiKey = "app-IyD6i2DIxGDteTT2JoMethKN";
+//        String apiKey = "app-569FKczHOtQkaHwEFk0QdEcW"; // 本地
+        String apiKey = "app-IyD6i2DIxGDteTT2JoMethKN"; // 远程
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(300))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100000);
@@ -52,6 +53,7 @@ public class DifyReportCommentService implements IDifyReportCommentService {
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(exchangeStrategies)
                 .baseUrl("https://api.dify.ai/v1")
+//                .baseUrl("http://localhost/v1")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .build();
@@ -104,13 +106,32 @@ public class DifyReportCommentService implements IDifyReportCommentService {
                                 String text = dataNode.path("text").asText();
                                 if (text == null || text.trim().isEmpty()) return Mono.empty();
 
+                                // 去掉JSON格式字符串开头的```json和结尾的```
+                                String cleanedText = text;
+                                
+                                // 处理各种可能的JSON标记格式
+                                if (cleanedText.startsWith("```json")) {
+                                    cleanedText = cleanedText.substring(7);
+                                } else if (cleanedText.startsWith("```")) {
+                                    cleanedText = cleanedText.substring(3);
+                                } else if (cleanedText.startsWith("json")) {
+                                    cleanedText = cleanedText.substring(4);
+                                }
+                                
+                                if (cleanedText.endsWith("```")) {
+                                    cleanedText = cleanedText.substring(0, cleanedText.length() - 3);
+                                }
+                                
+                                // 去掉开头和结尾的空白字符
+                                cleanedText = cleanedText.trim();
+
                                 BufferedWriter writer = writerRef.get();
                                 if (writer != null) {
                                     synchronized (writer) {
-                                        writer.write(text);
+                                        writer.write(cleanedText);
                                         writer.flush();
                                         int count = dataCountRef.incrementAndGet();
-                                        log.info("文本已写入文件: '{}' (第{}个数据块)", text, count);
+                                        log.info("文本已写入文件: '{}' (第{}个数据块)", cleanedText, count);
                                     }
                                 }
                             } else if ("workflow_failed".equals(event)) {

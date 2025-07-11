@@ -7,6 +7,15 @@ public class StudentMissionUpdateDTO {
     private Integer score;
     private Boolean isDone;
     private Boolean isActive;
+    private String reportUrl;
+
+    public String getReportUrl() {
+        return reportUrl;
+    }
+
+    public void setReportUrl(String reportUrl) {
+        this.reportUrl = reportUrl;
+    }
 
     public Long getId() {
         return id;

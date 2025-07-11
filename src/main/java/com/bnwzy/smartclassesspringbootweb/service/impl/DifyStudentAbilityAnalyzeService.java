@@ -1,6 +1,10 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
+import com.bnwzy.smartclassesspringbootweb.exception.StudentNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.pojo.Student;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.DifyStudentAbilityAnalyzeDTO;
+import com.bnwzy.smartclassesspringbootweb.repository.StudentDataRepository;
+import com.bnwzy.smartclassesspringbootweb.repository.StudentRepository;
 import com.bnwzy.smartclassesspringbootweb.service.IDifyStudentAbilityAnalyzeService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,14 +24,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -36,10 +38,16 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
     private final ObjectMapper objectMapper;
 
     @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private OssUploadService ossUploadService;
+    @Autowired
+    private StudentDataRepository studentDataRepository;
 
     public DifyStudentAbilityAnalyzeService() {
-        String apiKey = "app-XWHo2AUJA4pKIoNX3yTLTgQq";
+//        String apiKey = "app-6rYPAA60WQdzgfucg9QIM2FR"; // 本地
+        String apiKey = "app-XWHo2AUJA4pKIoNX3yTLTgQq"; // 远程
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(300))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 100000);
@@ -51,6 +59,7 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(exchangeStrategies)
+//                .baseUrl("http://localhost/v1")
                 .baseUrl("https://api.dify.ai/v1")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
@@ -60,20 +69,17 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
 
     @Override
     public Mono<String> studentAbilityAnalyze(DifyStudentAbilityAnalyzeDTO dto) {
+        if (dto.getStudentId() == null) {
+            throw new IllegalArgumentException("studentId<UNK>");
+        }
         log.info("开始处理Dify请求，支持直接JSON格式和data:前缀格式");
 
-        AtomicReference<File> fileRef = new AtomicReference<>();
-        AtomicReference<BufferedWriter> writerRef = new AtomicReference<>();
+        StringBuilder jsonBuilder = new StringBuilder();
         AtomicInteger dataCountRef = new AtomicInteger(0);
 
         try {
-            validateRequest(dto);
-            String requestBody = objectMapper.writeValueAsString(dto);
-            String filename = "dify-response-" + System.currentTimeMillis();
-
-            File tempFile = File.createTempFile(filename, ".json");
-            fileRef.set(tempFile);
-            log.info("临时文件创建成功: {}", tempFile.getAbsolutePath());
+            validateRequest(dto.getUpload());
+            String requestBody = objectMapper.writeValueAsString(dto.getUpload());
 
             return webClient.post()
                     .uri("/workflows/run")
@@ -103,16 +109,29 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
                                 JsonNode dataNode = rootNode.path("data");
                                 String text = dataNode.path("text").asText();
                                 if (text == null || text.trim().isEmpty()) return Mono.empty();
-
-                                BufferedWriter writer = writerRef.get();
-                                if (writer != null) {
-                                    synchronized (writer) {
-                                        writer.write(text);
-                                        writer.flush();
-                                        int count = dataCountRef.incrementAndGet();
-                                        log.info("文本已写入文件: '{}' (第{}个数据块)", text, count);
-                                    }
+                                
+                                // 去掉JSON格式字符串开头的```json和结尾的```
+                                String cleanedText = text;
+                                
+                                // 处理各种可能的JSON标记格式
+                                if (cleanedText.startsWith("```json")) {
+                                    cleanedText = cleanedText.substring(7);
+                                } else if (cleanedText.startsWith("```")) {
+                                    cleanedText = cleanedText.substring(3);
+                                } else if (cleanedText.startsWith("json")) {
+                                    cleanedText = cleanedText.substring(4);
                                 }
+                                
+                                if (cleanedText.endsWith("```")) {
+                                    cleanedText = cleanedText.substring(0, cleanedText.length() - 3);
+                                }
+                                
+                                // 去掉开头和结尾的空白字符
+                                cleanedText = cleanedText.trim();
+                                
+                                jsonBuilder.append(cleanedText);
+                                int count = dataCountRef.incrementAndGet();
+                                log.info("文本已追加到StringBuilder: '{}' (第{}个数据块)", cleanedText, count);
                             } else if ("workflow_failed".equals(event)) {
                                 log.error("检测到workflow_failed事件");
                             }
@@ -124,51 +143,34 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
                         }
                     })
                     .then(Mono.defer(() -> {
-                        BufferedWriter writer = writerRef.get();
-                        if (writer != null) {
-                            try {
-                                writer.close();
-                            } catch (IOException e) {
-                                log.warn("关闭Writer失败", e);
+                        // 处理拼接后的完整JSON字符串
+                        try {
+                            String jsonString = jsonBuilder.toString();
+                            String cleanJson = jsonString.replaceAll("(?i)```json|```", "").trim();
+                            System.out.println(cleanJson);
+                            com.bnwzy.smartclassesspringbootweb.pojo.StudentData studentData = objectMapper.readValue(cleanJson, com.bnwzy.smartclassesspringbootweb.pojo.StudentData.class);
+                            log.info("成功将JSON字符串转为StudentData对象: {}", studentData);
+                            if (studentRepository.findById(dto.getStudentId()).isEmpty()) {
+                                throw new StudentNotFoundException("<Student not found>");
+                            } else {
+                                Student student = studentRepository.findById(dto.getStudentId()).get();
+                                studentDataRepository.save(studentData);
+                                student.setStudentData(studentData);
+                                studentRepository.save(student);
+                                return Mono.just("success");
                             }
+                        } catch (Exception e) {
+                            log.error("JSON转StudentData对象失败", e);
+                            return Mono.error(e);
                         }
-
-                        File outputFile = fileRef.get();
-                        if (outputFile == null || !outputFile.exists()) {
-                            throw new IllegalStateException("临时文件错误");
-                        }
-
-                        MultipartFile multipartFile = null;
-                        try {
-                            multipartFile = convertToMultipartFile(outputFile);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        return uploadFile(multipartFile)
-                                .doFinally(signal -> {
-                                    if (outputFile.exists() && outputFile.delete()) {
-                                        log.info("临时文件已删除: {}", outputFile.getAbsolutePath());
-                                    }
-                                });
-                    }))
-                    .doOnSubscribe(s -> {
-                        try {
-                            BufferedWriter writer = new BufferedWriter(new FileWriter(fileRef.get()));
-                            writerRef.set(writer);
-                        } catch (IOException e) {
-                            throw new RuntimeException("创建Writer失败", e);
-                        }
-                    })
-                    .doOnError(e -> cleanupResources(writerRef, fileRef));
+                    }));
         } catch (Exception e) {
             log.error("初始化失败", e);
-            cleanupResources(writerRef, fileRef);
             return Mono.error(e);
         }
     }
 
-    private void validateRequest(DifyStudentAbilityAnalyzeDTO dto) {
+    private void validateRequest(DifyStudentAbilityAnalyzeDTO.Upload dto) {
         if (dto.getInputs() == null) {
             throw new IllegalArgumentException("inputs 不能为空");
         }
@@ -206,20 +208,6 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
                     log.error("API返回错误: 状态码={}，响应体={}", status, body);
                     return Mono.error(new RuntimeException("API调用失败: " + status + " - " + body));
                 });
-    }
-
-    private void cleanupResources(AtomicReference<BufferedWriter> writerRef, AtomicReference<File> fileRef) {
-        try {
-            BufferedWriter writer = writerRef.get();
-            if (writer != null) writer.close();
-        } catch (IOException e) {
-            log.warn("关闭Writer失败", e);
-        }
-
-        File file = fileRef.get();
-        if (file != null && file.exists() && !file.delete()) {
-            log.warn("未能删除临时文件: {}", file.getAbsolutePath());
-        }
     }
 
     private MultipartFile convertToMultipartFile(File file) throws IOException {

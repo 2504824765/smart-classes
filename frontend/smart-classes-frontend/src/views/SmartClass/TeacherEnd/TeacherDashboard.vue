@@ -142,6 +142,10 @@ const getTeacherStatistics = async () => {
   } finally {
     loading.value = false
   }
+
+  
+
+
 }
 // 快捷跳转
 const gotoCourseManagement = () => {

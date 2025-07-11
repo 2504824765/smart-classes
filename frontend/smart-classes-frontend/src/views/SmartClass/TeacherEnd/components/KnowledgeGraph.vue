@@ -429,7 +429,7 @@ async function createKnowledgeGraph() {
       credit: classRes.data.credit,
       classHours: classRes.data.classHours,
       graph: classRes.data.graph,
-      active: classRes.data.active,
+      isActive: classRes.data.isActive,
       description: classRes.data.description,
       imageUrl: classRes.data.imageUrl
     }
@@ -461,7 +461,7 @@ const deleteKnowledgeGraph = async () => {
       credit: classRes.data.credit,
       classHours: classRes.data.classHours,
       graph: '',
-      active: classRes.data.active,
+      isActive: classRes.data.isActive,
       description: classRes.data.description,
       imageUrl: classRes.data.imageUrl
     }

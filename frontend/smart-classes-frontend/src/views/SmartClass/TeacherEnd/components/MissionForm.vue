@@ -180,8 +180,8 @@ const handleSubmit = async () => {
             studentId: record.student.id,
             classMissionId: classMissionRes.data.id, 
             score: 0,
-            done: false,
-            active: true,
+            isDone: false,
+            isActive: true,
             reportUrl: ''
           }
           console.log('dto',dto)

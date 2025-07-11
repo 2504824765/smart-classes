@@ -56,7 +56,7 @@ setProps({
       }
     },
     {
-      field: 'active',
+      field: 'isActive',
       label: '是否开课',
       width: 100,
       formatter: (_: Recordable, __: TableColumn, cellValue: boolean) => {

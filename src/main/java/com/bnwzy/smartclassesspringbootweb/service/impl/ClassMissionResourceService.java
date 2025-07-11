@@ -1,6 +1,7 @@
 package com.bnwzy.smartclassesspringbootweb.service.impl;
 
 import com.bnwzy.smartclassesspringbootweb.exception.ClassMissionNotFoundException;
+import com.bnwzy.smartclassesspringbootweb.exception.ClassMissionResourceNotFoundException;
 import com.bnwzy.smartclassesspringbootweb.pojo.ClassMission;
 import com.bnwzy.smartclassesspringbootweb.pojo.ClassMissionResource;
 import com.bnwzy.smartclassesspringbootweb.pojo.dto.ClassMissionResourceCreateDTO;
@@ -34,5 +35,15 @@ public class ClassMissionResourceService implements IClassMissionResourceService
     public List<ClassMissionResource> getAllClassMissionResourcesByClassMissionId(Long id) {
         ClassMission classMission = classMissionRepository.findById(id).orElseThrow(() -> new ClassMissionNotFoundException("<ClassMission not found>"));
         return classMissionResourceRepository.findByClassMission(classMission);
+    }
+
+    @Override
+    public Boolean deleteClassMissionResourceById(Long id) {
+        if (classMissionResourceRepository.findById(id).isPresent()) {
+            classMissionResourceRepository.deleteById(id);
+            return true;
+        } else {
+            throw new ClassMissionResourceNotFoundException("<ClassMission not found>" + id);
+        }
     }
 }

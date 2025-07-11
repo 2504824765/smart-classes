@@ -11,4 +11,6 @@ public interface IClassMissionResourceService {
     ClassMissionResource createClassMissionResource(ClassMissionResourceCreateDTO classMissionResourceCreateDTO);
 
     List<ClassMissionResource> getAllClassMissionResourcesByClassMissionId(Long id);
+
+    Boolean deleteClassMissionResourceById(Long id);
 }

@@ -116,7 +116,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
         icon: 'vi-ant-design:user-outlined',
         userType: 'teacher',
         noCache: true,
-        alwaysShow: true,
+        alwaysShow: true
       },
       children: [
         {
@@ -127,7 +127,7 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             title: t('teacher.studentManage'),
             userType: 'teacher',
             noCache: true
-          },
+          }
         },
         {
           path: 'detail',

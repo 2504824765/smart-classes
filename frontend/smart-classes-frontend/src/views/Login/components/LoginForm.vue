@@ -176,51 +176,57 @@ const signIn = async () => {
       permissionStore.setUserType(role)
       try {
         const res = await loginApi(formData)
-        if (res.data === true) {
-          ElMessage.success('登录成功')
-          const user = await getUserInfoApi(formData.username)
-          formData.roleId = user.data.id
-          // 是否记住我
-          if (unref(remember)) {
-            userStore.setLoginInfo({
-              username: formData.username,
-              password: formData.password,
-              role: role
-            })
-          } else {
-            userStore.setLoginInfo(undefined)
-          }
-          userStore.setRememberMe(unref(remember))
-          const extendedFormData = {
-            ...formData,
-            permissions: ['*.*.*']
-          }
-          userStore.setUserInfo(extendedFormData)
-          // 是否使用动态路由
-          if (appStore.getDynamicRouter) {
-            // getRole()
-            userStore.setRoleRouters(roleList)
-            await permissionStore.generateRoutes('frontEnd', roleList).catch(() => {})
-            // 动态添加路由
-            permissionStore.getAddRouters.forEach((route) => {
-              addRoute(route as RouteRecordRaw)
-            })
-            permissionStore.setIsAddRouters(true)
+        if(res){
+          if (res.data === true) {
+            ElMessage.success('登录成功')
+            const user = await getUserInfoApi(formData.username)
+            formData.roleId = user.data.id
+            // 是否记住我
+            if (unref(remember)) {
+              userStore.setLoginInfo({
+                username: formData.username,
+                password: formData.password,
+                role: role
+              })
+            } else {
+              userStore.setLoginInfo(undefined)
+            }
+            userStore.setRememberMe(unref(remember))
+            const extendedFormData = {
+              ...formData,
+              permissions: ['*.*.*']
+            }
+            userStore.setUserInfo(extendedFormData)
+            // 是否使用动态路由
+            if (appStore.getDynamicRouter) {
+              // getRole()
+              userStore.setRoleRouters(roleList)
+              await permissionStore.generateRoutes('frontEnd', roleList).catch(() => {})
+              // 动态添加路由
+              permissionStore.getAddRouters.forEach((route) => {
+                addRoute(route as RouteRecordRaw)
+              })
+              permissionStore.setIsAddRouters(true)
 
-            // 跳转首页
-            push({ path: permissionStore.addRouters[0].path })
-          } else {
-            await permissionStore.generateRoutes('static').catch(() => {})
-            permissionStore.getAddRouters.forEach((route) => {
-              addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
-            })
-            permissionStore.setIsAddRouters(true)
-            push({ path: redirect.value || permissionStore.addRouters[0].path })
+              // 跳转首页
+              push({ path: permissionStore.addRouters[0].path })
+            } else {
+              await permissionStore.generateRoutes('static').catch(() => {})
+              permissionStore.getAddRouters.forEach((route) => {
+                addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
+              })
+              permissionStore.setIsAddRouters(true)
+              push({ path: redirect.value || permissionStore.addRouters[0].path })
+            }
           }
         } else {
-          ElMessage.error('登录失败')
+          ElMessage.error('密码或账户错误')
         }
-      } finally {
+      }
+      catch {
+        ElMessage.error('登录失败')
+      } 
+      finally {
         loading.value = false
       }
     }

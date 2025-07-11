@@ -9,6 +9,7 @@ export type StudentMission = {
   isDone: boolean
   isActive: boolean
   reportUrl: string
+  aiCommentUrl: string
 }
 
 export type StudentMissionCreateDTO = Omit<StudentMission, 'id' | 'student' | 'classMission'> & {

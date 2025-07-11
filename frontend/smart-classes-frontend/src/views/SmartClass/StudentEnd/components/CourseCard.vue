@@ -6,7 +6,7 @@
     :class="{ 'is-disabled': disabled }"
   >
     <el-image
-      :src="course.imageUrl ? `/${course.imageUrl}` : 'default.png'"
+      :src=" course.imageUrl ? `/${course.imageUrl}` : '/default.png'"
       alt="课程封面"
       style="width: 100%; height: 160px; object-fit: cover"
     />
@@ -32,6 +32,8 @@ const props = defineProps<{
   course: Classes
   disabled?: boolean
 }>()
+
+console.log(props.course)
 
 const goToCourseDetail = () => {
   push({ path: '/course/detail', query: { course: props.course.id } })

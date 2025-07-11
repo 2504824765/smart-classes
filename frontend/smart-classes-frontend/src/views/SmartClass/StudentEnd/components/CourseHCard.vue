@@ -5,7 +5,7 @@
     :class="{ 'disabled-card': !course.isActive }"
     @click="handleClick"
   >
-    <el-image :src="course.imageUrl" alt="课程封面" class="course-image" />
+    <el-image :src="course.imageUrl ? course.imageUrl : '/default.png'" alt="课程封面" class="course-image" />
     <div class="course-info">
       <h3 class="course-title">{{ course.name }}</h3>
       <p class="course-description">{{ course.description }}</p>

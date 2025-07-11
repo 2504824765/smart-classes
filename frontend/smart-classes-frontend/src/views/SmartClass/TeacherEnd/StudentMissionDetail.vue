@@ -112,9 +112,10 @@ const updateScore = async () => {
 }
 
 const applyAiScore = async () => {
-  if (!studentMission.value || !aiScore) return
-  studentMission.value.score = Number(aiScore)
-  editableScore.value = Number(aiScore)
+  if (!studentMission.value || !aiScore.value) return
+  studentMission.value.score = Number(aiScore.value)
+  editableScore.value = Number(aiScore.value)
+  console.log(editableScore)
   const res = await updateStudentMission(studentMission.value)
   if (res.code === 200) {
     ElMessage.success('AI评分已应用')
@@ -131,7 +132,6 @@ const loadData = async () => {
     return
   }
 
-
   const res = await getStudentMissionById(studentMissionId)
   console.log(res)
   if (res.code === 200) {
@@ -139,6 +139,17 @@ const loadData = async () => {
 
     if (studentMission.value?.score !== null) {
       editableScore.value = studentMission.value.score
+    }
+
+    if(studentMission.value?.aiCommentUrl) {
+      const response = await fetch(PREFIX + studentMission.value?.aiCommentUrl)
+      if (!response.ok) {
+        throw new Error('下载 AI 评语失败')
+      }
+      const result = await response.json()
+
+      aiComment.value = result.comment || '无评语'
+      aiScore.value = result.score || '无评分'
     }
 
     // 设置学生文件
@@ -171,7 +182,6 @@ const download = (file: { url: string; name: string }) => {
 
 // 加载状态与结果
 const grading = ref(false)
-const commentResult = ref<{ score: string; comment: string } | null>(null)
 
 // 智能批改处理逻辑
 const handleAutoGrade = async () => {
@@ -186,17 +196,30 @@ const handleAutoGrade = async () => {
   })
 
   grading.value = true
-  commentResult.value = null
+  aiScore.value = ''
+  aiComment.value = ''
 
   try {
     const request = createDifyReportCommentRequest(studentFile.value.url, templateFile.value.url)
     const res = await commentReportApi(request)
-    console.log(res)
-    const result = JSON.parse(res.data)
-    commentResult.value = {
-      score: result.score || '无评分',
-      comment: result.comment || '无评价'
+    const downloadUrl = res.data
+    if(!studentMission.value){
+      ElMessage.error('学生作业不存在')
+      return
     }
+    studentMission.value.aiCommentUrl = downloadUrl.replace(PREFIX,'')
+    await updateStudentMission(studentMission.value)
+    // 使用 fetch 获取 JSON 文件内容
+    const response = await fetch(downloadUrl)
+    if (!response.ok) {
+      throw new Error('下载 AI 评语失败')
+    }
+    const result = await response.json()
+
+    console.log('解析结果:', result)
+    console.log(result)
+    aiComment.value = result.comment || '无评语'
+    aiScore.value = result.score || '无评分'
 
     ElMessage.success('批改完成')
   } catch (err) {

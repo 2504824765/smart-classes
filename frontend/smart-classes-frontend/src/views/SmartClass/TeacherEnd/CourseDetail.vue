@@ -1,48 +1,70 @@
 <template>
-  <el-card shadow="never" class="mission-list">
-    <ElButton
-      type="primary"
-      style="margin-bottom: 10px"
-      @click="push({ path: '/course/detail/form' , query: { classId: classId } })"
-      >添加任务</ElButton
-    >
-    <draggable v-model="missions" item-key="id" animation="200">
-      <template #item="{ element }">
-        <MissionCard :mission="element" />
-      </template>
-    </draggable>
-  </el-card>
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <el-card shadow="never" class="mission-list">
+      <div class="flex justify-between items-center mb-2">
+      <ElButton
+        type="primary"
+        @click="push({ 
+          path: '/course/detail/form', 
+          query: { 
+            classId: classId,
+            redirect: route.fullPath 
+          }
+        })"
+      >
+        添加任务
+      </ElButton>
+        <ElButton type="danger" @click="deleteSelectedMissions">
+          删除选中任务
+        </ElButton>
+      </div>
 
-  <!-- 上传资源卡片 -->
-  <el-card class="col-span-3">
-    <div class="mb-2 font-bold">上传资源</div>
-    <el-upload
-      class="upload-demo"
-      drag
-      :action="''"
-      :auto-upload="false"
-      :on-change="handleFileChange"
-      :file-list="fileList"
-      :multiple="true"
-    >
-      <el-icon><upload-filled /></el-icon>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-    </el-upload>
-    <el-button class="mt-4" type="primary" @click="uploadResource" :loading="uploading">
-      上传文件
-    </el-button>
-  </el-card>
+      <div style="height: 5px; color: black;"></div>
 
-  <el-card>
-    <KnowledgeGraph v-if="classId !== undefined" :classId="classId" />
-  </el-card>
+      <draggable v-model="missions" item-key="id" animation="200">
+        <template #item="{ element }">
+          <div class="flex items-start gap-2 mb-2">
+            <el-checkbox
+              :model-value="selectedMissionIds.includes(element.id)"
+              @change="(val) => toggleSelection(element.id, !!val)"
+            />
+            <MissionCard :mission="element" />
+          </div>
+        </template>
+      </draggable>
+    </el-card>
+
+    <!-- 上传资源卡片 -->
+    <el-card class="col-span-3">
+      <div class="mb-2 font-bold">上传资源</div>
+      <el-upload
+        class="upload-demo"
+        drag
+        :action="''"
+        :auto-upload="false"
+        :on-change="handleFileChange"
+        :file-list="fileList"
+        :multiple="true"
+      >
+        <el-icon><upload-filled /></el-icon>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+      <el-button class="mt-4" type="primary" @click="uploadResource" :loading="uploading">
+        上传文件
+      </el-button>
+    </el-card>
+
+    <el-card style="min-height: 350px" body-style="padding: 16px;">
+      <KnowledgeGraph v-if="classId !== undefined" :classId="classId" :key="graphKey" />
+    </el-card>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import draggable from 'vuedraggable'
 import MissionCard from './components/MissionCard.vue'
-import { getClassMissionByCidApi } from '@/api/classMission/index'
+import { getClassMissionByCidApi, deleteClassMissionApi } from '@/api/classMission/index'
 import type { ClassMission } from '@/api/classMission/types'
 import { useRouter, useRoute } from 'vue-router'
 import KnowledgeGraph from './components/KnowledgeGraph.vue'
@@ -53,6 +75,8 @@ import type { UploadFile } from 'element-plus'
 import { ResourceCreateDTO } from '@/api/resource/types'
 import { addResourceApi } from '@/api/resource/index'
 
+const graphKey = ref(0)
+
 const route = useRoute()
 const { push } = useRouter()
 const classId = ref<number>()
@@ -61,6 +85,32 @@ const missions = ref<ClassMission[]>([])
 
 const uploading = ref(false)
 const fileList = ref<UploadFile[]>([])
+
+const selectedMissionIds = ref<number[]>([])
+
+const toggleSelection = (id: number, checked: boolean) => {
+  if (checked) {
+    selectedMissionIds.value.push(id)
+  } else {
+    selectedMissionIds.value = selectedMissionIds.value.filter((mid) => mid !== id)
+  }
+}
+
+const deleteSelectedMissions = async () => {
+  if (selectedMissionIds.value.length === 0) {
+    ElMessage.warning('请先选择要删除的任务')
+    return
+  }
+
+  try {
+    await Promise.all(selectedMissionIds.value.map((id) => deleteClassMissionApi(id)))
+    ElMessage.success('删除成功')
+    await fetchMissions()
+    selectedMissionIds.value = []
+  } catch (e) {
+    ElMessage.error('删除失败')
+  }
+}
 
 const handleFileChange = (uploadFile: UploadFile, uploadFiles: UploadFile[]) => {
   fileList.value = uploadFiles
@@ -96,7 +146,7 @@ const uploadResource = async () => {
 
       await addResourceApi(resource)
     }
-
+    graphKey.value++
     ElMessage.success('所有资源上传成功')
     fileList.value = [] // 清空文件列表（可选）
   } catch (err) {

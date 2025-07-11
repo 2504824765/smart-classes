@@ -128,7 +128,7 @@ onMounted(async () => {
       <template #content="cls">
         <div class="flex cursor-pointer gap-3">
           <img
-            :src="cls.imageUrl ? cls.imageUrl : 'default.png'"
+            :src="cls.imageUrl ? cls.imageUrl : '/default.png'"
             class="w-64px h-64px rounded object-cover"
             alt="课程封面"
           />

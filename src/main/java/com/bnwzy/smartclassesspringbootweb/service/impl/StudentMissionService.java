@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentMissionService implements IStudentMissionService {
@@ -88,14 +87,17 @@ public class StudentMissionService implements IStudentMissionService {
             if (studentMissionUpdateDTO.getScore() != null) {
                 studentMission.setScore(studentMissionUpdateDTO.getScore());
             }
-            if (studentMissionUpdateDTO.getDone() != null) {
-                studentMission.setIsDone(studentMissionUpdateDTO.getDone());
+            if (studentMissionUpdateDTO.getIsDone() != null) {
+                studentMission.setIsDone(studentMissionUpdateDTO.getIsDone());
             }
-            if (studentMissionUpdateDTO.getActive() != null) {
-                studentMission.setIsActive(studentMissionUpdateDTO.getActive());
+            if (studentMissionUpdateDTO.getIsActive() != null) {
+                studentMission.setIsActive(studentMissionUpdateDTO.getIsActive());
             }
             if (studentMissionUpdateDTO.getReportUrl() != null) {
                 studentMission.setReportUrl(studentMissionUpdateDTO.getReportUrl());
+            }
+            if (studentMissionUpdateDTO.getAiCommentUrl() != null) {
+                studentMission.setAiCommentUrl(studentMissionUpdateDTO.getAiCommentUrl());
             }
             return studentMissionRepository.save(studentMission);
         }

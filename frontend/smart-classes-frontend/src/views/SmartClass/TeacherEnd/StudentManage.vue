@@ -52,7 +52,10 @@ const columns: TableColumn[] = [
     field: 'department',
     label: t('student.dept'),
     slots: {
-      default: (row) => row.department?.name || ''
+      default: ({ row }) => {
+        console.log('row结构为:', row)
+        return row.department?.name || '未知'
+      }
     }
   },
   {
@@ -79,7 +82,6 @@ const columns: TableColumn[] = [
 const loading = ref(true)
 const tableDataList = ref<Student[]>([])
 
-// 分页相关状态
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -107,7 +109,7 @@ const getTableList = async () => {
       tableDataList.value = studentData
       total.value = studentData.length
 
-      console.log('选课学生列表：', studentData)
+      console.log('选课学生列表：', tableDataList.value)
     } else {
       ElMessage.error('获取学生列表失败')
     }
@@ -139,14 +141,13 @@ const onEditSave = async (newData) => {
   try {
     await updateStudentApi(newData)
     ElMessage.success('保存成功')
-    getTableList() // 刷新表格
+    getTableList() 
   } catch (e) {
     ElMessage.error('保存失败')
   }
 }
 
 const onDeleted = () => {
-  // 删除成功后刷新列表
   getTableList()
 }
 
@@ -158,7 +159,7 @@ const handleCurrentChange = (page: number) => {
 
 const handleSizeChange = (size: number) => {
   pageSize.value = size
-  currentPage.value = 1 // 重置到第一页
+  currentPage.value = 1
   getTableList()
 }
 
@@ -174,7 +175,7 @@ const onAddSave = async (newData) => {
   try {
     await createStudentApi(newData)
     ElMessage.success('添加成功')
-    getTableList() // 刷新表格
+    getTableList() 
   } catch (e) {
     ElMessage.error('添加失败')
   }
@@ -193,10 +194,9 @@ const searchFn = async () => {
 
     console.log('开始搜索，关键词:', searchKeyword.value.trim())
 
-    // 先获取所有学生数据，然后前端过滤
     const res = await getStudentListApi({
       pageIndex: 1,
-      pageSize: 1000 // 获取更多数据用于搜索
+      pageSize: 1000 
     })
 
     console.log('获取所有学生数据:', res)
@@ -204,7 +204,6 @@ const searchFn = async () => {
     if (res && res.data) {
       const allStudents = Array.isArray(res.data) ? res.data : res.data.list || []
       console.log('所有学生数据:', allStudents)
-      // 前端过滤：按姓名搜索
       const keyword = searchKeyword.value.trim().toLowerCase()
       const filteredStudents = allStudents.filter(
         (student) => student.name && student.name.toLowerCase().includes(keyword)
@@ -238,7 +237,6 @@ const searchFn = async () => {
   }
 }
 
-// 搜索ID
 const searchByIdFn = async (studentId: string) => {
   if (!studentId.trim()) {
     ElMessage.warning('请输入学生ID')

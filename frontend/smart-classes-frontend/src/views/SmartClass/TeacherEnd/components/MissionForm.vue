@@ -18,7 +18,9 @@ import { StudentMissionCreateDTO } from '@/api/studentMission/types'
 import { createClassMissionResource } from '@/api/classMissionResource'
 
 const route = useRoute()
-
+const { push } = useRouter()
+const router = useRouter()
+const redirectPath = route.query.redirect as string || '/course/list' // fallback 默认返回某页
 // 从路由中获取课程 ID
 const classId = Number(route.query.classId)
 // 定义上传等待列表
@@ -68,7 +70,11 @@ const missionFormSchema = reactive<FormSchema[]>([
     componentProps: {
       type: 'datetime',
       format: 'YYYY-MM-DD HH:mm:ss',
-      valueFormat: 'YYYY-MM-DD HH:mm:ss'
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      // 禁用今天以前的日期时间
+      disabledDate: (time: Date) => {
+        return time.getTime() < new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+      }
     },
     formItemProps: {
       required: true
@@ -76,7 +82,7 @@ const missionFormSchema = reactive<FormSchema[]>([
   },
   {
     field: 'submit_method',
-    label: '提交方式',
+    label: '提交说明（可选）',
     component: 'Input'
   },
   {
@@ -182,7 +188,8 @@ const handleSubmit = async () => {
             score: 0,
             isDone: false,
             isActive: true,
-            reportUrl: ''
+            reportUrl: '',
+            aiCommentUrl: '',
           }
           console.log('dto',dto)
           const res = await addStudentMission(dto)
@@ -192,6 +199,7 @@ const handleSubmit = async () => {
 
         await Promise.all(createPromises)
         ElMessage.success('学生任务创建成功')
+        router.push(redirectPath)
         // 可选重置
         elForm.resetFields()
         pendingResources.value = []
@@ -205,11 +213,24 @@ const handleSubmit = async () => {
     }
   })
 }
+
+const handleBack = () => {
+  const redirect = router.currentRoute.value.query.redirect as string
+  if (redirect) {
+    router.push(redirect)
+  } else {
+    router.back()
+  }
+}
 </script>
 
 <template>
-  <ContentWrap title="新增任务">
+  <el-page-header content="新增任务" @back="handleBack" />
+  <ContentWrap>
     <Form :schema="missionFormSchema" @register="formRegister" />
-    <BaseButton type="primary" style="margin-top: 16px" @click="handleSubmit">提交</BaseButton>
+
+    <div style="margin-top: 16px; display: flex; gap: 12px">
+      <BaseButton type="primary" @click="handleSubmit">提交</BaseButton>
+    </div>
   </ContentWrap>
 </template>

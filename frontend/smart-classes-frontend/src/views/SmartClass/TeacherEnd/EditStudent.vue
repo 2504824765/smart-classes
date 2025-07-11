@@ -15,6 +15,7 @@ watch(
 watch(visible, (v) => emit('update:visible', v))
 
 const form = reactive({ ...props.data })
+console.log(form)
 
 watch(
   () => props.data,
@@ -59,27 +60,27 @@ const handleSave = () => {
 
 <template>
   <el-dialog v-model="visible" title="编辑学生" width="500px" @close="handleClose">
-    <!-- 这里放表单内容，比如： -->
     <el-form :model="form">
       <el-form-item label="学号">
-        <el-input v-model="form.id" />
+        <el-input v-model="form.id" disabled />
       </el-form-item>
       <el-form-item label="姓名">
-        <el-input v-model="form.name" />
+        <el-input v-model="form.name" disabled />
       </el-form-item>
       <el-form-item label="性别">
-        <el-radio-group v-model="form.gender">
+        <el-radio-group v-model="form.gender" disabled>
           <el-radio value="Male" size="large">男</el-radio>
           <el-radio value="Female" size="large">女</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="所在部门">
-        <el-input v-model="form.department" />
+        <el-input v-model="form.department.name" disabled />
       </el-form-item>
       <el-form-item label="绩点">
         <el-input v-model="form.gpa" />
       </el-form-item>
     </el-form>
+
     <template #footer>
       <div
         style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px"
@@ -93,3 +94,4 @@ const handleSave = () => {
     </template>
   </el-dialog>
 </template>
+

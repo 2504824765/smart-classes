@@ -27,4 +27,6 @@ public class StudentMission {
     private Boolean isActive;
     @Column(name = "report_url")
     private String reportUrl;
+    @Column(name = "ai_comment_url")
+    private String aiCommentUrl;
 }

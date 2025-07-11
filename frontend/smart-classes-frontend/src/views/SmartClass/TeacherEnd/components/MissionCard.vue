@@ -5,9 +5,16 @@
     @click="goToDetail"
     :class="{ 'is-disabled': isExpired }"
   >
-    <el-text tag="h4">{{ mission.classes.name }}</el-text>
-    <el-text class="mission-desc" size="small">{{ mission.description }}</el-text>
-    <el-text type="info" size="small">截止时间：{{ mission.deadline }}</el-text>
+    <el-text tag="h4" class="font-bold">任务 {{ mission.id }}</el-text>
+
+    <el-text class="mission-desc" size="small">
+      {{ mission.description || '暂无任务描述' }}
+    </el-text>
+
+    <el-text type="info" size="small" class="mission-deadline">
+      截止时间：{{ mission.deadline || '未设置' }}
+    </el-text>
+
     <el-tag :type="isExpired ? 'danger' : 'success'" class="status" effect="light">
       {{ isExpired ? '已截止' : '进行中' }}
     </el-tag>
@@ -36,17 +43,28 @@ const goToDetail = () => {
   cursor: pointer;
   transition: transform 0.2s ease;
 }
+
 .mission-card:hover {
   transform: translateY(-3px);
 }
+
 .mission-desc {
-  margin: 8px 0;
-  color: #666;
-}
-.status {
   margin-top: 8px;
+  color: #666;
   display: block;
 }
+
+.mission-deadline {
+  display: block;
+  margin-top: 4px;
+  color: #999;
+}
+
+.status {
+  margin-top: 10px;
+  display: block;
+}
+
 .mission-card.is-disabled {
   opacity: 0.6;
 }

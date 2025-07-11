@@ -136,14 +136,25 @@ public class DifyCreateGraphService implements IDifyCreateGraphService {
                                         return Mono.empty();
                                     }
                                     
+                                    // 去掉JSON格式字符串开头的```json和结尾的```
+                                    String cleanedText = text;
+                                    if (cleanedText.startsWith("```json")) {
+                                        cleanedText = cleanedText.substring(7);
+                                    }
+                                    if (cleanedText.endsWith("```")) {
+                                        cleanedText = cleanedText.substring(0, cleanedText.length() - 3);
+                                    }
+                                    // 去掉开头和结尾的空白字符
+                                    cleanedText = cleanedText.trim();
+                                    
                                     // 确保writer存在
                                     BufferedWriter writer = writerRef.get();
                                     if (writer != null) {
                                         synchronized (writer) {
-                                            writer.write(text);
+                                            writer.write(cleanedText);
                                             writer.flush(); // 确保数据立即写入
                                             int count = dataCountRef.incrementAndGet();
-                                            log.info("文本已写入文件: '{}' (第{}个数据块)", text, count);
+                                            log.info("文本已写入文件: '{}' (第{}个数据块)", cleanedText, count);
                                         }
                                     } else {
                                         log.error("Writer为null，无法写入数据");

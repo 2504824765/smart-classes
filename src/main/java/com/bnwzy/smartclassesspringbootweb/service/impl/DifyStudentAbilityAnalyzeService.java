@@ -109,9 +109,21 @@ public class DifyStudentAbilityAnalyzeService implements IDifyStudentAbilityAnal
                                 JsonNode dataNode = rootNode.path("data");
                                 String text = dataNode.path("text").asText();
                                 if (text == null || text.trim().isEmpty()) return Mono.empty();
-                                jsonBuilder.append(text);
+                                
+                                // 去掉JSON格式字符串开头的```json和结尾的```
+                                String cleanedText = text;
+                                if (cleanedText.startsWith("```json")) {
+                                    cleanedText = cleanedText.substring(7);
+                                }
+                                if (cleanedText.endsWith("```")) {
+                                    cleanedText = cleanedText.substring(0, cleanedText.length() - 3);
+                                }
+                                // 去掉开头和结尾的空白字符
+                                cleanedText = cleanedText.trim();
+                                
+                                jsonBuilder.append(cleanedText);
                                 int count = dataCountRef.incrementAndGet();
-                                log.info("文本已追加到StringBuilder: '{}' (第{}个数据块)", text, count);
+                                log.info("文本已追加到StringBuilder: '{}' (第{}个数据块)", cleanedText, count);
                             } else if ("workflow_failed".equals(event)) {
                                 log.error("检测到workflow_failed事件");
                             }

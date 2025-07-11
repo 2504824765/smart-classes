@@ -22,6 +22,11 @@ export const getUserInfoApi = (username: string): Promise<IResponse<UserBackEnd>
   return request.get({ url: `/api/user/getUserByUsername/${username}` })
 }
 
+// 根据ID获取用户信息
+export const getUserByIdApi = (id: number): Promise<IResponse<UserBackEnd>> => {
+  return request.get({ url: `/api/user/getUserById/${id}` })
+}
+
 export const getUserListApi = ({ params }: AxiosConfig) => {
   return request.get<{
     code: string

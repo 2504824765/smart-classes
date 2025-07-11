@@ -20,6 +20,7 @@ import {
   getStudentCountApi
 } from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
+
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { Teacher } from '@/api/teacher/types'
@@ -54,6 +55,7 @@ interface Statistics {
 
 const router = useRouter()
 const { t } = useI18n()
+const userStore = useUserStore()
 
 // 近期课程
 const recentCourses = ref<Classes[]>([])
@@ -69,13 +71,7 @@ const statistics = ref<Statistics>({
 const getCurrentTeacher = async () => {
   try {
 
-    // 设置统计数据
-    statistics.value = {
-      studentCount: 0,
-      courseCount: 0,
-      assignmentCount: 0,
-      completionRate: 0
-    }
+    console.log('最终教师信息:', teacherInfo.value)
 
   } catch (error) {
     console.error('初始化失败:', error)
@@ -108,67 +104,9 @@ const getTeacherStatistics = async () => {
       statistics.value.studentCount = 0
     }
 
-    try {
-      // 获取课程数量
-      const res = await getAllClassesApi()
-      const teacherId = teacherInfo.value.id
-      const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
-      recentCourses.value = courseList
-      console.log('课程数量API响应:', res)
-      if (res && courseList) {
-        statistics.value.courseCount = Number(courseList.length)
-        console.log('成功获取课程数量:', courseList.length)
-      }
-      
     } catch (error) {
       console.error('获取课程数量失败:', error)
       statistics.value.courseCount = 0
-    }
-
-    try {
-      // 获取作业数量
-      const res = await getAllClassesApi()
-      const classes = res.data  // 假设这里是课程数组
-
-      let totalMissions = 0
-
-      await Promise.all(
-        classes.map(async (cls) => {
-          const missionRes = await getClassMissionByCidApi(cls.id)
-          totalMissions += missionRes.data.length
-        })
-      )
-
-      console.log('所有课程任务总数', totalMissions)
-      statistics.value.assignmentCount = totalMissions
-    } catch (error) {
-      console.error('获取作业数量失败:', error)
-      statistics.value.assignmentCount = 0
-    }
-
-    try {
-      // 获取完成率
-      const res = await getAllClassesApi()
-      const classes = res.data 
-
-      const startedMissionCounts: Record<number, number> = {}
-
-      await Promise.all(
-        classes.map(async (cls) => {
-          const missionRes = await getClassMissionByCidApi(cls.id)
-          const missions = missionRes.data
-
-          const startedMissions = missions.filter(mission => mission.deadline && new Date(mission.deadline) < new Date)
-
-          startedMissionCounts[cls.id] = startedMissions.length
-        })
-      )
-
-      console.log('每个课程已开始任务数量', startedMissionCounts)
-      statistics.value.completionRate = Object.values(startedMissionCounts).reduce((acc, count) => acc + count, 0) / (classes.length * 2) * 100
-    } catch (error) {
-      console.error('获取完成率失败:', error)
-      statistics.value.completionRate = 0
     }
 
   } catch (error) {
@@ -274,22 +212,6 @@ onMounted(() => {
             </div>
           </el-card>
         </el-col>
-        <el-col :span="6">
-          <el-card shadow="hover" class="stat-card stat-card-4">
-          <el-statistic
-            :value="statistics.completionRate"
-            :value-style="{ fontSize: '32px', fontWeight: 'bold', color: 'white' }"
-            :formatter="value => Number(value).toFixed(2) + '%'"
-          >
-            <template #title>
-              <span style="font-size: 16px; font-weight: 600; color: white">作业完成率</span>
-            </template>
-          </el-statistic>
-            <div class="card-footer">
-              <el-button type="text" plain @click="gotoStudentManagement">查看详情</el-button>
-            </div>
-          </el-card>
-        </el-col>
       </el-row>
     </div>
 
@@ -342,7 +264,6 @@ onMounted(() => {
           <el-card
             shadow="hover"
             class="quick-card quick-card-2"
-            @click="router.push('/course/content')"
           >
             <div class="quick-action-item">
               <Icon icon="ep:edit-pen" :size="24" />

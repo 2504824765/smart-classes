@@ -71,17 +71,17 @@ const getClassList = async () => {
 // 最终展示的课程：未选过 + 搜索匹配 + 状态匹配
 const filteredList = computed(() => {
   return classList.value
-    .filter((cls): cls is Classes => !!cls && typeof cls.active !== 'undefined')
+    .filter((cls): cls is Classes => !!cls && typeof cls.isActive !== 'undefined')
     .filter((cls) => {
       const matchKeyword = cls.name.includes(searchKeyword.value)
-      const matchActive = onlyShowActive.value ? cls.active : true
+      const matchActive = onlyShowActive.value ? cls.isActive : true
       return matchKeyword && matchActive
     })
 })
 
 // 点击选课
 const handleSelect = async (cls: Classes) => {
-  if (!cls.active) {
+  if (!cls.isActive) {
     ElMessage.warning('该课程尚未开放')
     return
   }
@@ -143,13 +143,13 @@ onMounted(async () => {
       <template #content-footer="cls">
         <div v-if="cls" class="flex justify-between items-center">
           <ElTag
-            :type="cls.active === true ? 'success' : cls.active === false ? 'warning' : 'danger'"
+            :type="cls.isActive === true ? 'success' : cls.isActive === false ? 'warning' : 'danger'"
           >
-            {{ cls.active === true ? '已开放' : cls.active === false ? '未开放' : '未知状态' }}
+            {{ cls.isActive === true ? '已开放' : cls.isActive === false ? '未开放' : '未知状态' }}
           </ElTag>
           <ElLink
             :underline="false"
-            :class="{ 'cursor-not-allowed text-gray-400': !cls.active }"
+            :class="{ 'cursor-not-allowed text-gray-400': !cls.isActive }"
             @click="() => handleSelect(cls)"
             >选课</ElLink
           >

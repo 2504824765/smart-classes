@@ -8,7 +8,7 @@
           <h2 class="text-xl font-bold"
             >{{ classMission?.classes.name }} - {{ classMission?.type }}</h2
           >
-          <el-tag type="success" v-if="studentMission?.done">已完成</el-tag>
+          <el-tag type="success" v-if="studentMission?.isDone">已完成</el-tag>
           <el-tag type="warning" v-else>未完成</el-tag>
         </div>
       </template>
@@ -97,8 +97,6 @@ const queryDate = async () => {
   const studentMissionRes = await getStudentMissionById(studentMissionId)
   if (studentMissionRes.code === 200) {
     studentMission.value = studentMissionRes.data
-    console.log('res:', studentMissionRes)
-    console.log('studentMission:', studentMission.value)
     loadHistoryFile()
   }
 }
@@ -179,7 +177,7 @@ const handleSubmit = async () => {
       studentMission.value.reportUrl = relativePath
       ElMessage.success('文件上传并资源更新成功')
     }
-    console.log(studentMission.value)
+    studentMission.value.isDone = true
     await updateStudentMission(studentMission.value)
   } catch (err) {
     ElMessage.error('上传失败，请稍后重试')

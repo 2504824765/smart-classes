@@ -173,7 +173,7 @@ onMounted(async () => {
           credit: course.credit,
           classHours: course.classHours,
           description: course.description,
-          active: course.active
+          isActive: course.isActive
         })
         // 直接拉取课程所有资源
         const resourceRes = await getResourceByClassIdApi(courseId.value)

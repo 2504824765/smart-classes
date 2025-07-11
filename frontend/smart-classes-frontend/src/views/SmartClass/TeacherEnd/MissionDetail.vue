@@ -11,7 +11,7 @@
         <el-descriptions-item label="任务类型">{{ mission?.type }}</el-descriptions-item>
         <el-descriptions-item label="截止时间">{{ mission?.deadline }}</el-descriptions-item>
         <el-descriptions-item label="提交方式">{{ mission?.submitMethod }}</el-descriptions-item>
-        <el-descriptions-item label="得分">{{ mission?.score }}</el-descriptions-item>
+        <el-descriptions-item label="总分">{{ mission?.score }}</el-descriptions-item>
         <el-descriptions-item label="任务描述" :span="2">{{
           mission?.description
         }}</el-descriptions-item>
@@ -104,7 +104,7 @@ onMounted(async () => {
   console.log(studentRes.data)
   studentMissions.value = studentRes.data.map((s) => ({
     ...s,
-    isDone: s.done
+    isDone: s.isDone
   }))
   console.log(studentMissions.value)
   console.log(missionId)

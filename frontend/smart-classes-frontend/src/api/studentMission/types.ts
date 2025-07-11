@@ -6,8 +6,8 @@ export type StudentMission = {
   student: Student
   classMission: ClassMission
   score: number
-  done: boolean
-  active: boolean
+  isDone: boolean
+  isActive: boolean
   reportUrl: string
 }
 

@@ -15,7 +15,7 @@
       <el-text type="info" class="course-desc">
         {{ course.description }}
       </el-text>
-      <el-text class="status" type="success" size="small" v-if="course.active"> 开放中 </el-text>
+      <el-text class="status" type="success" size="small" v-if="course.isActive"> 开放中 </el-text>
       <el-text class="status" type="danger" size="small" v-else> 未开放 </el-text>
     </div>
   </el-card>

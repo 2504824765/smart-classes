@@ -6,21 +6,30 @@
       <template #header>
         <div class="flex justify-between items-center">
           <h2 class="text-lg font-bold">学生作业信息</h2>
-          <el-tag :type="studentMission?.done ? 'success' : 'warning'">
-            {{ studentMission?.done ? '已完成' : '未完成' }}
+          <el-tag :type="studentMission?.isDone ? 'success' : 'warning'">
+            {{ studentMission?.isDone ? '已完成' : '未完成' }}
           </el-tag>
         </div>
       </template>
 
       <el-descriptions :column="2" border>
         <el-descriptions-item label="完成情况">
-          {{ studentMission?.done ? '是' : '否' }}
+          {{ studentMission?.isDone ? '是' : '否' }}
         </el-descriptions-item>
         <el-descriptions-item label="激活状态">
-          {{ studentMission?.active ? '是' : '否' }}
+          {{ studentMission?.isActive ? '是' : '否' }}
         </el-descriptions-item>
         <el-descriptions-item label="得分">
-          {{ studentMission?.score ?? '未评分' }}
+          <el-input-number
+            v-model="editableScore"
+            :min="0"
+            :max="100"
+            size="small"
+            controls-position="right"
+          />
+          <el-button type="primary" size="small" class="ml-2" @click="updateScore">
+            确认
+          </el-button>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -51,7 +60,18 @@
 
       <el-divider>智能批改结果</el-divider>
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="评分">{{ aiScore || '暂无' }}</el-descriptions-item>
+        <el-descriptions-item label="评分">
+          {{ aiScore || '暂无' }}
+          <el-button
+            v-if="aiScore"
+            size="small"
+            type="success"
+            class="ml-2"
+            @click="applyAiScore"
+          >
+            应用
+          </el-button>
+        </el-descriptions-item>
         <el-descriptions-item label="评语">{{ aiComment || '暂无' }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
@@ -66,6 +86,7 @@ import { getAllClassMissionResourcesByClassMissionId } from '@/api/classMissionR
 import { StudentMission } from '@/api/studentMission/types'
 import { commentReportApi } from '@/api/dify'
 import { createDifyReportCommentRequest } from '@/api/dify/types'
+import { updateStudentMission } from '@/api/studentMission'
 import { PREFIX } from '@/constants'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -76,6 +97,31 @@ const templateFile = ref<{ url: string; name: string }>({ url: '', name: '' })
 const studentFile = ref<{ url: string; name: string }>({ url: '', name: '' })
 const aiScore = ref('')
 const aiComment = ref('')
+const editableScore = ref<number | null>(null)
+
+const updateScore = async () => {
+  if (studentMission.value) {
+    studentMission.value.score = editableScore.value ?? 0
+    const res = await updateStudentMission(studentMission.value)
+    if (res.code === 200) {
+      ElMessage.success('得分已更新')
+    } else {
+      ElMessage.error('更新失败')
+    }
+  }
+}
+
+const applyAiScore = async () => {
+  if (!studentMission.value || !aiScore) return
+  studentMission.value.score = Number(aiScore)
+  editableScore.value = Number(aiScore)
+  const res = await updateStudentMission(studentMission.value)
+  if (res.code === 200) {
+    ElMessage.success('AI评分已应用')
+  } else {
+    ElMessage.error('更新失败')
+  }
+}
 
 const loadData = async () => {
   const studentMissionId = Number(route.query.studentMissionId)
@@ -84,10 +130,16 @@ const loadData = async () => {
     ElMessage.error('学生作业ID无效')
     return
   }
+
+
   const res = await getStudentMissionById(studentMissionId)
   console.log(res)
   if (res.code === 200) {
     studentMission.value = res.data
+
+    if (studentMission.value?.score !== null) {
+      editableScore.value = studentMission.value.score
+    }
 
     // 设置学生文件
     const fileUrl = res.data.reportUrl

@@ -4,7 +4,7 @@
     shadow="hover"
     :body-style="{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem' }"
   >
-    <el-link :href="props.url" target="_blank" :underline="false" class="file-link">
+    <el-link :href="PREFIX + props.url" target="_blank" :underline="false" class="file-link">
       <component :is="iconComponent" class="file-icon" />
       <span class="file-name">{{ filename }}</span>
     </el-link>
@@ -20,6 +20,7 @@ import {
   VideoCameraOutlined,
   FileUnknownOutlined
 } from '@vicons/antd'
+import { PREFIX } from '@/constants';
 
 const props = defineProps<{
   url: string

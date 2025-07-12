@@ -32,7 +32,7 @@
 
         <div v-if="fileCards.length > 0">
           <div v-for="file in fileCards" :key="file.id" class="mb-2">
-            <FileDisplay :url="file.url" :name="file.name" />
+            <FileDisplay :url=" PREFIX + file.url" :name="file.name" />
           </div>
         </div>
         <el-empty v-else description="暂无资源文件" />
@@ -91,7 +91,7 @@ import { getStudentMissionById } from '@/api/studentMission/index'
 import { StudentMission } from '@/api/studentMission/types'
 import { uploadResourcesApi } from '@/api/oss/index'
 import { updateStudentMission } from '@/api/studentMission/index'
-
+import FileDisplay  from './components/FileDisplay.vue'
 import { UploadFile, ElMessage } from 'element-plus'
 import { PREFIX } from '@/constants'
 import { getAllClassMissionResourcesByClassMissionId } from '@/api/classMissionResource'

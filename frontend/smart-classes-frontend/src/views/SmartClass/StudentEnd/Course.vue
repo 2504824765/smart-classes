@@ -31,10 +31,18 @@ import { useUserStore } from '@/store/modules/user'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
 import { getClassesByIdApi } from '@/api/classes/index'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const studentId = ref<number>()
 const getStudentId = async (username: string) => {
   const res = await getStudentByUsernameApi(username)
+  if(!res){
+    ElMessage.warning('请先注册学生')
+    router.push('/personal/personal-center')
+    return
+  }
   studentId.value = res.data.id
 }
 

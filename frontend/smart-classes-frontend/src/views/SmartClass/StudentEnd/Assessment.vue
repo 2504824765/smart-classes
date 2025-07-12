@@ -18,11 +18,11 @@ import { getStudentByUsernameApi } from '@/api/student/index'
 const studentId = ref<number | null>(null)
 
 const studentAbilities = ref({
-  conceptUnderstanding: 0,
-  logicalReasoning: 0,
-  problemSolving: 0,
-  innovativeThinking: 0,
-  expressionNorms: 0
+  conceptUnderstanding: 60,
+  logicalReasoning: 60,
+  problemSolving: 60,
+  innovativeThinking: 60,
+  expressionNorms: 60
 })
 
 const loaded = ref(false)
@@ -40,11 +40,11 @@ const getStudentInfo = async (username: string) => {
     if (studentData.studentData) {
       const ability = studentData.studentData
       studentAbilities.value = {
-        conceptUnderstanding: ability.conceptUnderstanding || 0,
-        logicalReasoning: ability.logicalReasoning || 0,
-        problemSolving: ability.problemSolving || 0,
-        innovativeThinking: ability.innovativeThinking || 0,
-        expressionNorms: ability.expressionNorms || 0
+        conceptUnderstanding: ability.conceptUnderstanding >= 60 ? ability.conceptUnderstanding : 60,
+        logicalReasoning: ability.logicalReasoning >= 60 ? ability.logicalReasoning : 60,
+        problemSolving: ability.problemSolving >= 60 ? ability.problemSolving : 60,
+        innovativeThinking: ability.innovativeThinking >= 60 ? ability.innovativeThinking : 60,
+        expressionNorms: ability.expressionNorms >= 60 ? ability.expressionNorms : 60
       }
       hasAbilityData.value = true
     } else {

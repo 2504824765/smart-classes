@@ -25,6 +25,19 @@
         </el-descriptions-item>
       </el-descriptions>
 
+      <el-card class="mt-4">
+        <template #header>
+          <div class="font-bold text-base">作业资源文件</div>
+        </template>
+
+        <div v-if="fileCards.length > 0">
+          <div v-for="file in fileCards" :key="file.id" class="mb-2">
+            <FileDisplay :url="file.url" :name="file.name" />
+          </div>
+        </div>
+        <el-empty v-else description="暂无资源文件" />
+      </el-card>
+
       <el-divider>学生完成情况</el-divider>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="学生">{{ studentMission?.student.name }}</el-descriptions-item>
@@ -81,11 +94,13 @@ import { updateStudentMission } from '@/api/studentMission/index'
 
 import { UploadFile, ElMessage } from 'element-plus'
 import { PREFIX } from '@/constants'
+import { getAllClassMissionResourcesByClassMissionId } from '@/api/classMissionResource'
 const route = useRoute()
 const router = useRouter()
 
 const classMission = ref<ClassMission>()
 const studentMission = ref<StudentMission>()
+const fileCards = ref<{ id: number; url: string; name: string }[]>([])
 
 const queryDate = async () => {
   const missionId = Number(route.query.missionId)
@@ -93,6 +108,20 @@ const queryDate = async () => {
   const classMissionRes = await getClassMissionByIdApi(missionId)
   if (classMissionRes.code === 200) {
     classMission.value = classMissionRes.data
+    if (classMission.value) {
+      const resourceRes = await getAllClassMissionResourcesByClassMissionId(classMission.value.id)
+      console.log(resourceRes.data)
+      if (Array.isArray(resourceRes.data)) {
+        fileCards.value = resourceRes.data.map((item: any) => ({
+          id: item.id,
+          url: PREFIX + item.path, 
+          name: item.name || '未命名资源'
+        }))
+        console.log('files',fileCards.value)
+      } else {
+        fileCards.value = []
+      }
+    }
   }
   const studentMissionRes = await getStudentMissionById(studentMissionId)
   if (studentMissionRes.code === 200) {
@@ -177,8 +206,8 @@ const handleSubmit = async () => {
       ElMessage.success('文件上传并资源更新成功')
     }
     studentMission.value.reportUrl = relativePath
-    await updateStudentMission(studentMission.value)
     studentMission.value.isDone = true
+    await updateStudentMission(studentMission.value)
   } catch (err) {
     ElMessage.error('上传失败，请稍后重试')
   }

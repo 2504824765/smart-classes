@@ -95,7 +95,14 @@ const schema: FormSchema[] = [
     field: 'deadline',
     label: '截止时间',
     component: 'DatePicker',
-    componentProps: { type: 'datetime' }
+    componentProps: { 
+      type: 'datetime',
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      disabledDate: (time: Date) => {
+        return time.getTime() < new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+      }
+    }
   },
   {
     field: 'submit_method',

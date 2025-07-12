@@ -27,7 +27,7 @@ import { useRouter } from 'vue-router'
 import type { ClassMission } from '@/api/classMission/types'
 
 const props = defineProps<{ mission: ClassMission }>()
-console.log('接收到的 mission：', props.mission)
+
 const { push } = useRouter()
 
 const isExpired = computed(() => new Date(props.mission.deadline) < new Date())
@@ -40,6 +40,7 @@ const goToDetail = () => {
 <style scoped>
 .mission-card {
   margin-bottom: 16px;
+  width: 100%; /* 占满父组件宽度 */
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -62,6 +63,7 @@ const goToDetail = () => {
 
 .status {
   margin-top: 10px;
+  align-content: center;
   display: block;
 }
 

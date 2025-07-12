@@ -15,7 +15,7 @@ export type ClassMission = {
 export type ClassMissionCreateDTO = {
   cid: number
   resource: number
-} & Omit<ClassMission, 'id' | 'class' | 'resource'> // 排除id和class
+} & Omit<ClassMission, 'id' | 'classes' | 'resource'> // 排除id和class
 
 export type ClassMissionUpdateDTO = Partial<
   {

@@ -8,7 +8,7 @@ import { getStudentByUsernameApi, createStudentApi, updateStudentApi } from '@/a
 import { getAllDeptApi } from '@/api/department'
 import { useUserStore } from '@/store/modules/user'
 import { addStudentDataApi } from '@/api/studentData'
-import { getTeacherByUsernameApi, updateTeacherApi } from '@/api/teacher'
+import { getTeacherByUsernameApi, updateTeacherApi, createTeacherApi } from '@/api/teacher'
 
 const props = defineProps({
   userInfo: {
@@ -28,6 +28,8 @@ const studentId = ref<number | null>(null)
 const teacherId = ref<number | null>(null)
 const isAdd = ref(true)
 const deptOptions = ref<any[]>([])
+const deptMap = ref<Record<number, { id: number, parentId: number }>>({})
+const deptPath = ref<number[]>([])
 const studentDataId = ref<number | null>(null)
 
 // 学生表单
@@ -51,7 +53,7 @@ const studentFormSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'deptId',
+    field: 'deptPath',
     label: '部门',
     component: 'Cascader',
     colProps: { span: 24 },
@@ -88,7 +90,7 @@ const teacherFormSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'departmentId',
+    field: 'deptPath',
     label: '部门',
     component: 'Cascader',
     colProps: { span: 24 },
@@ -107,8 +109,7 @@ const teacherFormSchema = reactive<FormSchema[]>([
 const rules = reactive({
   name: [required()],
   gender: [required()],
-  deptId: [required()],
-  departmentId: [required()]
+  deptPath: [required()]
 })
 
 const { formRegister, formMethods } = useForm()
@@ -123,13 +124,34 @@ function buildDeptTree(list: any[], parentId = 0) {
     }))
 }
 
+// 构建部门id->parentId映射
+function buildDeptMap(list: any[]) {
+  list.forEach(item => {
+    deptMap.value[item.id] = { id: item.id, parentId: item.parentId }
+    if (item.children && item.children.length) buildDeptMap(item.children)
+  })
+}
+// 递归获取部门path
+function getDeptPathById(id: number): number[] {
+  const path: number[] = []
+  let current = id
+  while (current && deptMap.value[current]) {
+    path.unshift(current)
+    current = deptMap.value[current].parentId
+  }
+  return path
+}
+
+// 获取部门树和映射
 const fetchDeptOptions = async () => {
   const res = await getAllDeptApi()
   if (res && res.data) {
     deptOptions.value = buildDeptTree(res.data)
+    buildDeptMap(deptOptions.value)
   }
 }
 
+// 获取学生信息
 const fetchStudentInfo = async () => {
   username.value = userStore.getUserInfo?.username || props.userInfo?.username || ''
   if (!username.value) return
@@ -138,29 +160,33 @@ const fetchStudentInfo = async () => {
     isAdd.value = false
     studentId.value = res.data.id
     studentDataId.value = res.data.studentData?.id || null
+    const path = res.data.department?.id ? getDeptPathById(res.data.department.id) : []
     setValues({
       name: res.data.name,
       gender: res.data.gender,
-      deptId: res.data.department?.id ? [res.data.department.id] : []
+      deptPath: path
     })
   } else {
     isAdd.value = true
     setValues({})
   }
 }
-
+// 获取教师信息
 const fetchTeacherInfo = async () => {
   username.value = userStore.getUserInfo?.username || props.userInfo?.username || ''
   if (!username.value) return
   const res = await getTeacherByUsernameApi(username.value)
   if (res && res.data) {
+    isAdd.value = false
     teacherId.value = res.data.id
+    const path = res.data.department?.id ? getDeptPathById(res.data.department.id) : []
     setValues({
       name: res.data.name,
       gender: res.data.gender,
-      departmentId: res.data.department?.id ? [res.data.department.id] : []
+      deptPath: path
     })
   } else {
+    isAdd.value = true
     setValues({})
   }
 }
@@ -190,12 +216,8 @@ const save = async () => {
         try {
           saveLoading.value = true
           const formData = await getFormData()
+          const deptId = Array.isArray(formData.deptPath) ? formData.deptPath.at(-1) : formData.deptPath
           if (props.role === 'student') {
-            const payload = {
-              name: formData.name,
-              gender: formData.gender,
-              deptId: Array.isArray(formData.deptId) ? formData.deptId[formData.deptId.length - 1] : formData.deptId
-            }
             if (isAdd.value) {
               const studentDataRes = await addStudentDataApi({
                 conceptUnderstanding: 0,
@@ -206,21 +228,50 @@ const save = async () => {
               })
               const newStudentDataId = studentDataRes?.data?.id
               if (!newStudentDataId) throw new Error('学生数据创建失败')
-              await createStudentApi({ ...payload, studentDataId: newStudentDataId, gpa: 0, username: username.value } as any)
+              await createStudentApi({
+                name: formData.name,
+                gender: formData.gender,
+                deptId,
+                studentDataId: newStudentDataId,
+                gpa: 0,
+                username: username.value,
+                department: { id: 0, name: '', parentId: 0, departmentLevel: 0 }
+              })
               ElMessage.success('添加成功')
+              isAdd.value = false
+              await fetchStudentInfo()
             } else {
-              await updateStudentApi({ id: studentId.value!, ...payload, studentDataId: studentDataId.value! })
+              await updateStudentApi({
+                id: studentId.value!,
+                name: formData.name,
+                gender: formData.gender,
+                deptId,
+                studentDataId: studentDataId.value!
+              })
               ElMessage.success('修改成功')
+              await fetchStudentInfo()
             }
           } else if (props.role === 'teacher') {
-            const payload = {
-              id: teacherId.value!,
-              name: formData.name,
-              gender: formData.gender,
-              departmentId: Array.isArray(formData.departmentId) ? formData.departmentId[formData.departmentId.length - 1] : formData.departmentId
+            if (isAdd.value) {
+              await createTeacherApi({
+                name: formData.name,
+                gender: formData.gender,
+                departmentId: deptId,
+                username: username.value
+              })
+              ElMessage.success('添加成功')
+              isAdd.value = false
+              await fetchTeacherInfo()
+            } else {
+              await updateTeacherApi({
+                id: teacherId.value!,
+                name: formData.name,
+                gender: formData.gender,
+                departmentId: deptId
+              })
+              ElMessage.success('修改成功')
+              await fetchTeacherInfo()
             }
-            await updateTeacherApi(payload)
-            ElMessage.success('修改成功')
           }
         } catch (error) {
           console.log(error)
@@ -235,7 +286,7 @@ const save = async () => {
 
 <template>
   <Form
-    :rules="props.role === 'student' ? { name: rules.name, gender: rules.gender, deptId: rules.deptId } : { name: rules.name, gender: rules.gender, departmentId: rules.departmentId }"
+    :rules="rules"
     @register="formRegister"
     :schema="props.role === 'student' ? studentFormSchema : teacherFormSchema"
   />

@@ -4,11 +4,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import {
   getStudentListApi,
-  deleteStudentApi,
-  updateStudentApi,
   createStudentApi,
-  getStudentByUsernameApi,
-  getStudentByIdApi
 } from '@/api/student'
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -17,7 +13,6 @@ import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
 import EditStudent from './EditStudent.vue'
 import AddStudent from './AddStudent.vue'
-import { Student } from '@/api/student/types'
 import { useRoute } from 'vue-router'
 import { getAssociatedByCidApi, updateClassRecordApi } from '@/api/studentClasses'
 import { StudentClasses, StudentClassesUpdateDTO } from '@/api/studentClasses/types'

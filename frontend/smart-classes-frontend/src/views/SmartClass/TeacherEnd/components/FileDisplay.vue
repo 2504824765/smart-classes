@@ -25,8 +25,6 @@ const props = defineProps<{
   url: string
 }>()
 
-console.log('url:',props.url)
-
 const filename = computed(() => {
   try {
     return decodeURIComponent(props.url.split('/').pop() || '未知文件')

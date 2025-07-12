@@ -1,22 +1,11 @@
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { getTableListApi } from '@/api/table'
-import { TableData } from '@/api/table/types'
-import { ref, h, reactive, onMounted } from 'vue'
-import { ElTag, ElCard, ElStatistic, ElProgress } from 'element-plus'
-import { BaseButton } from '@/components/Button'
+import { ref, onMounted } from 'vue'
+import { ElTag, ElCard, ElStatistic} from 'element-plus'
 import { useRouter } from 'vue-router'
-import { UserType } from '@/api/login/types'
 import { ElMessage } from 'element-plus'
 import {
-  getStudentListApi,
-  deleteStudentApi,
-  updateStudentApi,
-  createStudentApi,
-  getStudentByUsernameApi,
-  getStudentByIdApi,
   getStudentCountApi
 } from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
@@ -26,6 +15,8 @@ import { Teacher } from '@/api/teacher/types'
 import { getAllClassesApi } from '@/api/classes'
 import { Classes } from '@/api/classes/types'
 import { getClassMissionByCidApi } from '@/api/classMission'
+import { getAssociatedByCidApi, getStudentClassesByIdApi } from '@/api/studentClasses'
+import { getStudentMissionByMission } from '@/api/studentMission'
 
 
 // 教师信息
@@ -33,6 +24,11 @@ const teacherInfo = ref<Teacher>()
 
 const getId = async (username: string) => {
   const res = await getTeacherByUsernameApi(username)
+  if(!res) {
+    ElMessage.error('请先注册教师')
+    router.push('/personal/personal-center')
+    return
+  }
   teacherInfo.value = res.data
 }
 
@@ -94,15 +90,17 @@ const getTeacherStatistics = async () => {
 
     // 获取学生数量
     try {
-      const studentCountRes = await getStudentCountApi()
-      console.log('学生数量API响应:', studentCountRes)
-      if (studentCountRes && studentCountRes.data !== undefined) {
-        statistics.value.studentCount = Number(studentCountRes.data)
-        console.log('成功获取学生数量:', studentCountRes.data)
-      } else {
-        statistics.value.studentCount = 0
-        console.warn('API响应格式异常，学生数量设为0')
-      }
+      const res = await getAllClassesApi()
+      const teacherId = teacherInfo.value.id
+      const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
+      await Promise.all(
+        courseList.map(async (cls) => {
+          const studentRes = await getAssociatedByCidApi(cls.id)
+          statistics.value.studentCount += studentRes.data.length
+        })
+      )
+      console.log('成功获取学生数量:', statistics.value.studentCount
+      )
     } catch (error) {
       console.error('获取学生数量失败:', error)
       statistics.value.studentCount = 0
@@ -128,12 +126,12 @@ const getTeacherStatistics = async () => {
     try {
       // 获取作业数量
       const res = await getAllClassesApi()
-      const classes = res.data  // 假设这里是课程数组
-
+      const teacherId = teacherInfo.value.id
+      const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
       let totalMissions = 0
 
       await Promise.all(
-        classes.map(async (cls) => {
+        courseList.map(async (cls) => {
           const missionRes = await getClassMissionByCidApi(cls.id)
           totalMissions += missionRes.data.length
         })
@@ -149,23 +147,40 @@ const getTeacherStatistics = async () => {
     try {
       // 获取完成率
       const res = await getAllClassesApi()
-      const classes = res.data 
+      const teacherId = teacherInfo.value.id
 
-      const startedMissionCounts: Record<number, number> = {}
+      // 当前教师的课程列表
+      const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
+
+      let totalCompletionRate = 0
+      let missionCount = 0
 
       await Promise.all(
-        classes.map(async (cls) => {
+        courseList.map(async (cls) => {
           const missionRes = await getClassMissionByCidApi(cls.id)
           const missions = missionRes.data
 
-          const startedMissions = missions.filter(mission => mission.deadline && new Date(mission.deadline) < new Date)
+          await Promise.all(
+            missions.map(async (mission) => {
+              const studentMissionRes = await getStudentMissionByMission(mission.id)
+              const studentMissions = studentMissionRes.data
+              if (studentMissions.length === 0) return
 
-          startedMissionCounts[cls.id] = startedMissions.length
+              const doneCount = studentMissions.filter(sm => sm.isDone).length
+              const completionRate = doneCount / studentMissions.length
+
+              totalCompletionRate += completionRate
+              missionCount++
+            })
+          )
         })
       )
 
-      console.log('每个课程已开始任务数量', startedMissionCounts)
-      statistics.value.completionRate = Object.values(startedMissionCounts).reduce((acc, count) => acc + count, 0) / (classes.length * 2) * 100
+      // 计算平均完成率（保留两位小数）
+      const averageCompletionRate = missionCount > 0 ? (totalCompletionRate / missionCount).toFixed(2) : '0.00'
+      statistics.value.completionRate = Number(averageCompletionRate)
+      console.log('教师任务平均完成率：', averageCompletionRate)
+
     } catch (error) {
       console.error('获取完成率失败:', error)
       statistics.value.completionRate = 0
@@ -189,7 +204,7 @@ const gotoCourseManagement = () => {
 }
 
 const gotoStudentManagement = () => {
-  router.push('/course/content')
+  router.push('/studentManage/list')
 }
 
 const gotoAssignmentManagement = () => {
@@ -200,8 +215,8 @@ const gotoMissionManagement = () => {
   router.push('/course/content')
 }
 
-onMounted(() => {
-  initialize()
+onMounted(async () => {
+  await initialize()
   setTimeout(() => {
     getCurrentTeacher().catch((error) => {
       console.error('初始化失败:', error)

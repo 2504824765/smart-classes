@@ -28,10 +28,10 @@
             </el-card>
           </div>
           <div v-else-if="res.type === 'question'" class="text-gray-400">
-            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)"
+            <ElButton type="primary" :disabled="questions.length > 0" @click="createQuestions(1)" style="margin-bottom: 10px;"
               >生成题目</ElButton
             >
-            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)"
+            <ElButton type="primary" :disabled="questions.length === 0" @click="createQuestions(2)" style="margin-bottom: 10px;"
               >刷新题目</ElButton
             >
             <QuestionCard
@@ -43,6 +43,7 @@
               :answer="q.answer"
               :showResult="submitted"
             />
+            <div class="text-right mt-4"> </div>
             <el-button type="primary" :disabled="questions.length === 0" @click="handleSubmit"
               >提交</el-button
             >
@@ -64,10 +65,15 @@
     :show-close="true"
     @close="cancelRequest"
   >
-    <p>正在生成题目，请稍候...</p>
-    <template #footer>
+    <div style="margin-bottom: 20px">正在生成题目，请稍候...</div>
+
+    <div class="loading-bar-container">
+      <div class="loading-bar"></div>
+    </div>
+
+    <!-- <template #footer>
       <el-button type="danger" @click="cancelRequest">取消生成</el-button>
-    </template>
+    </template> -->
   </el-dialog>
 </template>
 
@@ -196,7 +202,7 @@ const createQuestions = async (method: number) => {
     }
     loading.value = true
     try {
-      fetchQuestions()
+      await fetchQuestions()
     } finally {
       loading.value = false
     }
@@ -329,7 +335,7 @@ const fetchQuestions = async () => {
   }catch (err: any) {
     if (err.name === 'AbortError') {
       console.warn('题目请求被用户中止')
-      loadingInstance.close()
+      // loadingInstance.close()
       loading.value = false
       return
     } else {
@@ -343,15 +349,15 @@ const fetchQuestions = async () => {
 }
 
 const cancelRequest = () => {
-  if (controller) {
-    controller.abort()
-    controller = null
-  }
+  // if (controller) {
+  //   controller.abort()
+  //   controller = null
+  // }
 
-  if (loadingInstance) {
-    loadingInstance.close()
-    loadingInstance = null
-  }
+  // if (loadingInstance) {
+  //   loadingInstance.close()
+  //   loadingInstance = null
+  // }
 
   loading.value = false
 }
@@ -388,5 +394,35 @@ onMounted(async () => {
 .chat-body::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 3px;
+}
+
+.loading-bar-container {
+  height: 8px;
+  background: #eee;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.loading-bar {
+  height: 100%;
+  width: 200%;
+  background: repeating-linear-gradient(
+    45deg,
+    #409eff,
+    #409eff 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  animation: loading-stripe 1.2s linear infinite;
+}
+
+@keyframes loading-stripe {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
 }
 </style>

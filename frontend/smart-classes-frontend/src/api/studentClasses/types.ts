@@ -13,6 +13,8 @@ export type StudentClassesCreateDTO = Omit<StudentClasses, 'id' | 'classes' | 's
   sid: number
 }
 
-export type StudentClassesUpdateDTO = Partial<Omit<StudentClasses, 'id'>> & {
+export type StudentClassesUpdateDTO = Partial<Omit<StudentClasses, 'id' | 'student' | 'classes'>> & {
   id: number
+  cid: number
+  sid: number
 }

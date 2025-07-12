@@ -160,7 +160,13 @@ const initGraph = async () => {
   const nodes: any[] = []
   const edges: any[] = []
 
-  const walkTreeList = (treeList: any[], parentId: string | null = null) => {
+  const getColorByLevel = (level: number) => {
+    // 基础色相值 200（蓝色），每层级增加15
+    const hue = (240 - level * 15) % 360
+    return `hsl(${hue}, 80%, 60%)`
+  }
+
+  const walkTreeList = (treeList: any[], parentId: string | null = null, level = 0) => {
     for (const node of treeList) {
       nodes.push({
         id: node.id,
@@ -168,8 +174,12 @@ const initGraph = async () => {
         type: 'progress-node',
         progress: node.progress ?? Math.random(), // 示例随机进度，可自定义
         style: {
-          fill: parentId ? '#4BABF4' : '#5B8FF9',
-          stroke: '#5B8FF9'
+          // 原本的颜色设置
+          // fill: parentId ? '#4BABF4' : '#5B8FF9',
+          // stroke: '#5B8FF9'
+          // 新的基于层级的颜色设置
+          fill: getColorByLevel(level),
+          stroke: getColorByLevel(level)
         }
       })
 
@@ -181,7 +191,7 @@ const initGraph = async () => {
       }
 
       if (node.children && Array.isArray(node.children)) {
-        walkTreeList(node.children, node.id)
+        walkTreeList(node.children, node.id, level + 1)
       }
     }
   }
@@ -193,15 +203,23 @@ const initGraph = async () => {
     width: graphContainer.value!.offsetWidth,
     height: graphContainer.value!.offsetHeight,
     layout: {
-      type: 'force',
+      type: 'radial',
       center: [containerWidth / 2, containerHeight / 2], // 设置中心点
       linkDistance: 100, // 连线长度
       maxIteration: 1000, // 最大迭代次数
       focusNode: '1', // 以根节点为中心
       unitRadius: 120, // 每一层的半径间距
       preventOverlap: true, // 防止节点重叠
-      nodeSize: 90, // 节点大小（用于防重叠计算）
-      strictRadial: false // 不严格按径向排列，允许微调
+      nodeSize: 40, // 节点大小（用于防重叠计算）
+      strictRadial: true, // 不严格按径向排列，允许微调
+      angleRatio: 1.5,
+      workerEnabled: true,
+      sortBy: 'degree',
+      clustering: true,
+      reventOverlap: true,
+      nodeSpacing: 50,
+      nodeStrength: -10,
+      controlPoints: true
     },
     modes: {
       default: ['drag-canvas', 'zoom-canvas', 'drag-node']
@@ -363,7 +381,7 @@ onMounted(async () => {
     </el-card>
 
     <!-- 主体区域：三栏布局 -->
-    <div class="grid grid-cols-12 gap-4 h-[80vh]">
+    <div class="grid grid-cols-12 gap-3 h-[80vh]">
       <!-- 左：树结构 -->
       <el-card class="col-span-2 overflow-auto">
         <el-tree :data="treeData" :props="defaultProps" @node-click="handleTreeClick">
@@ -383,7 +401,7 @@ onMounted(async () => {
             <div
               v-if="treeData.length > 0"
               ref="graphContainer"
-              class="w-full h-[calc(80vh-120px)]"
+              class="w-full h-[calc(80vh-120px)] overflow-auto"
               style="min-height: 500px"
             ></div>
             <el-empty v-else description="暂无图谱数据" />

@@ -30,6 +30,12 @@ public class ALiOssUtil {
     @Autowired
     private OssProperties ossProperties;
 
+    protected OSS createOssClient() {
+        return new OSSClientBuilder().build(
+                ossProperties.getEndpoint(),
+                ossProperties.getAccessKeyId(),
+                ossProperties.getAccessKeySecret());
+    }
 
     public String uploadFile(String objectName, InputStream in){
 
@@ -118,5 +124,13 @@ public class ALiOssUtil {
             ossClient.shutdown();
         }
         return files;
+    }
+
+    public String getBucketName() {
+        return ossProperties.getBucketName();
+    }
+
+    public String getEndpoint() {
+        return ossProperties.getEndpoint();
     }
 }

@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import G6 from '@antv/g6'
 import FileDisplay from './FileDisplay.vue'
 import { getResourceByClassIdApi } from '@/api/resource/index'
@@ -394,7 +394,6 @@ async function createKnowledgeGraph() {
     const limitedResources = resources.slice(0, 8)
 
     const urls = limitedResources.map((res: Resource) => PREFIX + res.path.replace(/^\/+/, ''))
-    console.log('urls', urls)
     const requestBody = createDifyGraphRequestMulti(urls)
 
     const graphRes = await createGraphApi(requestBody)
@@ -407,7 +406,6 @@ async function createKnowledgeGraph() {
       })
 
     if (graphJson) {
-      console.log('解析后的图谱数据：', graphJson)
       treeData.value = graphJson
     }
 
@@ -489,7 +487,6 @@ const fetchGraphData = async () => {
   }
 
   const fullUrl = PREFIX + res.data.graph.replace(/^\/+/, '')
-  console.log('fullUrl', fullUrl)
   const graphJson = await fetch(fullUrl)
     .then((r) => r.json())
     .catch((err) => {
@@ -499,7 +496,6 @@ const fetchGraphData = async () => {
   if (!graphJson) return
 
   if (graphJson) {
-    console.log('解析后的图谱数据：', graphJson)
     treeData.value = graphJson
   }
 
@@ -510,13 +506,21 @@ const fetchGraphData = async () => {
   }
 
   treeData.value = [normalizeNode(graphJson)]
-
-  initGraph()
 }
+
+watch(hasGraph, async (val) => {
+  if (val) {
+    await nextTick() // 等待 DOM 更新完毕，graphContainer 出现
+    if (graphContainer.value) {
+      initGraph() // 现在容器已准备好，开始绘图
+    } else {
+      console.warn('图谱容器未挂载')
+    }
+  }
+})
 
 const fetchFiles = async () => {
   const res = await getResourceByClassIdApi(props.classId!)
-  console.log(res)
   fileCards.value = res.data.map((resource: Resource) => ({
     name: resource.name,
     type: resource.type,

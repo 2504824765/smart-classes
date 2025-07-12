@@ -1,9 +1,11 @@
 package com.bnwzy.smartclassesspringbootweb.utils;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.OSSObjectSummary;
 import com.aliyun.oss.model.ObjectListing;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.aliyun.oss.model.PutObjectResult;
 import com.bnwzy.smartclassesspringbootweb.config.OssProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.aliyun.oss.ClientException;
 
 class ALiOssUtilTest {
     private ALiOssUtil aliOssUtil;
@@ -90,4 +93,27 @@ class ALiOssUtilTest {
         String name = spy.generateUniqueFilename("testfile");
         assertEquals("testfile(1)", name);
     }
+
+    @Test
+    void testUploadFileOssException() {
+        ALiOssUtil spy = Mockito.spy(aliOssUtil);
+        OSS ossClient = Mockito.mock(OSS.class);
+        Mockito.doReturn(ossClient).when(spy).createOssClient();
+        Mockito.doThrow(new OSSException("oss error")).when(ossClient).putObject(Mockito.any(PutObjectRequest.class));
+        Mockito.doNothing().when(ossClient).shutdown();
+        String url = spy.uploadFile("test.txt", new ByteArrayInputStream("abc".getBytes()));
+        assertEquals("", url);
+    }
+
+    @Test
+    void testUploadFileClientException() {
+        ALiOssUtil spy = Mockito.spy(aliOssUtil);
+        OSS ossClient = Mockito.mock(OSS.class);
+        Mockito.doReturn(ossClient).when(spy).createOssClient();
+        Mockito.doThrow(new ClientException("client error")).when(ossClient).putObject(Mockito.any(PutObjectRequest.class));
+        Mockito.doNothing().when(ossClient).shutdown();
+        String url = spy.uploadFile("test.txt", new ByteArrayInputStream("abc".getBytes()));
+        assertEquals("", url);
+    }
+
 } 

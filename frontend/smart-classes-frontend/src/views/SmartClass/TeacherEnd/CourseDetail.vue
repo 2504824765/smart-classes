@@ -34,6 +34,38 @@
       </draggable>
     </el-card>
 
+    <!-- 资源文件列表 -->
+    <el-card class="col-span-3 mt-4">
+      <div class="mb-2 font-bold">已有资源文件</div>
+      <div v-if="fileCards.length > 0" class="grid gap-3">
+        <el-card
+          v-for="file in fileCards"
+          :key="file.id"
+          shadow="hover"
+          class="cursor-pointer hover:shadow-lg transition duration-200"
+          body-style="padding: 12px"
+        >
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <Icon icon="ep:document" class="text-blue-500" />
+              <el-link :href="file.url" target="_blank" :underline="false">
+                {{ file.name }}
+              </el-link>
+            </div>
+            <el-button
+              type="danger"
+              icon="Delete"
+              size="small"
+              @click.stop="handleDelete(file.id)"
+            >
+              删除
+            </el-button>
+          </div>
+        </el-card>
+      </div>
+      <el-empty v-else description="暂无资源文件" />
+    </el-card>
+
     <!-- 上传资源卡片 -->
     <el-card class="col-span-3">
       <div class="mb-2 font-bold">上传资源</div>
@@ -69,11 +101,11 @@ import type { ClassMission } from '@/api/classMission/types'
 import { useRouter, useRoute } from 'vue-router'
 import KnowledgeGraph from './components/KnowledgeGraph.vue'
 import { uploadResourcesApi } from '@/api/oss/index'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { PREFIX } from '@/constants'
 import type { UploadFile } from 'element-plus'
-import { ResourceCreateDTO } from '@/api/resource/types'
-import { addResourceApi } from '@/api/resource/index'
+import { Resource, ResourceCreateDTO } from '@/api/resource/types'
+import { addResourceApi, deleteResourceApi, getResourceByClassIdApi } from '@/api/resource/index'
 
 const graphKey = ref(0)
 
@@ -89,7 +121,6 @@ const fileList = ref<UploadFile[]>([])
 const selectedMissionIds = ref<number[]>([])
 
 const toggleSelection = (id: number, checked: boolean) => {
-  console.log('id, checked',id,checked)
   if (checked) {
     selectedMissionIds.value.push(id)
   } else {
@@ -104,7 +135,6 @@ const deleteSelectedMissions = async () => {
   }
 
   try {
-    console.log(selectedMissionIds.value)
     await Promise.all(selectedMissionIds.value.map((id) => deleteClassMissionApi(id)))
     ElMessage.success('删除成功')
     await fetchMissions()
@@ -135,7 +165,6 @@ const uploadResource = async () => {
     for (const fileItem of fileList.value) {
       const file = fileItem.raw as File
       const res = await uploadResourcesApi(file, '')
-      console.log(res)
       const url = res.data.replace(PREFIX, '')
 
       const resource: ResourceCreateDTO = {
@@ -165,6 +194,44 @@ const fetchMissions = async () => {
   classId.value = Number(route.query.classId)
   const res = await getClassMissionByCidApi(classId.value)
   missions.value = res.data
+
+  await fetchFiles()
+}
+
+const fileCards = ref<
+  { id: number; name: string; type: string; url: string }[]
+>([])
+
+const fetchFiles = async () => {
+  if(!classId.value){
+    console.log('classId is undefined')
+    return
+  }
+  try {
+    const res = await getResourceByClassIdApi(classId.value)
+    console.log(res)
+    fileCards.value = res.data.map((resource: Resource) => ({
+      id: resource.id,
+      name: resource.name,
+      type: resource.type,
+      url: PREFIX + resource.path,
+    }))
+  } catch (e) {
+    console.error('资源获取失败', e)
+  }
+}
+
+const handleDelete = async (id: number) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该文件吗？', '提示', {
+      type: 'warning',
+    })
+    await deleteResourceApi(id)
+    ElMessage.success('删除成功')
+    await fetchFiles()
+  } catch (e) {
+    if (e !== 'cancel') ElMessage.error('删除失败')
+  }
 }
 
 onMounted(fetchMissions)

@@ -2,7 +2,7 @@
   <el-card class="homework-card" shadow="hover" @click="$emit('view-detail', homework)">
     <div class="card-header">
       <div class="title">{{
-        homework.classMission.id ? `任务 # ${homework.classMission.type} ` : '未知任务'
+        homework.classMission.id ? `任务 ${homework.classMission.id} # ${homework.classMission.type} ` : '未知任务'
       }}</div>
       <el-tag
         :type="homework.isDone ? 'success' : homework.isActive ? 'warning' : 'danger'"

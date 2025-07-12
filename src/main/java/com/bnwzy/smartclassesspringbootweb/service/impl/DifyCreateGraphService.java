@@ -283,7 +283,7 @@ public class DifyCreateGraphService implements IDifyCreateGraphService {
     }
 
     // 参数校验逻辑
-    private void validateRequest(DifyCreateGraphDTO dto) {
+    void validateRequest(DifyCreateGraphDTO dto) {
         if (dto.getInputs() == null || dto.getInputs().isEmpty()) {
             throw new IllegalArgumentException("inputs不能为空");
         }

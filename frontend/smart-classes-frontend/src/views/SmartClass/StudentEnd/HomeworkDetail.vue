@@ -174,11 +174,11 @@ const handleSubmit = async () => {
     if (!studentMission.value?.reportUrl) {
       ElMessage.success('文件上传并资源创建成功')
     } else {
-      studentMission.value.reportUrl = relativePath
       ElMessage.success('文件上传并资源更新成功')
     }
-    studentMission.value.isDone = true
+    studentMission.value.reportUrl = relativePath
     await updateStudentMission(studentMission.value)
+    studentMission.value.isDone = true
   } catch (err) {
     ElMessage.error('上传失败，请稍后重试')
   }

@@ -107,7 +107,7 @@ export default {
     small: '小'
   },
   login: {
-    welcome: '欢迎使用智慧课堂',
+    welcome: '欢迎使用北南武中营智慧课堂',
     message: 'AI教与学，点亮每一课',
     username: '用户名',
     password: '密码',

@@ -189,7 +189,7 @@ const gotoCourseManagement = () => {
 }
 
 const gotoStudentManagement = () => {
-  router.push('/course/content')
+  router.push('/studentManage/list')
 }
 
 const gotoAssignmentManagement = () => {

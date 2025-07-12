@@ -84,12 +84,14 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
   return [
     {
       path: '/teacher',
+      redirect: '/teacher/dashboard',
       component: Layout,
       name: 'Teacher',
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher'
+        userType: 'teacher',
+        alwaysShow: true,
       },
       children: [
         {
@@ -100,8 +102,6 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
             title: t('teacher.dashboard'),
             userType: 'teacher',
             noCache: true,
-            icon: 'vi-ant-design:dashboard-filled',
-            affix: true
           }
         }
       ]
@@ -225,29 +225,6 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
 export const getStudentRoutes = (): AppRouteRecordRaw[] => {
   return [
     {
-      path: '/student',
-      component: Layout,
-      name: 'StudentDashboard',
-      meta: {
-        title: t('teacher.dashboard'),
-        icon: 'vi-ant-design:book-outlined',
-        userType: 'student'
-      },
-      children: [
-        {
-          path: 'dashboard',
-          component: () => import('@/views/SmartClass/StudentEnd/StudentDashboard.vue'),
-          name: 'StdDashboard',
-          meta: {
-            title: t('teacher.dashboard'),
-            userType: 'student',
-            noCache: true,
-            affix: true
-          }
-        }
-      ]
-    },
-    {
       path: '/course',
       component: Layout,
       redirect: '/course/content',
@@ -266,7 +243,6 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
             title: t('student.courseList'),
             userType: 'student',
             noCache: true,
-            affix: true
           }
         },
         {
@@ -338,7 +314,8 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
         title: t('student.homework'),
         icon: 'vi-ant-design:file-done-outlined',
         userType: 'student',
-        noCache: true
+        noCache: true,
+        alwaysShow: true
       },
       children: [
         {
@@ -441,7 +418,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               component: () => import('@/views/SmartClass/AdminEnd/components/TeacherForm.vue'),
               name: 'AdminTeacherManageForm',
               meta: {
-                title: t('admin.createform'),
+                title: t('admin.createForm'),
                 userType: 'admin',
                 noCache: true,
                 hidden: true,
@@ -465,7 +442,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               component: () => import('@/views/SmartClass/AdminEnd/components/StudentForm.vue'),
               name: 'AdminStudentManageForm',
               meta: {
-                title: t('admin.createform'),
+                title: t('admin.createForm'),
                 userType: 'admin',
                 noCache: true,
                 hidden: true,
@@ -489,7 +466,7 @@ export const getAdminRoutes = (): AppRouteRecordRaw[] => {
               component: () => import('@/views/SmartClass/AdminEnd/components/CourseForm.vue'),
               name: 'AdminCourseManageForm',
               meta: {
-                title: t('admin.createform'),
+                title: t('admin.createForm'),
                 userType: 'admin',
                 noCache: true,
                 hidden: true,

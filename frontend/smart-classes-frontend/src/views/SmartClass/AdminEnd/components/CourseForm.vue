@@ -111,7 +111,7 @@ const courseFormSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'active',
+    field: 'isActive',
     label: '是否开放',
     component: 'Switch',
     value: true

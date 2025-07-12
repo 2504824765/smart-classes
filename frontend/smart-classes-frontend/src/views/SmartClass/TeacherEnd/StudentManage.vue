@@ -4,15 +4,12 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { Table, TableColumn } from '@/components/Table'
 import {
   getStudentListApi,
-  createStudentApi,
 } from '@/api/student'
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Icon } from '@/components/Icon'
 import { BaseButton } from '@/components/Button'
-import { useRouter } from 'vue-router'
 import EditStudent from './EditStudent.vue'
-import AddStudent from './AddStudent.vue'
 import { useRoute } from 'vue-router'
 import { getAssociatedByCidApi, updateClassRecordApi } from '@/api/studentClasses'
 import { StudentClasses, StudentClassesUpdateDTO } from '@/api/studentClasses/types'
@@ -22,13 +19,7 @@ const route = useRoute()
 // 从路由中获取课程 ID
 const classId = Number(route.query.classId)
 
-interface Params {
-  pageIndex?: number
-  pageSize?: number
-}
-
 const { t } = useI18n()
-const router = useRouter()
 
 const columns: TableColumn[] = [
   {
@@ -52,7 +43,10 @@ const columns: TableColumn[] = [
   },
   {
     field: 'grade',
-    label: '成绩'
+    label: '成绩',
+    formatter: (row) => {
+      return row.grade ?? 0 // 如果是 null 或 undefined，就返回 0
+    }
   },
   {
     field: 'action',
@@ -128,9 +122,10 @@ const onEditSave = async (newData) => {
   }
 
   try {
-
+    await updateClassRecordApi(updateDto)
+    ElMessage.success('保存成功')
+    getTableList() // 刷新表格
   } catch (e) {
-    console.error('编辑失败:', e)
     ElMessage.error('保存失败')
   }
 }
@@ -149,31 +144,6 @@ const handleSizeChange = (size: number) => {
   pageSize.value = size
   currentPage.value = 1
   getTableList()
-}
-
-const addDialogVisible = ref(false)
-const addData = ref({})
-
-const addFn = () => {
-  addData.value = {}
-  addDialogVisible.value = true
-}
-
-const onAddSave = async (newData) => {
-  try {
-    console.log('发送添加数据:', newData)
-    console.log('数据类型检查:', {
-      username: typeof newData.username,
-      name: typeof newData.name,
-      gender: typeof newData.gender,
-      deptId: typeof newData.deptId,
-      gpa: typeof newData.gpa
-    })
-
-    const response = await createStudentApi(newData)
-    console.log('添加学生API响应:', response)
-    ElMessage.success('添加成功')
-  }
 }
 
 // 搜索姓名 - 改用前端过滤方式
@@ -277,7 +247,6 @@ const resetSearch = () => {
       @save="onEditSave"
       @deleted="onDeleted"
     />
-    <AddStudent v-model:visible="addDialogVisible" :data="addData" @save="onAddSave" />
     <div style="display: flex; justify-content: center; margin-top: 16px">
       <el-pagination
         v-model:current-page="currentPage"

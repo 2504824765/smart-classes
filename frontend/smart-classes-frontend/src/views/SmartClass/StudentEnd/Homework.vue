@@ -28,10 +28,14 @@ import { Classes, CourseDisplayData } from '@/api/classes/types'
 import { getClassesByIdApi } from '@/api/classes/index'
 import { getStudentByUsernameApi } from '@/api/student/index'
 import { getAssociatedBySidApi } from '@/api/studentClasses/index'
-import { getStudentMissionByClass } from '@/api/studentMission/index'
+import { addStudentMission, getStudentMissionByClass, updateStudentMission } from '@/api/studentMission/index'
 import { ref, onMounted, watch } from 'vue'
 import { useUserStore } from '@/store/modules/user'
 import { ElMessage } from 'element-plus'
+import { getClassMissionByCidApi } from '@/api/classMission'
+import { ClassMission } from '@/api/classMission/types'
+import { StudentMission } from '@/api/studentMission/types'
+import { tr } from 'element-plus/es/locale'
 
 const { push } = useRouter()
 
@@ -90,14 +94,65 @@ const loadCourses = async () => {
 
   // 遍历课程，获取任务统计数据
   for (const cls of classes.value) {
-    const missionRes = await getStudentMissionByClass(cls.id, studentId.value)
-    console.log(missionRes)
+    // 获取课程任务
+    const classMissionRes = await getClassMissionByCidApi(cls.id)
+    const classMissions: ClassMission[] = classMissionRes.data || []
 
-    const missions = missionRes.data || []
-    const total = missions.length
-    const unfinished = missions.filter((m) => m.isDone).length
-    console.log(total)
-    console.log(unfinished)
+    if (classMissions.length === 0) {
+      // 没有任务，跳过统计
+      courseList.push({
+        id: cls.id,
+        name: cls.name,
+        description: cls.description,
+        imageUrl: cls.imageUrl || '/default.png',
+        total: 0,
+        unfinished: 0,
+        isActive: cls.isActive
+      })
+      continue
+    }
+
+    // 获取该学生在该课程下的学生任务
+    const studentMissionRes = await getStudentMissionByClass(cls.id, studentId.value)
+    const studentMissions: StudentMission[] = studentMissionRes.data || []
+
+    const studentMissionMap = new Map<number, StudentMission>()
+    studentMissions.forEach((sm) => {
+      studentMissionMap.set(sm.classMission.id, sm) // 以 classMissionId 为 key
+    })
+    const now = new Date()
+
+    // 补充创建缺失的 studentMission
+    for (const mission of classMissions) {
+      const studentMission = studentMissionMap.get(mission.id)
+
+      const deadline = new Date(mission.deadline)
+      const isExpired = deadline < now
+
+      if (!studentMission) {
+        // 学生任务不存在，创建
+        await addStudentMission({
+          studentId: studentId.value,
+          classMissionId: mission.id,
+          isActive: !isExpired, // 若过期则直接设为 false
+          score: 0,
+          isDone: false,
+          reportUrl: '',
+          aiCommentUrl: ''
+        })
+      } else if (studentMission.isActive && isExpired) {
+        // 任务存在，但已经过期还没设置 inactive，更新为 inactive
+        await updateStudentMission({ ...studentMission, isActive: false })
+      }
+    }
+
+    // 获取最新学生任务列表（包含刚补充的）
+    const updatedStudentMissionRes = await getStudentMissionByClass(cls.id, studentId.value)
+    const updatedMissions: StudentMission[] = updatedStudentMissionRes.data || []
+
+    const total = updatedMissions.length
+    const unfinished = updatedMissions.filter((m) => m.isDone).length
+
     courseList.push({
       id: cls.id,
       name: cls.name,

@@ -1,11 +1,6 @@
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
-import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { getTableListApi } from '@/api/table'
-import { TableData } from '@/api/table/types'
-import { ref, h, reactive, onMounted } from 'vue'
-import { ElTag } from 'element-plus'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
@@ -14,32 +9,6 @@ import { getResourceByClassIdApi } from '@/api/resource'
 import type { Resource } from '@/api/resource/types'
 
 const router = useRouter()
-const { t } = useI18n()
-const value = ref('')
-const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
-
-const shortcuts = [
-  {
-    text: 'Today',
-    value: new Date()
-  },
-  {
-    text: 'Yesterday',
-    value: () => {
-      const date = new Date()
-      date.setDate(date.getDate() - 1)
-      return date
-    }
-  },
-  {
-    text: 'A week ago',
-    value: () => {
-      const date = new Date()
-      date.setDate(date.getDate() - 7)
-      return date
-    }
-  }
-]
 
 interface FormData {
   cid: number | null
@@ -60,10 +29,13 @@ const formData = reactive<FormData>({
   score: null
 })
 
-const missionResource = ref<Resource[]>([])
 const route = useRouter().currentRoute
 const missionId = ref<number | null>(null)
 const classResources = ref<Resource[]>([])
+
+watch(() => formData.deadline, (val) => {
+  console.log('截止时间变更:', val)
+})
 
 onMounted(async () => {
   // 假设编辑时url带有id参数
@@ -79,13 +51,6 @@ onMounted(async () => {
     }
   }
 })
-
-// const classList = ref([])
-// const getClasses = async () => {
-//   const res = await getClassesApi()
-//   classList.value = res.data
-// }
-// getClasses()
 
 const schema: FormSchema[] = [
   { field: 'cid', label: '课程ID', component: 'Select' },
@@ -118,21 +83,8 @@ const rules = {
   cid: [{ required: true, message: '请输入课程ID' }],
   type: [{ required: true, message: '请输入任务类型' }],
   description: [{ required: true, message: '请输入描述' }],
-  //deadline: [{ required: true, message: '请选择截止时间' }],
   submit_method: [{ required: true, message: '请输入提交方式' }]
-  //score: [{ required: true, message: '请输入分数' }]
 }
-
-const form = reactive({
-  name: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: ''
-})
 
 const create = () => {
   console.log(formData)

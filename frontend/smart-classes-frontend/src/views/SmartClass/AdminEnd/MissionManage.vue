@@ -211,8 +211,9 @@ const handleSubmit = async () => {
             v-model="formData.deadline"
             type="datetime"
             placeholder="请选择截止时间"
-            format="yyyy-MM-dd HH:mm:ss"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            :disabled-date="(time) => time.getTime() < new Date().setHours(0,0,0,0)"
             style="width: 100%"
           />
         </el-form-item>

@@ -200,7 +200,6 @@ const createQuestions = async (method: number) => {
     if (questions.value.length > 0) {
       questions.value = []
     }
-    loading.value = true
     try {
       await fetchQuestions()
     } finally {

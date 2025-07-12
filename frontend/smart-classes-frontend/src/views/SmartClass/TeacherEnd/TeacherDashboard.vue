@@ -5,9 +5,6 @@ import { ref, onMounted } from 'vue'
 import { ElTag, ElCard, ElStatistic} from 'element-plus'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import {
-  getStudentCountApi
-} from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
@@ -15,7 +12,7 @@ import { Teacher } from '@/api/teacher/types'
 import { getAllClassesApi } from '@/api/classes'
 import { Classes } from '@/api/classes/types'
 import { getClassMissionByCidApi } from '@/api/classMission'
-import { getAssociatedByCidApi, getStudentClassesByIdApi } from '@/api/studentClasses'
+import { getAssociatedByCidApi } from '@/api/studentClasses'
 import { getStudentMissionByMission } from '@/api/studentMission'
 
 
@@ -93,14 +90,15 @@ const getTeacherStatistics = async () => {
       const res = await getAllClassesApi()
       const teacherId = teacherInfo.value.id
       const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
+      let studentCount = 0
       await Promise.all(
         courseList.map(async (cls) => {
           const studentRes = await getAssociatedByCidApi(cls.id)
-          statistics.value.studentCount += studentRes.data.length
+          if(studentRes)
+            studentCount += studentRes.data.length
         })
       )
-      console.log('成功获取学生数量:', statistics.value.studentCount
-      )
+      statistics.value.studentCount = studentCount
     } catch (error) {
       console.error('获取学生数量失败:', error)
       statistics.value.studentCount = 0
@@ -112,10 +110,8 @@ const getTeacherStatistics = async () => {
       const teacherId = teacherInfo.value.id
       const courseList = res.data.filter((course: Classes) => course.teacher.id === teacherId)
       recentCourses.value = courseList
-      console.log('课程数量API响应:', res)
       if (res && courseList) {
         statistics.value.courseCount = Number(courseList.length)
-        console.log('成功获取课程数量:', courseList.length)
       }
       
     } catch (error) {
@@ -136,8 +132,6 @@ const getTeacherStatistics = async () => {
           totalMissions += missionRes.data.length
         })
       )
-
-      console.log('所有课程任务总数', totalMissions)
       statistics.value.assignmentCount = totalMissions
     } catch (error) {
       console.error('获取作业数量失败:', error)
@@ -179,7 +173,6 @@ const getTeacherStatistics = async () => {
       // 计算平均完成率（保留两位小数）
       const averageCompletionRate = missionCount > 0 ? (totalCompletionRate / missionCount).toFixed(2) : '0.00'
       statistics.value.completionRate = Number(averageCompletionRate)
-      console.log('教师任务平均完成率：', averageCompletionRate)
 
     } catch (error) {
       console.error('获取完成率失败:', error)

@@ -84,12 +84,14 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
   return [
     {
       path: '/teacher',
+      redirect: '/teacher/dashboard',
       component: Layout,
       name: 'Teacher',
       meta: {
         title: t('teacher.dashboard'),
         icon: 'vi-ant-design:dashboard-filled',
-        userType: 'teacher'
+        userType: 'teacher',
+        alwaysShow: true,
       },
       children: [
         {
@@ -223,29 +225,6 @@ export const getTeacherRoutes = (): AppRouteRecordRaw[] => {
 export const getStudentRoutes = (): AppRouteRecordRaw[] => {
   return [
     {
-      path: '/student',
-      component: Layout,
-      name: 'StudentDashboard',
-      meta: {
-        title: t('teacher.dashboard'),
-        icon: 'vi-ant-design:book-outlined',
-        userType: 'student'
-      },
-      children: [
-        {
-          path: 'dashboard',
-          component: () => import('@/views/SmartClass/StudentEnd/StudentDashboard.vue'),
-          name: 'StdDashboard',
-          meta: {
-            title: t('teacher.dashboard'),
-            userType: 'student',
-            noCache: true,
-            affix: true
-          }
-        }
-      ]
-    },
-    {
       path: '/course',
       component: Layout,
       redirect: '/course/content',
@@ -264,7 +243,6 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
             title: t('student.courseList'),
             userType: 'student',
             noCache: true,
-            affix: true
           }
         },
         {
@@ -336,7 +314,8 @@ export const getStudentRoutes = (): AppRouteRecordRaw[] => {
         title: t('student.homework'),
         icon: 'vi-ant-design:file-done-outlined',
         userType: 'student',
-        noCache: true
+        noCache: true,
+        alwaysShow: true
       },
       children: [
         {

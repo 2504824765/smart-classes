@@ -174,10 +174,11 @@ const uploadResource = async () => {
         description: '',
         classId: classId.value
       }
-
+      
       await addResourceApi(resource)
     }
     graphKey.value++
+    await fetchFiles()
     ElMessage.success('所有资源上传成功')
     fileList.value = [] // 清空文件列表（可选）
   } catch (err) {

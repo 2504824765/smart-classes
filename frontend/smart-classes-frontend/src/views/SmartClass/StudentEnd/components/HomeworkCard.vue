@@ -8,7 +8,7 @@
         :type="homework.isDone ? 'success' : homework.isActive ? 'warning' : 'danger'"
         size="small"
       >
-        {{ homework.isDone ? '已完成' : homework.isActive ? '未完成' : '已截止' }}
+        {{ !homework.isActive ? '已截止' : homework.isDone ? '已完成' :  '未完成'   }}
       </el-tag>
     </div>
     <p class="brief">成绩：{{ homework.score ?? '未评分' }}</p>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { StudentMission } from '@/api/studentMission/types' // 根据路径调整
+import type { StudentMission } from '@/api/studentMission/types' 
 
 const props = defineProps<{
   homework: StudentMission

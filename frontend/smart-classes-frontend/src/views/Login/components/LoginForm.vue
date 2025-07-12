@@ -176,7 +176,7 @@ const signIn = async () => {
       permissionStore.setUserType(role)
       try {
         const res = await loginApi(formData)
-        if(res){
+        if (res) {
           if (res.data === true) {
             ElMessage.success('登录成功')
             const user = await getUserInfoApi(formData.username)
@@ -222,11 +222,9 @@ const signIn = async () => {
         } else {
           ElMessage.error('密码或账户错误')
         }
-      }
-      catch {
+      } catch {
         ElMessage.error('登录失败')
-      } 
-      finally {
+      } finally {
         loading.value = false
       }
     }
@@ -277,7 +275,7 @@ const schema = reactive<FormSchema[]>([
       span: 24
     },
     componentProps: {
-      placeholder: '请输入学号或工号'
+      placeholder: '请输入用户名'
     }
   },
   {
@@ -370,9 +368,9 @@ const schema = reactive<FormSchema[]>([
                 </BaseButton>
               </div>
               <div class="w-[100%] mt-15px">
-                <BaseButton class="w-[100%]" onClick={toRegister}>
+                <el-button class="w-[100%]" onClick={toRegister}>
                   {t('login.register')}
-                </BaseButton>
+                </el-button>
               </div>
             </>
           )

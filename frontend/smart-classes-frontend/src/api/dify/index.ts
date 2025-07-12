@@ -1,5 +1,10 @@
 import request from '@/axios'
-import type { DifyGraphRequest, DifyGenerateQuestionRequest, DifyChatRequest, DifyReportCommentRequest } from './types'
+import type {
+  DifyGraphRequest,
+  DifyGenerateQuestionRequest,
+  DifyChatRequest,
+  DifyReportCommentRequest
+} from './types'
 
 const DIFY_CHAT_URL = 'https://api.dify.ai/v1/chat-messages'
 

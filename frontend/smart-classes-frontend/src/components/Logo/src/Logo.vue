@@ -65,7 +65,7 @@ watch(
       <div
         v-if="show"
         :class="[
-          'ml-10px text-16px font-700',
+          'ml-10px text-16px font-700 text-center leading-6',
           {
             'text-[var(--logo-title-text-color)]': layout === 'classic',
             'text-[var(--top-header-text-color)]':
@@ -73,7 +73,7 @@ watch(
           }
         ]"
       >
-        {{ title }}
+        北南武中营<br />智慧课堂
       </div>
     </router-link>
   </div>

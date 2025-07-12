@@ -97,7 +97,7 @@ const schema = reactive<FormSchema[]>([
       span: 24
     },
     componentProps: {
-      placeholder: t('login.rolePlaceholder'),
+      placeholder: '请选择角色',
       options: [
         {
           label: '学生',
@@ -157,9 +157,9 @@ const schema = reactive<FormSchema[]>([
                 </BaseButton>
               </div>
               <div class="w-[100%] mt-15px">
-                <BaseButton class="w-[100%]" onClick={toLogin}>
+                <el-button class="w-[100%]" onClick={toLogin}>
                   {t('login.hasUser')}
-                </BaseButton>
+                </el-button>
               </div>
             </>
           )

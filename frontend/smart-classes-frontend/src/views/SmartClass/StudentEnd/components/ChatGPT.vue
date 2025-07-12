@@ -1,7 +1,7 @@
 <template>
   <div class="chat-wrapper">
     <!-- 聊天内容区域 -->
-    <div class="chat-body">
+    <div class="chat-body" ref="chatBodyRef">
       <div v-for="(msg, index) in messages" :key="index" class="chat-message" :class="msg.role">
         <div class="message-bubble">
           <span v-if="msg.role === 'user'" class="name"></span>
@@ -69,6 +69,26 @@ const messages = ref<{ role: 'user' | 'ai'; content: string }[]>([
 ])
 const generating = ref(false)
 const conversationId = ref<string | null>(null)
+
+const chatBodyRef = ref<HTMLElement>()
+
+// 滚动到底部的函数
+const scrollToBottom = () => {
+  if (chatBodyRef.value) {
+    setTimeout(() => {
+      chatBodyRef.value!.scrollTop = chatBodyRef.value!.scrollHeight
+    }, 0)
+  }
+}
+
+// 监听消息列表变化
+watch(
+  messages,
+  () => {
+    scrollToBottom()
+  },
+  { deep: true }
+)
 
 // 流式响应处理
 const fetchAnswer = async (question: string) => {
@@ -144,9 +164,9 @@ const submitMessage = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 12px;
+  padding: 0px;
   box-sizing: border-box;
-  background: #f5f7fa;
+  background: rgba(255, 255, 255, 0);
 }
 
 /* 聊天区域 */
@@ -163,7 +183,7 @@ const submitMessage = () => {
 
 /* 每条消息 */
 .chat-message {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
 }
@@ -178,9 +198,9 @@ const submitMessage = () => {
 
 .message-bubble {
   max-width: 80%;
-  padding: 10px 14px;
+  padding: 1px 14px;
   border-radius: 12px;
-  line-height: 1.5;
+  line-height: 1.25;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: background-color 0.3s;
 }
@@ -191,8 +211,8 @@ const submitMessage = () => {
 .content {
   white-space: pre-wrap;
   word-break: break-word;
-  margin-top: 4px;
-  margin-left: 4px;
+  margin-top: 2px;
+  margin-left: 10px;
 }
 
 /* 快捷按钮样式 */

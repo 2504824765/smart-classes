@@ -128,10 +128,9 @@ const onEditSave = async (newData) => {
   }
 
   try {
-    await updateClassRecordApi(updateDto)
-    ElMessage.success('保存成功')
-    getTableList()
+
   } catch (e) {
+    console.error('编辑失败:', e)
     ElMessage.error('保存失败')
   }
 }
@@ -162,11 +161,18 @@ const addFn = () => {
 
 const onAddSave = async (newData) => {
   try {
-    await createStudentApi(newData)
+    console.log('发送添加数据:', newData)
+    console.log('数据类型检查:', {
+      username: typeof newData.username,
+      name: typeof newData.name,
+      gender: typeof newData.gender,
+      deptId: typeof newData.deptId,
+      gpa: typeof newData.gpa
+    })
+
+    const response = await createStudentApi(newData)
+    console.log('添加学生API响应:', response)
     ElMessage.success('添加成功')
-    getTableList() 
-  } catch (e) {
-    ElMessage.error('添加失败')
   }
 }
 

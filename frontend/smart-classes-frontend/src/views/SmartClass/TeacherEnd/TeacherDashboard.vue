@@ -1,22 +1,11 @@
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
 import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { getTableListApi } from '@/api/table'
-import { TableData } from '@/api/table/types'
-import { ref, h, reactive, onMounted } from 'vue'
-import { ElTag, ElCard, ElStatistic, ElProgress } from 'element-plus'
-import { BaseButton } from '@/components/Button'
+import { ref, onMounted } from 'vue'
+import { ElTag, ElCard, ElStatistic} from 'element-plus'
 import { useRouter } from 'vue-router'
-import { UserType } from '@/api/login/types'
 import { ElMessage } from 'element-plus'
 import {
-  getStudentListApi,
-  deleteStudentApi,
-  updateStudentApi,
-  createStudentApi,
-  getStudentByUsernameApi,
-  getStudentByIdApi,
   getStudentCountApi
 } from '@/api/student'
 import { getTeacherByUsernameApi } from '@/api/teacher'
@@ -200,8 +189,8 @@ const gotoMissionManagement = () => {
   router.push('/course/content')
 }
 
-onMounted(() => {
-  initialize()
+onMounted(async () => {
+  await initialize()
   setTimeout(() => {
     getCurrentTeacher().catch((error) => {
       console.error('初始化失败:', error)
